@@ -16,12 +16,20 @@
   // Bezpieczne limity per serwis. Allegro celowo pozostaje na 1 workerze,
   // żeby nie powtarzać sytuacji z blokadą antybotową. Wolne sloty mogą
   // przechodzić na Ceneo/OLX, ale nigdy nie zwiększają limitu Allegro.
-  const PROVIDER_MAX_WORKERS = { allegro: 1, ceneo: 3, olx: 4 };
+  const PROVIDER_DEFAULT_WORKERS = { allegro: 1, ceneo: 1, olx: 4 };
+  const PROVIDER_HARD_MAX_WORKERS = { allegro: 2, ceneo: 3, olx: 6 };
   const providerControl = {
     allegro: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0, requestCount: 0 },
     ceneo: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0, requestCount: 0 },
     olx: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0, requestCount: 0 },
   };
+
+  function configuredProviderLimit(provider) {
+    const fallback = PROVIDER_DEFAULT_WORKERS[provider] || 1;
+    const hardMax = PROVIDER_HARD_MAX_WORKERS[provider] || fallback;
+    const requested = Number(jobs[provider]?.options?.workerLimits?.[provider] ?? fallback);
+    return Math.max(1, Math.min(hardMax, Number.isFinite(requested) ? Math.round(requested) : fallback));
+  }
 
   const scheduler = {
     limit: 6,
@@ -46,7 +54,7 @@
       const canBorrow = !otherWaiting;
       const base = canBorrow ? this.limit : fairShare;
       const penalty = providerControl[provider]?.penalty || 0;
-      return Math.max(1, Math.min(PROVIDER_MAX_WORKERS[provider] || 2, base - penalty));
+      return Math.max(1, Math.min(configuredProviderLimit(provider), base - penalty));
     },
 
     acquire(provider, signal) {
@@ -383,7 +391,7 @@
     // mniej więcej co 3.2 s. Ceneo i OLX mogą wykorzystać wolne workery w ramach
     // swoich limitów.
     if (provider === 'allegro') return Math.max(3200, Math.round(base * 4.5));
-    if (provider === 'ceneo') return Math.max(700, Math.round(base * 1.0));
+    if (provider === 'ceneo') return Math.max(1800, Math.round(base * 2.5));
     if (provider === 'olx') return Math.max(350, Math.round(base * 0.65));
     return Math.max(700, base);
   }
@@ -414,7 +422,7 @@
     const control = providerControl[provider];
     if (!control) return;
     control.successStreak = 0;
-    control.penalty = Math.min((PROVIDER_MAX_WORKERS[provider] || 2) - 1, control.penalty + 1);
+    control.penalty = Math.min(Math.max(0, configuredProviderLimit(provider) - 1), control.penalty + 1);
     const base = provider === 'allegro' ? 7000 : provider === 'olx' ? 5000 : 3500;
     const statusFactor = status === 429 ? 2 : 1;
     control.cooldownUntil = Math.max(control.cooldownUntil, Date.now() + base * statusFactor * Math.max(1, control.penalty));
@@ -457,6 +465,9 @@
         // dużych skanów i redukuje ryzyko kolejnej blokady.
         if (provider === 'allegro' && control.requestCount > 1 && control.requestCount % 20 === 0) {
           control.nextRequestAt = Math.max(control.nextRequestAt, Date.now() + 12000);
+        }
+        if (provider === 'ceneo' && control.requestCount > 1 && control.requestCount % 25 === 0) {
+          control.nextRequestAt = Math.max(control.nextRequestAt, Date.now() + 8000);
         }
 
         const response = await fetch(url, {
@@ -2045,7 +2056,7 @@
       }
     }
 
-    const workerCount = Math.min(PROVIDER_MAX_WORKERS.allegro, Math.max(1, groups.length));
+    const workerCount = Math.min(configuredProviderLimit('allegro'), Math.max(1, groups.length));
     await Promise.all(Array.from({ length: workerCount }, (_, i) => groupWorker(i + 1)));
 
     const queue = buildQueueFromOffers([...all.values()], options, seenIds);
@@ -2188,7 +2199,7 @@
         errors = results.filter((offer) => offer?.error).length;
         if (!parsed.error) historyBuffer.push(parsed);
 
-        if (historyBuffer.length >= 5) await flushHistory(false);
+        if (historyBuffer.length >= (provider === 'olx' ? 5 : 1)) await flushHistory(false);
         await setState(provider, {
           processed,
           errors,
@@ -2207,7 +2218,7 @@
       }
     }
 
-    const workerCount = Math.max(1, Math.min(PROVIDER_MAX_WORKERS[provider] || 2, total || 1));
+    const workerCount = Math.max(1, Math.min(configuredProviderLimit(provider), total || 1));
     await Promise.all(Array.from({ length: workerCount }, (_, i) => worker(i + 1)));
     await flushHistory(true);
     await savePartial(true);
@@ -2255,7 +2266,7 @@
           activeWorkers: scheduler.activeByProvider[provider] || 0,
           percent: 94 + ((retried / failedIndexes.length) * 3),
         });
-        if (historyBuffer.length >= 5) await flushHistory(false);
+        if (historyBuffer.length >= (provider === 'olx' ? 5 : 1)) await flushHistory(false);
         await savePartial(false);
         await sleep(provider === 'allegro' ? 900 : provider === 'olx' ? 600 : 350);
       }
@@ -2312,6 +2323,7 @@
         declaredCount: null,
         totalPages: null,
         activeWorkers: 0,
+        workerLimit: configuredProviderLimit(provider),
         currentItem: sourceUrl,
         percent: 0,
         startedAt,
@@ -2556,6 +2568,11 @@
         mode: message.options?.mode === 'full' ? 'full' : 'compact',
         maxOffers: Math.max(0, Number(message.options?.maxOffers || 0)),
         concurrency: Math.max(2, Math.min(9, Number(message.options?.concurrency || 6))),
+        workerLimits: {
+          allegro: Math.max(1, Math.min(2, Number(message.options?.workerLimits?.allegro || 1))),
+          ceneo: Math.max(1, Math.min(3, Number(message.options?.workerLimits?.ceneo || 1))),
+          olx: Math.max(1, Math.min(6, Number(message.options?.workerLimits?.olx || 4))),
+        },
         delayMs: Math.max(200, Math.min(2000, Number(message.options?.delayMs || 700))),
         skipSeen: message.options?.skipSeen !== false,
       };

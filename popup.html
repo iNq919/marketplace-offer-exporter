@@ -44,7 +44,7 @@
         <label>
           Łączny limit workerów
           <input id="concurrency" type="number" min="2" max="9" step="1" value="6">
-          <small>Automatycznie dzielone między aktywne serwisy</small>
+          <small>Wspólna pula. Każdy serwis ma dodatkowo własny limit poniżej.</small>
         </label>
       </div>
 
@@ -60,7 +60,7 @@
         <button id="startCurrentBtn" class="primary">Uruchom bieżącą kartę</button>
         <button id="startBothBtn">Uruchom Allegro + Ceneo + OLX</button>
       </div>
-      <p class="hint">Po uruchomieniu możesz zamknąć karty Allegro, Ceneo i OLX. Zadania działają w tle rozszerzenia. Allegro ma stały bezpieczny limit 1 workera, Ceneo maks. 3, OLX maks. 4. Wolne workery przechodzą tylko do serwisów, które mogą je bezpiecznie wykorzystać.</p>
+      <p class="hint">Po uruchomieniu możesz zamknąć karty Allegro, Ceneo i OLX. Zadania działają w tle rozszerzenia. Domyślnie Allegro = 1 worker, Ceneo = 1 worker, OLX = 4 workery. Limity możesz zmienić osobno przed startem lub wznowieniem.</p>
     </section>
 
     <section class="providers-grid">
@@ -71,6 +71,11 @@
             <small id="allegroHistoryCount">Historia: 0</small>
           </div>
           <span id="allegroBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="worker-control">
+          <label for="allegroWorkers">Limit workerów</label>
+          <input id="allegroWorkers" type="number" min="1" max="2" step="1" value="1" title="zalecane 1">
+          <small id="allegroWorkerStatus">Aktywne: 0 / limit: 1</small>
         </div>
         <div class="progress-head">
           <span id="allegroPhase">Gotowy</span>
@@ -92,6 +97,7 @@
           <button id="allegroStopBtn" class="danger" disabled>Przerwij</button>
           <button id="allegroResumeBtn" disabled>Wznów</button>
           <button id="allegroResultBtn" disabled>Pokaż wynik</button>
+          <button id="allegroExportHistoryBtn">Eksport historii</button>
           <button id="allegroClearHistoryBtn">Wyczyść historię</button>
         </div>
       </article>
@@ -103,6 +109,11 @@
             <small id="ceneoHistoryCount">Historia: 0</small>
           </div>
           <span id="ceneoBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="worker-control">
+          <label for="ceneoWorkers">Limit workerów</label>
+          <input id="ceneoWorkers" type="number" min="1" max="3" step="1" value="1" title="zalecane 1">
+          <small id="ceneoWorkerStatus">Aktywne: 0 / limit: 1</small>
         </div>
         <div class="progress-head">
           <span id="ceneoPhase">Gotowy</span>
@@ -124,6 +135,7 @@
           <button id="ceneoStopBtn" class="danger" disabled>Przerwij</button>
           <button id="ceneoResumeBtn" disabled>Wznów</button>
           <button id="ceneoResultBtn" disabled>Pokaż wynik</button>
+          <button id="ceneoExportHistoryBtn">Eksport historii</button>
           <button id="ceneoClearHistoryBtn">Wyczyść historię</button>
         </div>
       </article>
@@ -135,6 +147,11 @@
             <small id="olxHistoryCount">Historia: 0</small>
           </div>
           <span id="olxBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="worker-control">
+          <label for="olxWorkers">Limit workerów</label>
+          <input id="olxWorkers" type="number" min="1" max="6" step="1" value="4" title="zalecane 4">
+          <small id="olxWorkerStatus">Aktywne: 0 / limit: 4</small>
         </div>
         <div class="progress-head">
           <span id="olxPhase">Gotowy</span>
@@ -156,6 +173,7 @@
           <button id="olxStopBtn" class="danger" disabled>Przerwij</button>
           <button id="olxResumeBtn" disabled>Wznów</button>
           <button id="olxResultBtn" disabled>Pokaż wynik</button>
+          <button id="olxExportHistoryBtn">Eksport historii</button>
           <button id="olxClearHistoryBtn">Wyczyść historię</button>
         </div>
       </article>
@@ -164,10 +182,11 @@
     <section class="card history-tools">
       <div>
         <strong>Historia wcześniejszych eksportów</strong>
-        <p>Możesz zaimportować stare TXT lub JSON. Pozycje z błędem pobierania nie zostaną oznaczone jako sprawdzone.</p>
+        <p>Historia na żywo jest przechowywana w chrome.storage.local. Pliki znajdujące się w folderze rozszerzenia nie aktualizują się same. Użyj eksportu historii, aby zapisać aktualną kopię JSON.</p>
       </div>
       <div class="actions">
         <button id="importHistoryBtn">Importuj TXT / JSON</button>
+        <button id="exportAllHistoryBtn">Eksportuj wszystkie historie</button>
         <input id="historyFiles" type="file" accept=".txt,.json,text/plain,application/json" multiple hidden>
       </div>
     </section>

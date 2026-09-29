@@ -113,11 +113,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         sendResponse({ ok: false, error: 'Brak zapisanego adresu źródłowego do wznowienia.' });
         return;
       }
+      const overrideOptions = message.options || {};
       const response = await sendRunner({
         type: 'MARKETPLACE_RUNNER_START',
         provider: message.provider,
         sourceUrl: meta.sourceUrl,
-        options: { ...(meta.options || {}), skipSeen: true },
+        options: {
+          ...(meta.options || {}),
+          ...overrideOptions,
+          workerLimits: {
+            ...((meta.options || {}).workerLimits || {}),
+            ...(overrideOptions.workerLimits || {}),
+          },
+          skipSeen: true,
+        },
         resume: true,
       });
       sendResponse(response);

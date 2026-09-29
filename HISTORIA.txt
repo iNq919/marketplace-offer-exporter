@@ -1,0 +1,11 @@
+Historia rozszerzenia nie jest zapisywana w plikach znajdujących się w tym folderze.
+
+Aktualna historia Allegro, Ceneo i OLX znajduje się w chrome.storage.local i jest aktualizowana podczas pracy rozszerzenia.
+
+Aby utworzyć aktualny plik kopii historii:
+- użyj przycisku "Eksport historii" przy wybranym serwisie, albo
+- użyj "Eksportuj wszystkie historie".
+
+Tak wygenerowany JSON można później ponownie zaimportować przyciskiem "Importuj TXT / JSON".
+
+Stary folder history-import z wcześniejszych wersji zawierał tylko statyczne pliki startowe i nie aktualizował się automatycznie.

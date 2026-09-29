@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Allegro + Ceneo + OLX Offer Exporter for ChatGPT",
-  "version": "1.7.0",
-  "description": "Eksportuje Allegro, Ceneo i OLX w tle, zapisuje checkpointy, bezpiecznie wznawia zadania i ogranicza tempo Allegro po wykryciu ochrony.",
+  "version": "1.8.0",
+  "description": "Eksportuje Allegro, Ceneo i OLX w tle, ma osobne limity workerów, bezpieczne tempo, checkpointy i eksport bieżącej historii.",
   "permissions": [
     "tabs",
     "offscreen",

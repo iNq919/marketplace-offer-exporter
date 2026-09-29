@@ -2,6 +2,17 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.8.0
+
+- Dodano osobny, widoczny limit workerów dla każdego serwisu.
+- Domyślne limity: Allegro 1, Ceneo 1, OLX 4.
+- Dodano podgląd `Aktywne: X / limit: Y`.
+- Ceneo zostało dodatkowo spowolnione i dostało przerwy okresowe.
+- Historia Allegro i Ceneo jest zapisywana po każdym poprawnym rekordzie.
+- Dodano licznik i rozmiar historii z `chrome.storage.local`.
+- Dodano eksport historii osobno dla serwisów i zbiorczo.
+- `Wznów` używa aktualnych ustawień workerów z popupu.
+
 ## v1.7.0
 
 - Naprawiono regresję `findProductJsonLd is not defined` dla wszystkich serwisów.

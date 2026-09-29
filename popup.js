@@ -22,6 +22,7 @@ const els = {
   startCurrentBtn: document.querySelector('#startCurrentBtn'),
   startBothBtn: document.querySelector('#startBothBtn'),
   importHistoryBtn: document.querySelector('#importHistoryBtn'),
+  exportAllHistoryBtn: document.querySelector('#exportAllHistoryBtn'),
   historyFiles: document.querySelector('#historyFiles'),
   resultCard: document.querySelector('#resultCard'),
   resultTitle: document.querySelector('#resultTitle'),
@@ -56,6 +57,9 @@ const providerEls = Object.fromEntries(PROVIDERS.map((provider) => [provider, {
   resumeBtn: document.querySelector(`#${provider}ResumeBtn`),
   resultBtn: document.querySelector(`#${provider}ResultBtn`),
   historyCount: document.querySelector(`#${provider}HistoryCount`),
+  workerInput: document.querySelector(`#${provider}Workers`),
+  workerStatus: document.querySelector(`#${provider}WorkerStatus`),
+  exportHistoryBtn: document.querySelector(`#${provider}ExportHistoryBtn`),
   clearHistoryBtn: document.querySelector(`#${provider}ClearHistoryBtn`),
 }]));
 
@@ -118,14 +122,27 @@ async function getActiveMarketplaceTab() {
   return { tab, provider };
 }
 
+const WORKER_DEFAULTS = { allegro: 1, ceneo: 1, olx: 4 };
+const WORKER_HARD_MAX = { allegro: 2, ceneo: 3, olx: 6 };
+
+function clampWorkerLimit(provider, value) {
+  const max = WORKER_HARD_MAX[provider] || 1;
+  return Math.max(1, Math.min(max, Number.parseInt(value || WORKER_DEFAULTS[provider], 10) || WORKER_DEFAULTS[provider]));
+}
+
+function workerLimitsFromUi() {
+  return Object.fromEntries(PROVIDERS.map((provider) => [provider, clampWorkerLimit(provider, providerEls[provider].workerInput?.value)]));
+}
+
 function getOptions() {
   return {
-    settingsVersion: 2,
+    settingsVersion: 3,
     startFromFirst: els.startFromFirst.checked,
     skipSeen: els.skipSeen.checked,
     mode: els.mode.value,
     maxOffers: Math.max(0, Number.parseInt(els.maxOffers.value || '0', 10) || 0),
     concurrency: Math.max(2, Math.min(9, Number.parseInt(els.concurrency.value || '6', 10) || 6)),
+    workerLimits: workerLimitsFromUi(),
     delayMs: Math.max(200, Math.min(2000, Number.parseInt(els.delayMs.value || '700', 10) || 700)),
   };
 }
@@ -140,6 +157,7 @@ async function loadSettings() {
   if (!settings) {
     els.concurrency.value = 6;
     els.delayMs.value = 700;
+    for (const provider of PROVIDERS) providerEls[provider].workerInput.value = WORKER_DEFAULTS[provider];
     els.delayOutput.value = '700 ms';
     return;
   }
@@ -153,6 +171,9 @@ async function loadSettings() {
   } else {
     els.concurrency.value = Math.max(2, Math.min(9, Number(settings.concurrency || 6)));
     els.delayMs.value = Math.max(200, Math.min(2000, Number(settings.delayMs || 700)));
+  }
+  for (const provider of PROVIDERS) {
+    providerEls[provider].workerInput.value = clampWorkerLimit(provider, settings.workerLimits?.[provider] ?? WORKER_DEFAULTS[provider]);
   }
   els.delayOutput.value = `${els.delayMs.value} ms`;
 }
@@ -176,6 +197,7 @@ function normalizeState(state = {}) {
     failed: Boolean(state.failed),
     partial: Boolean(state.partial),
     activeWorkers: Number(state.activeWorkers || 0),
+    workerLimit: Number(state.workerLimit || 0),
   };
 }
 
@@ -232,9 +254,14 @@ function renderState(provider, rawState) {
   ui.resumeBtn.disabled = state.running || !metas[provider]?.sourceUrl;
   setBadge(ui.badge, state);
 
+  const configuredLimit = state.workerLimit || clampWorkerLimit(provider, metas[provider]?.options?.workerLimits?.[provider] ?? ui.workerInput?.value);
+  if (ui.workerInput && !state.running) ui.workerInput.value = configuredLimit;
+  if (ui.workerInput) ui.workerInput.disabled = state.running;
+  if (ui.workerStatus) ui.workerStatus.textContent = `Aktywne: ${state.activeWorkers} / limit: ${configuredLimit}`;
+
   const diagnostics = [];
   if (state.declaredCount) diagnostics.push(`Serwis deklaruje: ${state.declaredCount}`);
-  if (state.activeWorkers) diagnostics.push(`workery: ${state.activeWorkers}`);
+  diagnostics.push(`workery ${state.activeWorkers}/${configuredLimit}`);
   if (state.totalPages) {
     diagnostics.push(provider === 'allegro'
       ? `widoczna paginacja do: ${state.totalPages}`
@@ -248,8 +275,23 @@ function historyCount(history) {
   return history?.items && typeof history.items === 'object' ? Object.keys(history.items).length : 0;
 }
 
+function formatBytes(bytes) {
+  const value = Number(bytes || 0);
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function historySize(history) {
+  try {
+    return new Blob([JSON.stringify(history || { version: 1, items: {} })]).size;
+  } catch {
+    return 0;
+  }
+}
+
 function renderHistory(provider, history) {
-  providerEls[provider].historyCount.textContent = `Historia: ${historyCount(history)}`;
+  providerEls[provider].historyCount.textContent = `Historia: ${historyCount(history)} (${formatBytes(historySize(history))})`;
 }
 
 function renderResultButtons() {
@@ -334,7 +376,8 @@ async function stopProvider(provider) {
 }
 
 async function resumeProvider(provider) {
-  const response = await chrome.runtime.sendMessage({ type: 'EXPORTER_BG_RESUME', provider });
+  await saveSettings();
+  const response = await chrome.runtime.sendMessage({ type: 'EXPORTER_BG_RESUME', provider, options: getOptions() });
   if (!response?.ok) throw new Error(response?.error || `Nie udało się wznowić ${providerLabel(provider)}.`);
   showMessage(`Wznowiono ${providerLabel(provider)}. Poprawnie pobrane pozycje z historii zostaną pominięte.`, false);
 }
@@ -395,11 +438,48 @@ function parseJsonHistory(text) {
   const value = JSON.parse(text);
   const provider = value?.provider;
   if (!PROVIDERS.includes(provider)) throw new Error('JSON nie zawiera poprawnego pola provider.');
-  const offers = Array.isArray(value.offers) ? value.offers : [];
-  const entries = offers
-    .filter((offer) => offer && !offer.error && offer.itemId)
-    .map((offer) => ({ itemId: offer.itemId, title: offer.title || '', url: offer.url || '' }));
+
+  let entries = [];
+  if (Array.isArray(value.entries)) {
+    entries = value.entries;
+  } else if (Array.isArray(value.offers)) {
+    entries = value.offers.filter((offer) => offer && !offer.error);
+  } else if (value.items && typeof value.items === 'object') {
+    entries = Object.entries(value.items).map(([itemId, item]) => ({ itemId, ...(item || {}) }));
+  }
+
+  entries = entries
+    .filter((entry) => entry && entry.itemId)
+    .map((entry) => ({
+      itemId: String(entry.itemId),
+      title: entry.title || '',
+      url: entry.url || '',
+      seenAt: entry.seenAt || Date.now(),
+    }));
   return { provider, entries };
+}
+
+async function exportHistory(provider) {
+  const history = await getHistory(provider);
+  const entries = Object.entries(history.items || {}).map(([itemId, item]) => ({
+    itemId,
+    seenAt: item?.seenAt || null,
+    title: item?.title || '',
+    url: item?.url || '',
+  }));
+  const payload = {
+    schema: 'marketplace-exporter-history-v1',
+    provider,
+    exportedAt: new Date().toISOString(),
+    count: entries.length,
+    entries,
+  };
+  downloadText(
+    `${provider}-history-${Date.now()}.json`,
+    JSON.stringify(payload, null, 2),
+    'application/json;charset=utf-8',
+  );
+  return entries.length;
 }
 
 async function importHistoryFiles(fileList) {
@@ -470,7 +550,7 @@ els.delayMs.addEventListener('input', () => {
   els.delayOutput.value = `${els.delayMs.value} ms`;
 });
 
-for (const input of [els.startFromFirst, els.skipSeen, els.mode, els.maxOffers, els.concurrency, els.delayMs]) {
+for (const input of [els.startFromFirst, els.skipSeen, els.mode, els.maxOffers, els.concurrency, els.delayMs, ...PROVIDERS.map((provider) => providerEls[provider].workerInput)]) {
   input.addEventListener('change', () => saveSettings().catch(() => {}));
 }
 
@@ -527,12 +607,23 @@ for (const provider of PROVIDERS) {
     renderResult();
     els.resultCard.scrollIntoView({ block: 'nearest' });
   });
+  providerEls[provider].exportHistoryBtn.addEventListener('click', async () => {
+    const count = await exportHistory(provider);
+    showMessage(`Wyeksportowano historię ${providerLabel(provider)}: ${count} pozycji.`, false);
+  });
   providerEls[provider].clearHistoryBtn.addEventListener('click', async () => {
     await chrome.storage.local.remove(historyKey(provider));
     renderHistory(provider, { version: 1, items: {} });
     showMessage(`Wyczyszczono historię ${providerLabel(provider)}.`, false);
   });
 }
+
+els.exportAllHistoryBtn.addEventListener('click', async () => {
+  hideMessage();
+  const counts = {};
+  for (const provider of PROVIDERS) counts[provider] = await exportHistory(provider);
+  showMessage(`Wyeksportowano historie: Allegro ${counts.allegro}, Ceneo ${counts.ceneo}, OLX ${counts.olx}.`, false);
+});
 
 els.importHistoryBtn.addEventListener('click', () => els.historyFiles.click());
 els.historyFiles.addEventListener('change', async () => {

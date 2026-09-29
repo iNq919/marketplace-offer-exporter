@@ -1,21 +1,23 @@
-# Allegro + Ceneo + OLX Offer Exporter v1.7.0
+# Allegro + Ceneo + OLX Offer Exporter v1.8.0
 
 Rozszerzenie Chrome zbiera oferty z Allegro, produkty z Ceneo i ogłoszenia z OLX oraz przygotowuje eksport TXT/JSON i fragmenty do wklejenia do ChatGPT.
 
-## Najważniejsze zmiany v1.7.0
+## Najważniejsze zmiany v1.8.0
 
-- Naprawiono błąd `findProductJsonLd is not defined`, który w v1.6 powodował, że poprawnie pobrane strony Allegro, Ceneo i OLX były oznaczane jako błędy już na etapie parsowania.
-- Allegro ma teraz twardy limit 1 workera i minimum około 3,2 s pomiędzy kolejnymi żądaniami.
-- Co 20 żądań Allegro dostaje dodatkową przerwę. Wolne workery nigdy nie zwiększają szybkości Allegro ponad ten limit.
-- Ceneo może użyć maks. 3 workerów, a OLX maks. 4. Globalna pula nadal jest dynamicznie współdzielona.
-- Po wykryciu HTTP 403/429 albo strony ochronnej dany serwis jest natychmiast wstrzymywany. Rozszerzenie nie próbuje wielokrotnie ponawiać żądań do zablokowanego serwisu.
-- Wynik częściowy i poprawnie pobrane ID są zapisywane przed zatrzymaniem z powodu ochrony serwisu.
-- Historia jest aktualizowana częściej, partiami po 5 poprawnych pozycjach.
-- Dodano cache skanu listingu na 6 godzin. `Wznów` może użyć już znalezionej listy i przejść od razu do niepobranych szczegółów zamiast ponownie skanować wszystkie strony.
-- Przy `Wznów` poprawnie pobrane pozycje są zawsze pomijane, nawet jeśli podczas pierwszego uruchomienia opcja pomijania historii była wyłączona.
-- Allegro rozwija tylko grupy odpowiadające kartom produktów faktycznie znalezionym na głównym listingu. Nie skanuje już wszystkich pobocznych linków `/oferty-produktu/`, co wcześniej potrafiło sztucznie zwiększyć liczbę grup i liczbę requestów.
-- Ceneo ponownie stosuje filtry także do głównych kart i odrzuca oczywiste SSD/NVMe/M.2, jeśli źródłem jest kategoria `Dyski_HDD`.
-- OLX przy poprawnym pobraniu szczegółów preferuje cenę z danych strony ogłoszenia, zamiast błędnie sklejonej ceny z listingu.
+- Każdy serwis ma osobny, widoczny limit workerów bezpośrednio na swojej karcie.
+- Domyślne limity: Allegro 1, Ceneo 1, OLX 4.
+- Allegro można ustawić na 1-2, Ceneo na 1-3, OLX na 1-6 workerów. Zmiana obowiązuje przy kolejnym starcie lub wznowieniu.
+- Przy każdym serwisie widać teraz `Aktywne: X / limit: Y`.
+- Ceneo zostało spowolnione: minimum ok. 1,8 s między requestami i dodatkowa przerwa co 25 żądań. Ma domyślnie tylko 1 workera.
+- Allegro zachowuje konserwatywne tempo z v1.7: domyślnie 1 worker, minimum ok. 3,2 s między requestami i dłuższa przerwa co 20 żądań.
+- OLX pozostaje szybszy i może wykorzystywać wolną pulę do ustawionego limitu.
+- Historia Allegro i Ceneo jest zapisywana po każdym poprawnym rekordzie. OLX zapisuje ją partiami po 5 rekordów.
+- Przy każdym serwisie widać liczbę rekordów historii oraz jej faktyczny rozmiar w `chrome.storage.local`.
+- Dodano `Eksport historii` dla Allegro, Ceneo i OLX oraz `Eksportuj wszystkie historie`.
+- Eksport historii tworzy aktualny plik JSON, który można później ponownie zaimportować.
+- Pliki znajdujące się w folderze rozszerzenia są statyczne i nigdy nie są automatycznie nadpisywane przez Chrome. Aktualna historia żyje w `chrome.storage.local`.
+- `Wznów` używa aktualnych ustawień workerów z popupu, więc możesz zmienić limit przed wznowieniem zadania.
+- Nadal działa cache skanu na 6 godzin, częściowe wyniki i zatrzymanie po pierwszej stronie ochronnej/403/429.
 
 ## Instalacja / aktualizacja
 
@@ -32,8 +34,11 @@ Do historii trafia tylko pozycja, której szczegóły zostały poprawnie pobrane
 
 - `OK` zwiększa historię.
 - `Błąd` nie trafia do historii i będzie próbowany ponownie.
+- Allegro i Ceneo zapisują historię po każdym poprawnym rekordzie, OLX partiami po 5 rekordów.
 - `Wznów` zawsze pomija już poprawnie zapisane ID.
 - Zwykłe nowe uruchomienie respektuje checkbox `Pomiń wcześniej poprawnie wyeksportowane pozycje`.
+- Licznik i rozmiar historii widoczny w popupie pokazują faktyczny stan `chrome.storage.local`.
+- Jeśli chcesz plik na dysku, użyj przycisku `Eksport historii`. Plik w folderze rozszerzenia nie jest magazynem live i nie będzie sam zmieniał rozmiaru.
 
 W v1.6 błąd parsera `findProductJsonLd is not defined` powodował `OK = 0`, dlatego takie pozycje nie zostały zapisane jako sprawdzone. To było celowe zabezpieczenie przed zapisaniem niepełnych danych jako poprawnych.
 
@@ -54,11 +59,11 @@ Przycisk zwykłego startu robi świeży skan, aby wykryć nowe oferty.
 
 Przy domyślnym globalnym limicie 6:
 
-- Allegro: maks. 1 worker, minimum ok. 3,2 s między requestami,
-- Ceneo: maks. 3 workery,
-- OLX: maks. 4 workery.
+- Allegro: 1 worker, regulacja 1-2, minimum ok. 3,2 s między requestami,
+- Ceneo: 1 worker, regulacja 1-3, minimum ok. 1,8 s między requestami i przerwa co 25 żądań,
+- OLX: 4 workery, regulacja 1-6.
 
-Jeżeli Allegro skończy, jego slot może przejąć Ceneo lub OLX. Allegro nie przyspiesza po zakończeniu innych serwisów.
+Globalna pula jest współdzielona, ale żaden serwis nie przekroczy własnego limitu. Zwiększanie Allegro i Ceneo może szybciej uruchomić ochronę serwisu, dlatego domyślne wartości są celowo niskie.
 
 ## Ochrona serwisów
 
