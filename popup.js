@@ -6,6 +6,7 @@ const LEGACY_STORAGE_RESULT = 'marketplaceExporterResult';
 const stateKey = (provider) => `${STORAGE_PREFIX}:state:${provider}`;
 const resultKey = (provider) => `${STORAGE_PREFIX}:result:${provider}`;
 const historyKey = (provider) => `${STORAGE_PREFIX}:history:${provider}`;
+const metaKey = (provider) => `${STORAGE_PREFIX}:jobMeta:${provider}`;
 const SETTINGS_KEY = `${STORAGE_PREFIX}:settings`;
 
 const els = {
@@ -26,6 +27,7 @@ const els = {
   resultTitle: document.querySelector('#resultTitle'),
   resultMeta: document.querySelector('#resultMeta'),
   resultProvider: document.querySelector('#resultProvider'),
+  resultText: document.querySelector('#resultText'),
   chunkLabel: document.querySelector('#chunkLabel'),
   prevChunkBtn: document.querySelector('#prevChunkBtn'),
   nextChunkBtn: document.querySelector('#nextChunkBtn'),
@@ -46,10 +48,12 @@ const providerEls = Object.fromEntries(PROVIDERS.map((provider) => [provider, {
   queued: document.querySelector(`#${provider}Queued`),
   skipped: document.querySelector(`#${provider}Skipped`),
   processed: document.querySelector(`#${provider}Processed`),
+  success: document.querySelector(`#${provider}Success`),
   errors: document.querySelector(`#${provider}Errors`),
   declared: document.querySelector(`#${provider}Declared`),
   current: document.querySelector(`#${provider}Current`),
   stopBtn: document.querySelector(`#${provider}StopBtn`),
+  resumeBtn: document.querySelector(`#${provider}ResumeBtn`),
   resultBtn: document.querySelector(`#${provider}ResultBtn`),
   historyCount: document.querySelector(`#${provider}HistoryCount`),
   clearHistoryBtn: document.querySelector(`#${provider}ClearHistoryBtn`),
@@ -57,6 +61,7 @@ const providerEls = Object.fromEntries(PROVIDERS.map((provider) => [provider, {
 
 const states = { allegro: {}, ceneo: {}, olx: {} };
 const results = { allegro: null, ceneo: null, olx: null };
+const metas = { allegro: null, ceneo: null, olx: null };
 const chunkIndexes = { allegro: 0, ceneo: 0, olx: 0 };
 let activeResultProvider = 'allegro';
 let refreshTimer = null;
@@ -91,26 +96,6 @@ function hideMessage() {
   els.messageBox.classList.add('hidden');
 }
 
-function isMissingReceiverError(error) {
-  const message = error?.message || String(error || '');
-  return /receiving end does not exist|could not establish connection/i.test(message);
-}
-
-async function sendToMarketplaceTab(tabId, message, injectIfMissing = true) {
-  try {
-    return await chrome.tabs.sendMessage(tabId, message);
-  } catch (error) {
-    if (!injectIfMissing || !isMissingReceiverError(error)) throw error;
-
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      files: ['content.js'],
-    });
-    await new Promise((resolve) => setTimeout(resolve, 160));
-    return chrome.tabs.sendMessage(tabId, message);
-  }
-}
-
 async function getTabsByProvider() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
   const grouped = { allegro: [], ceneo: [], olx: [] };
@@ -135,12 +120,13 @@ async function getActiveMarketplaceTab() {
 
 function getOptions() {
   return {
+    settingsVersion: 2,
     startFromFirst: els.startFromFirst.checked,
     skipSeen: els.skipSeen.checked,
     mode: els.mode.value,
     maxOffers: Math.max(0, Number.parseInt(els.maxOffers.value || '0', 10) || 0),
-    concurrency: Math.max(1, Math.min(5, Number.parseInt(els.concurrency.value || '1', 10) || 1)),
-    delayMs: Math.max(400, Number.parseInt(els.delayMs.value || '1200', 10) || 1200),
+    concurrency: Math.max(2, Math.min(9, Number.parseInt(els.concurrency.value || '6', 10) || 6)),
+    delayMs: Math.max(200, Math.min(2000, Number.parseInt(els.delayMs.value || '700', 10) || 700)),
   };
 }
 
@@ -151,13 +137,23 @@ async function saveSettings() {
 async function loadSettings() {
   const data = await chrome.storage.local.get(SETTINGS_KEY);
   const settings = data[SETTINGS_KEY];
-  if (!settings) return;
+  if (!settings) {
+    els.concurrency.value = 6;
+    els.delayMs.value = 700;
+    els.delayOutput.value = '700 ms';
+    return;
+  }
   els.startFromFirst.checked = settings.startFromFirst !== false;
   els.skipSeen.checked = settings.skipSeen !== false;
   els.mode.value = settings.mode === 'full' ? 'full' : 'compact';
   els.maxOffers.value = Number(settings.maxOffers || 0);
-  els.concurrency.value = Math.max(1, Math.min(5, Number(settings.concurrency || 1)));
-  els.delayMs.value = Math.max(400, Math.min(3000, Number(settings.delayMs || 1200)));
+  if (Number(settings.settingsVersion || 0) < 2) {
+    els.concurrency.value = 6;
+    els.delayMs.value = 700;
+  } else {
+    els.concurrency.value = Math.max(2, Math.min(9, Number(settings.concurrency || 6)));
+    els.delayMs.value = Math.max(200, Math.min(2000, Number(settings.delayMs || 700)));
+  }
   els.delayOutput.value = `${els.delayMs.value} ms`;
 }
 
@@ -178,6 +174,8 @@ function normalizeState(state = {}) {
     percent: Math.max(0, Math.min(100, Number(state.percent || 0))),
     done: Boolean(state.done),
     failed: Boolean(state.failed),
+    partial: Boolean(state.partial),
+    activeWorkers: Number(state.activeWorkers || 0),
   };
 }
 
@@ -227,13 +225,16 @@ function renderState(provider, rawState) {
   ui.queued.textContent = state.queued;
   ui.skipped.textContent = state.skippedSeen;
   ui.processed.textContent = state.processed;
+  ui.success.textContent = Math.max(0, state.processed - state.errors);
   ui.errors.textContent = state.errors;
   ui.current.textContent = state.currentItem;
   ui.stopBtn.disabled = !state.running;
+  ui.resumeBtn.disabled = state.running || !metas[provider]?.sourceUrl;
   setBadge(ui.badge, state);
 
   const diagnostics = [];
   if (state.declaredCount) diagnostics.push(`Serwis deklaruje: ${state.declaredCount}`);
+  if (state.activeWorkers) diagnostics.push(`workery: ${state.activeWorkers}`);
   if (state.totalPages) {
     diagnostics.push(provider === 'allegro'
       ? `widoczna paginacja do: ${state.totalPages}`
@@ -293,6 +294,8 @@ function renderResult() {
   els.chunkLabel.textContent = `Fragment ${index + 1}/${result.chunks.length}`;
   els.prevChunkBtn.disabled = index <= 0;
   els.nextChunkBtn.disabled = index >= result.chunks.length - 1;
+  els.resultText.value = result.chunks[index] || '';
+  els.resultText.scrollTop = 0;
 }
 
 function downloadText(filename, text, type = 'text/plain;charset=utf-8') {
@@ -315,26 +318,25 @@ async function refreshActiveSiteLabel() {
 }
 
 async function startOnTab(tab, provider) {
-  const response = await sendToMarketplaceTab(tab.id, {
-    type: 'MARKETPLACE_EXPORTER_START',
+  const response = await chrome.runtime.sendMessage({
+    type: 'EXPORTER_BG_START',
+    provider,
+    sourceUrl: tab.url,
     options: getOptions(),
   });
   if (!response?.ok) throw new Error(response?.error || `Nie udało się rozpocząć eksportu ${providerLabel(provider)}.`);
 }
 
 async function stopProvider(provider) {
-  const grouped = await getTabsByProvider();
-  let sent = 0;
-  for (const tab of grouped[provider]) {
-    try {
-      const response = await sendToMarketplaceTab(tab.id, { type: 'MARKETPLACE_EXPORTER_STOP' }, false);
-      if (response?.ok) sent += 1;
-    } catch {
-      // Karta nie ma aktywnego content scriptu, więc nie ma czego zatrzymywać.
-    }
-  }
-  if (!sent) showMessage(`Nie znalazłem aktywnego zadania ${providerLabel(provider)} na otwartych kartach.`, true);
-  else showMessage(`Wysłano polecenie przerwania ${providerLabel(provider)}.`, false);
+  const response = await chrome.runtime.sendMessage({ type: 'EXPORTER_BG_STOP', provider });
+  if (!response?.ok) throw new Error(response?.error || `Nie udało się zatrzymać ${providerLabel(provider)}.`);
+  showMessage(`Zatrzymano ${providerLabel(provider)}. Częściowy wynik pozostaje dostępny i można go później wznowić.`, false);
+}
+
+async function resumeProvider(provider) {
+  const response = await chrome.runtime.sendMessage({ type: 'EXPORTER_BG_RESUME', provider });
+  if (!response?.ok) throw new Error(response?.error || `Nie udało się wznowić ${providerLabel(provider)}.`);
+  showMessage(`Wznowiono ${providerLabel(provider)}. Poprawnie pobrane pozycje z historii zostaną pominięte.`, false);
 }
 
 async function getHistory(provider) {
@@ -369,7 +371,7 @@ function parseTxtHistory(text) {
     : /#\s*Eksport z Allegro/i.test(text) ? 'allegro'
       : /#\s*Eksport z OLX/i.test(text) ? 'olx'
         : null;
-  if (!provider) throw new Error('Nie rozpoznano, czy plik pochodzi z Allegro czy Ceneo.');
+  if (!provider) throw new Error('Nie rozpoznano, czy plik pochodzi z Allegro, Ceneo czy OLX.');
 
   const blocks = text.split(/\n\s*---\s*\n/g);
   const entries = [];
@@ -450,10 +452,11 @@ async function migrateLegacyStorage() {
 
 async function refresh() {
   const keys = [];
-  for (const provider of PROVIDERS) keys.push(stateKey(provider), resultKey(provider), historyKey(provider));
+  for (const provider of PROVIDERS) keys.push(stateKey(provider), resultKey(provider), historyKey(provider), metaKey(provider));
   const data = await chrome.storage.local.get(keys);
 
   for (const provider of PROVIDERS) {
+    metas[provider] = data[metaKey(provider)] || null;
     renderState(provider, data[stateKey(provider)] || {});
     results[provider] = data[resultKey(provider)] || null;
     renderHistory(provider, data[historyKey(provider)] || { version: 1, items: {} });
@@ -517,6 +520,7 @@ els.startBothBtn.addEventListener('click', async () => {
 
 for (const provider of PROVIDERS) {
   providerEls[provider].stopBtn.addEventListener('click', () => stopProvider(provider).catch((error) => showMessage(error?.message || String(error))));
+  providerEls[provider].resumeBtn.addEventListener('click', () => resumeProvider(provider).then(refresh).catch((error) => showMessage(error?.message || String(error))));
   providerEls[provider].resultBtn.addEventListener('click', () => {
     activeResultProvider = provider;
     els.resultProvider.value = provider;
@@ -602,6 +606,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
     const stateChange = changes[stateKey(provider)];
     const resultChange = changes[resultKey(provider)];
     const historyChange = changes[historyKey(provider)];
+    const metaChange = changes[metaKey(provider)];
     if (stateChange) renderState(provider, stateChange.newValue || {});
     if (resultChange) {
       results[provider] = resultChange.newValue || null;
@@ -610,6 +615,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
       if (activeResultProvider === provider || !results[activeResultProvider]) renderResult();
     }
     if (historyChange) renderHistory(provider, historyChange.newValue || { version: 1, items: {} });
+    if (metaChange) { metas[provider] = metaChange.newValue || null; renderState(provider, states[provider] || {}); }
   }
 });
 
@@ -617,6 +623,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   try {
     await loadSettings();
     await migrateLegacyStorage();
+    await chrome.runtime.sendMessage({ type: 'EXPORTER_BG_HEALTH' }).catch(() => null);
     await refresh();
   } catch (error) {
     showMessage(error?.message || String(error));

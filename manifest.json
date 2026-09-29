@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Allegro + Ceneo + OLX Offer Exporter for ChatGPT",
-  "version": "1.5.0",
-  "description": "Eksportuje wszystkie oferty z Allegro (rozwija grupy produktów), produkty z Ceneo i ogłoszenia z OLX, z równoległym skanowaniem 3 serwisów i historią.",
+  "version": "1.6.0",
+  "description": "Eksportuje Allegro, Ceneo i OLX w tle, wznawia przerwane zadania, zapisuje częściowe wyniki i dynamicznie dzieli workery między serwisy.",
   "permissions": [
-    "activeTab",
-    "scripting",
+    "tabs",
+    "offscreen",
     "storage",
     "unlimitedStorage",
     "clipboardWrite"
@@ -18,24 +18,11 @@
     "https://olx.pl/*",
     "https://*.olx.pl/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_title": "Eksportuj Allegro / Ceneo / OLX",
     "default_popup": "popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://allegro.pl/*",
-        "https://*.allegro.pl/*",
-        "https://ceneo.pl/*",
-        "https://*.ceneo.pl/*",
-        "https://olx.pl/*",
-        "https://*.olx.pl/*"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "run_at": "document_idle"
-    }
-  ]
+  }
 }

@@ -247,3 +247,18 @@ progress {
 }
 
 .hidden { display: none !important; }
+
+.result-text {
+  width: 100%;
+  min-height: 280px;
+  max-height: 520px;
+  resize: vertical;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 10px;
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #fff;
+  color: #101828;
+  white-space: pre-wrap;
+}

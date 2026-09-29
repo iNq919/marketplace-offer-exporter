@@ -2,6 +2,15 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.6.0
+
+- Przeniesiono zadania do dokumentu tła, aby skan nie zależał od otwartej karty źródłowej.
+- Dodano częściowe wyniki, przycisk `Wznów` i częstsze zapisywanie historii.
+- Dodano globalny, dynamicznie współdzielony limit workerów.
+- Dodano adaptacyjne ograniczanie równoległości i cooldown przy 403/429.
+- Rozwijanie grup Allegro działa równolegle.
+- Uwaga: ta wersja miała regresję parsera `findProductJsonLd is not defined`, naprawioną w v1.7.0.
+
 ## v1.5.0
 
 - Dodano dwustopniowe skanowanie Allegro: karta produktu -> konkretne oferty sprzedawców.

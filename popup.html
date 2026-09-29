@@ -42,17 +42,17 @@
           <small>0 = wszystkie nowe</small>
         </label>
         <label>
-          Równoległe pobieranie
-          <input id="concurrency" type="number" min="1" max="5" step="1" value="1">
-          <small>Dla Allegro i OLX zalecane 1</small>
+          Łączny limit workerów
+          <input id="concurrency" type="number" min="2" max="9" step="1" value="6">
+          <small>Automatycznie dzielone między aktywne serwisy</small>
         </label>
       </div>
 
       <label>
-        Przerwa między pobraniami na worker
+        Bazowa przerwa adaptacyjna
         <div class="range-row">
-          <input id="delayMs" type="range" min="400" max="3000" step="100" value="1200">
-          <output id="delayOutput">1200 ms</output>
+          <input id="delayMs" type="range" min="200" max="2000" step="100" value="700">
+          <output id="delayOutput">700 ms</output>
         </div>
       </label>
 
@@ -60,7 +60,7 @@
         <button id="startCurrentBtn" class="primary">Uruchom bieżącą kartę</button>
         <button id="startBothBtn">Uruchom Allegro + Ceneo + OLX</button>
       </div>
-      <p class="hint">Aby uruchomić wszystkie 3 jednocześnie, otwórz po jednej karcie z ustawionymi filtrami Allegro, Ceneo i OLX. Każde zadanie ma osobny postęp, wynik i historię.</p>
+      <p class="hint">Po uruchomieniu możesz zamknąć karty Allegro, Ceneo i OLX. Zadania działają w tle rozszerzenia. Wolne workery są automatycznie przekazywane pozostałym serwisom, gdy jeden zakończy pracę.</p>
     </section>
 
     <section class="providers-grid">
@@ -82,13 +82,15 @@
           <span>Znalezione <strong id="allegroFound">0</strong></span>
           <span>Kolejka <strong id="allegroQueued">0</strong></span>
           <span>Pominięte <strong id="allegroSkipped">0</strong></span>
-          <span>Pobrane <strong id="allegroProcessed">0</strong></span>
+          <span>Przetw. <strong id="allegroProcessed">0</strong></span>
+          <span>OK <strong id="allegroSuccess">0</strong></span>
           <span>Błędy <strong id="allegroErrors">0</strong></span>
         </div>
         <p id="allegroDeclared" class="diagnostic"></p>
         <p id="allegroCurrent" class="current-item"></p>
         <div class="actions compact-actions">
           <button id="allegroStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="allegroResumeBtn" disabled>Wznów</button>
           <button id="allegroResultBtn" disabled>Pokaż wynik</button>
           <button id="allegroClearHistoryBtn">Wyczyść historię</button>
         </div>
@@ -112,13 +114,15 @@
           <span>Znalezione <strong id="ceneoFound">0</strong></span>
           <span>Kolejka <strong id="ceneoQueued">0</strong></span>
           <span>Pominięte <strong id="ceneoSkipped">0</strong></span>
-          <span>Pobrane <strong id="ceneoProcessed">0</strong></span>
+          <span>Przetw. <strong id="ceneoProcessed">0</strong></span>
+          <span>OK <strong id="ceneoSuccess">0</strong></span>
           <span>Błędy <strong id="ceneoErrors">0</strong></span>
         </div>
         <p id="ceneoDeclared" class="diagnostic"></p>
         <p id="ceneoCurrent" class="current-item"></p>
         <div class="actions compact-actions">
           <button id="ceneoStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="ceneoResumeBtn" disabled>Wznów</button>
           <button id="ceneoResultBtn" disabled>Pokaż wynik</button>
           <button id="ceneoClearHistoryBtn">Wyczyść historię</button>
         </div>
@@ -142,13 +146,15 @@
           <span>Znalezione <strong id="olxFound">0</strong></span>
           <span>Kolejka <strong id="olxQueued">0</strong></span>
           <span>Pominięte <strong id="olxSkipped">0</strong></span>
-          <span>Pobrane <strong id="olxProcessed">0</strong></span>
+          <span>Przetw. <strong id="olxProcessed">0</strong></span>
+          <span>OK <strong id="olxSuccess">0</strong></span>
           <span>Błędy <strong id="olxErrors">0</strong></span>
         </div>
         <p id="olxDeclared" class="diagnostic"></p>
         <p id="olxCurrent" class="current-item"></p>
         <div class="actions compact-actions">
           <button id="olxStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="olxResumeBtn" disabled>Wznów</button>
           <button id="olxResultBtn" disabled>Pokaż wynik</button>
           <button id="olxClearHistoryBtn">Wyczyść historię</button>
         </div>
@@ -179,6 +185,8 @@
         </select>
       </div>
 
+      <textarea id="resultText" class="result-text" readonly aria-label="Treść bieżącego fragmentu eksportu"></textarea>
+
       <div class="chunk-nav">
         <button id="prevChunkBtn" title="Poprzedni fragment">&larr;</button>
         <span id="chunkLabel">Fragment 1/1</span>
@@ -191,7 +199,7 @@
         <button id="downloadTxtBtn">Pobierz TXT</button>
         <button id="downloadJsonBtn">Pobierz JSON</button>
       </div>
-      <p class="hint">Eksporty Allegro, Ceneo i OLX są przechowywane osobno. Ponowne uruchomienie jednego serwisu nie kasuje wyników pozostałych.</p>
+      <p class="hint">Wynik jest zapisywany także w trakcie pracy. Po przerwaniu możesz skopiować część już pobraną, a potem użyć przycisku Wznów.</p>
     </section>
 
     <section id="messageBox" class="message hidden"></section>

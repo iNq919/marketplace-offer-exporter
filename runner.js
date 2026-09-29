@@ -6,12 +6,124 @@
   const stateKey = (provider) => `${STORAGE_PREFIX}:state:${provider}`;
   const resultKey = (provider) => `${STORAGE_PREFIX}:result:${provider}`;
   const historyKey = (provider) => `${STORAGE_PREFIX}:history:${provider}`;
+  const metaKey = (provider) => `${STORAGE_PREFIX}:jobMeta:${provider}`;
   const MAX_LISTING_PAGES = 100;
   const MAX_CHAT_CHUNK = 48000;
 
-  let job = null;
+  const jobs = { allegro: null, ceneo: null, olx: null };
+  const PROVIDER_MAX_WORKERS = { allegro: 3, ceneo: 5, olx: 5 };
+  const providerControl = {
+    allegro: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0 },
+    ceneo: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0 },
+    olx: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0 },
+  };
+
+  const scheduler = {
+    limit: 6,
+    active: 0,
+    activeByProvider: { allegro: 0, ceneo: 0, olx: 0 },
+    waiters: [],
+
+    setLimit(value) {
+      this.limit = Math.max(2, Math.min(9, Number(value || 6)));
+      this.pump();
+    },
+
+    activeProviders() {
+      return Object.keys(jobs).filter((provider) => Boolean(jobs[provider]));
+    },
+
+    dynamicCap(provider) {
+      const providers = this.activeProviders();
+      const activeCount = Math.max(1, providers.length);
+      const fairShare = Math.max(1, Math.floor(this.limit / activeCount));
+      const otherWaiting = this.waiters.some((item) => item.provider !== provider && !item.cancelled);
+      const canBorrow = !otherWaiting;
+      const base = canBorrow ? this.limit : fairShare;
+      const penalty = providerControl[provider]?.penalty || 0;
+      return Math.max(1, Math.min(PROVIDER_MAX_WORKERS[provider] || 2, base - penalty));
+    },
+
+    acquire(provider, signal) {
+      if (signal?.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'));
+      return new Promise((resolve, reject) => {
+        const waiter = { provider, resolve, reject, signal, cancelled: false, abortHandler: null };
+        if (signal) {
+          waiter.abortHandler = () => {
+            waiter.cancelled = true;
+            reject(new DOMException('Aborted', 'AbortError'));
+            this.pump();
+          };
+          signal.addEventListener('abort', waiter.abortHandler, { once: true });
+        }
+        this.waiters.push(waiter);
+        this.pump();
+      });
+    },
+
+    pump() {
+      if (this.active >= this.limit) return;
+      let madeProgress = true;
+      while (this.active < this.limit && madeProgress) {
+        madeProgress = false;
+        for (let i = 0; i < this.waiters.length; i += 1) {
+          const waiter = this.waiters[i];
+          if (waiter.cancelled || waiter.signal?.aborted) {
+            this.waiters.splice(i, 1);
+            i -= 1;
+            continue;
+          }
+          const cap = this.dynamicCap(waiter.provider);
+          if ((this.activeByProvider[waiter.provider] || 0) >= cap) continue;
+          this.waiters.splice(i, 1);
+          if (waiter.abortHandler && waiter.signal) waiter.signal.removeEventListener('abort', waiter.abortHandler);
+          this.active += 1;
+          this.activeByProvider[waiter.provider] = (this.activeByProvider[waiter.provider] || 0) + 1;
+          let released = false;
+          waiter.resolve(() => {
+            if (released) return;
+            released = true;
+            this.active = Math.max(0, this.active - 1);
+            this.activeByProvider[waiter.provider] = Math.max(0, (this.activeByProvider[waiter.provider] || 0) - 1);
+            this.pump();
+          });
+          madeProgress = true;
+          break;
+        }
+      }
+    },
+  };
+
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function storageGet(keys) {
+    const response = await chrome.runtime.sendMessage({
+      target: 'marketplace-background',
+      type: 'RUNNER_STORAGE_GET',
+      keys,
+    });
+    if (!response?.ok) throw new Error(response?.error || 'Nie udało się odczytać storage.');
+    return response.data || {};
+  }
+
+  async function storageSet(items) {
+    const response = await chrome.runtime.sendMessage({
+      target: 'marketplace-background',
+      type: 'RUNNER_STORAGE_SET',
+      items,
+    });
+    if (!response?.ok) throw new Error(response?.error || 'Nie udało się zapisać storage.');
+  }
+
+  async function storageRemove(keys) {
+    const response = await chrome.runtime.sendMessage({
+      target: 'marketplace-background',
+      type: 'RUNNER_STORAGE_REMOVE',
+      keys,
+    });
+    if (!response?.ok) throw new Error(response?.error || 'Nie udało się usunąć danych ze storage.');
+  }
 
   function cleanText(value) {
     return String(value || '')
@@ -63,13 +175,65 @@
     return new DOMParser().parseFromString(html, 'text/html');
   }
 
-  async function fetchHtml(url, signal, retries = 3) {
+  function providerRequestGap(provider) {
+    const options = jobs[provider]?.options || {};
+    const base = Math.max(200, Number(options.delayMs || 700));
+    if (provider === 'ceneo') return Math.max(100, Math.round(base * 0.28));
+    if (provider === 'olx') return Math.max(220, Math.round(base * 0.55));
+    return Math.max(450, Math.round(base * 0.85));
+  }
+
+  async function waitForProviderWindow(provider, signal) {
+    const control = providerControl[provider];
+    while (true) {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+      const now = Date.now();
+      const wait = Math.max(control?.cooldownUntil || 0, control?.nextRequestAt || 0) - now;
+      if (wait <= 0) return;
+      await sleep(Math.min(wait, 1000));
+    }
+  }
+
+  function noteProviderSuccess(provider) {
+    const control = providerControl[provider];
+    if (!control) return;
+    control.successStreak += 1;
+    if (control.successStreak >= 12 && control.penalty > 0) {
+      control.penalty -= 1;
+      control.successStreak = 0;
+      scheduler.pump();
+    }
+  }
+
+  function noteProviderThrottle(provider, status = 0) {
+    const control = providerControl[provider];
+    if (!control) return;
+    control.successStreak = 0;
+    control.penalty = Math.min((PROVIDER_MAX_WORKERS[provider] || 2) - 1, control.penalty + 1);
+    const base = provider === 'allegro' ? 7000 : provider === 'olx' ? 5000 : 3500;
+    const statusFactor = status === 429 ? 2 : 1;
+    control.cooldownUntil = Math.max(control.cooldownUntil, Date.now() + base * statusFactor * Math.max(1, control.penalty));
+    scheduler.pump();
+  }
+
+  function isRetryableError(error) {
+    const message = String(error?.message || error || '');
+    return /HTTP (403|408|425|429|5\d\d)|stronę ochronną|access denied|robotem|verify|failed to fetch|network|timeout|load failed/i.test(message);
+  }
+
+  async function fetchHtml(url, signal, retries = 2) {
     let lastError;
+    const provider = detectProvider(url);
 
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-
+      let release = null;
       try {
+        await waitForProviderWindow(provider, signal);
+        release = await scheduler.acquire(provider, signal);
+        const control = providerControl[provider];
+        control.nextRequestAt = Math.max(control.nextRequestAt || 0, Date.now() + providerRequestGap(provider));
+
         const response = await fetch(url, {
           method: 'GET',
           credentials: 'include',
@@ -78,243 +242,52 @@
           signal,
           headers: {
             Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'pl-PL,pl;q=0.9,en;q=0.7',
           },
         });
 
         if (response.status === 403 || response.status === 429 || response.status >= 500) {
+          noteProviderThrottle(provider, response.status);
           const retryAfter = Number.parseInt(response.headers.get('Retry-After') || '0', 10);
-          const provider = detectProvider(url);
-          const fallbackWait = provider === 'allegro'
-            ? Math.min(30000, 3000 * (2 ** attempt))
-            : provider === 'olx'
-              ? Math.min(18000, 2200 * (attempt + 1))
-              : Math.min(12000, 1500 * (attempt + 1));
-          const wait = retryAfter > 0 ? retryAfter * 1000 : fallbackWait;
           lastError = new Error(`HTTP ${response.status} dla ${url}`);
+          if (release) { release(); release = null; }
           if (attempt < retries) {
-            await sleep(wait);
+            const fallbackWait = provider === 'allegro'
+              ? Math.min(25000, 2500 * (2 ** attempt))
+              : provider === 'olx'
+                ? Math.min(15000, 1800 * (attempt + 1))
+                : Math.min(9000, 1200 * (attempt + 1));
+            await sleep(retryAfter > 0 ? retryAfter * 1000 : fallbackWait);
             continue;
           }
           throw lastError;
         }
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status} dla ${url}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status} dla ${url}`);
+        const html = await response.text();
+        if (release) { release(); release = null; }
+
+        if (/nietypow(?:y|a) ruch|access denied|potwierdź.{0,80}robotem|verify.{0,80}human|sprawdź.{0,80}człowiekiem|captcha/i.test(html) && html.length < 250000) {
+          noteProviderThrottle(provider, 429);
+          throw new Error(`Serwis ${providerLabel(provider)} zwrócił stronę ochronną zamiast danych`);
         }
 
-        const html = await response.text();
-        if (/nietypow(?:y|a) ruch|access denied|potwierdź.{0,80}robotem|verify.{0,80}human|sprawdź.{0,80}człowiekiem|captcha/i.test(html) && html.length < 250000) {
-          throw new Error(`Serwis ${providerLabel(detectProvider(url))} zwrócił stronę ochronną zamiast danych`);
-        }
+        noteProviderSuccess(provider);
         return html;
       } catch (error) {
+        if (release) release();
         lastError = error;
         if (error?.name === 'AbortError') throw error;
-        if (attempt < retries) {
-          const protective = /stronę ochronną|access denied|robotem|verify/i.test(error?.message || '');
-          const provider = detectProvider(url);
-          const wait = protective && provider === 'allegro'
-            ? Math.min(30000, 5000 * (attempt + 1))
-            : 1000 * (attempt + 1);
+        if (attempt < retries && isRetryableError(error)) {
+          const wait = provider === 'allegro' ? 1800 * (attempt + 1) : provider === 'olx' ? 1200 * (attempt + 1) : 800 * (attempt + 1);
           await sleep(wait);
+          continue;
         }
-      }
-    }
-
-    throw lastError || new Error(`Nie udało się pobrać ${url}`);
-  }
-
-  function parseJsonLd(doc) {
-    const values = [];
-
-    for (const script of doc.querySelectorAll('script[type="application/ld+json"]')) {
-      try {
-        const parsed = JSON.parse(script.textContent || 'null');
-        if (Array.isArray(parsed)) values.push(...parsed);
-        else if (parsed) values.push(parsed);
-      } catch {
-        // Ignore malformed JSON-LD.
-      }
-    }
-
-    function flatten(items) {
-      const output = [];
-      for (const item of items) {
-        if (!item || typeof item !== 'object') continue;
-        output.push(item);
-        if (Array.isArray(item['@graph'])) output.push(...flatten(item['@graph']));
-      }
-      return output;
-    }
-
-    return flatten(values);
-  }
-
-  function findProductJsonLd(doc) {
-    return parseJsonLd(doc).find((item) => {
-      const type = item?.['@type'];
-      return type === 'Product' || (Array.isArray(type) && type.includes('Product'));
-    }) || null;
-  }
-
-  function getMeta(doc, selector, attr = 'content') {
-    return cleanText(doc.querySelector(selector)?.getAttribute(attr) || '');
-  }
-
-  function fragmentToText(fragment) {
-    const blockTags = new Set([
-      'P', 'DIV', 'SECTION', 'ARTICLE', 'LI', 'TR', 'DT', 'DD',
-      'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'UL', 'OL', 'TABLE', 'BR',
-    ]);
-
-    function walk(node, out) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        out.push(node.nodeValue || '');
-        return;
-      }
-      if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
-
-      const tag = node.nodeType === Node.ELEMENT_NODE ? node.tagName : '';
-      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return;
-      if (tag === 'BR') {
-        out.push('\n');
-        return;
-      }
-
-      for (const child of node.childNodes) walk(child, out);
-      if (blockTags.has(tag)) out.push('\n');
-    }
-
-    const parts = [];
-    walk(fragment, parts);
-    return cleanText(parts.join(''));
-  }
-
-  function extractSectionByMatcher(doc, startMatcher, endMatchers = []) {
-    const headings = [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')];
-    const startIndex = headings.findIndex((heading) => startMatcher(singleLine(heading.textContent)));
-    if (startIndex < 0) return '';
-
-    let end = null;
-    for (let i = startIndex + 1; i < headings.length; i += 1) {
-      const text = singleLine(headings[i].textContent);
-      if (endMatchers.some((matcher) => matcher(text))) {
-        end = headings[i];
         break;
       }
     }
 
-    const range = doc.createRange();
-    range.setStartAfter(headings[startIndex]);
-    if (end) range.setEndBefore(end);
-    else range.setEndAfter(doc.body);
-
-    return fragmentToText(range.cloneContents());
-  }
-
-  function extractSection(doc, startHeadingText, endHeadingTexts = []) {
-    const start = startHeadingText.toLowerCase();
-    const ends = endHeadingTexts.map((value) => value.toLowerCase());
-    return extractSectionByMatcher(
-      doc,
-      (text) => text.toLowerCase() === start,
-      ends.map((end) => (text) => text.toLowerCase() === end),
-    );
-  }
-
-  function extractParameterByLabel(doc, label) {
-    const labelLower = label.toLowerCase();
-
-    for (const row of doc.querySelectorAll('tr')) {
-      const cells = [...row.querySelectorAll(':scope > th, :scope > td')];
-      if (cells.length < 2) continue;
-      const key = singleLine(cells[0].textContent).replace(/\?[^|]*$/, '').trim();
-      if (key.toLowerCase() === labelLower) {
-        const value = singleLine(cells[cells.length - 1].textContent);
-        if (value && value.toLowerCase() !== labelLower) return value;
-      }
-    }
-
-    for (const dt of doc.querySelectorAll('dt')) {
-      if (singleLine(dt.textContent).toLowerCase() !== labelLower) continue;
-      const dd = dt.nextElementSibling;
-      const value = singleLine(dd?.textContent);
-      if (value) return value;
-    }
-
-    const all = [...doc.querySelectorAll('body *')];
-    const leaves = all.filter((el) => {
-      if (el.children.length > 0) return false;
-      const text = singleLine(el.textContent).replace(/\?$/, '').trim().toLowerCase();
-      return text === labelLower;
-    });
-
-    for (const leaf of leaves) {
-      const siblingCandidates = [leaf.nextElementSibling, leaf.previousElementSibling].filter(Boolean);
-      for (const sibling of siblingCandidates) {
-        const value = singleLine(sibling.textContent);
-        if (value && value.toLowerCase() !== labelLower && value.length <= 250) return value;
-      }
-
-      let parent = leaf.parentElement;
-      for (let depth = 0; parent && depth < 4; depth += 1, parent = parent.parentElement) {
-        const whole = singleLine(parent.textContent);
-        if (!whole || whole.length > 450) continue;
-        const index = whole.toLowerCase().indexOf(labelLower);
-        if (index === -1) continue;
-        const value = cleanText(`${whole.slice(0, index)} ${whole.slice(index + label.length)}`)
-          .replace(/^\?+\s*/, '');
-        if (value && value.toLowerCase() !== labelLower && value.length <= 250) return value;
-      }
-    }
-
-    return '';
-  }
-
-  function extractKnownParameters(doc) {
-    const labels = [
-      'Stan',
-      'Producent',
-      'Marka',
-      'Model',
-      'Kod producenta',
-      'EAN (GTIN)',
-      'EAN',
-      'Pojemność dysku',
-      'Pojemność',
-      'Format dysku',
-      'Format',
-      'Interfejs',
-      'Pamięć podręczna',
-      'Cache',
-      'Prędkość obrotowa',
-      'Prędkość Obrotowa',
-      'Rodzaj dysku',
-      'Przeznaczenie',
-      'Technologia zapisu',
-      'Gwarancja',
-    ];
-
-    const params = {};
-    for (const label of labels) {
-      const value = extractParameterByLabel(doc, label);
-      if (value) params[label] = value;
-    }
-    return params;
-  }
-
-  function extractAllTableParameters(doc) {
-    const params = {};
-    for (const row of doc.querySelectorAll('tr')) {
-      const cells = [...row.querySelectorAll(':scope > th, :scope > td')];
-      if (cells.length < 2) continue;
-      const rawKey = singleLine(cells[0].textContent);
-      const rawValue = singleLine(cells[cells.length - 1].textContent);
-      const key = rawKey.split('?')[0].trim();
-      if (!key || !rawValue || key.length > 80 || rawValue.length > 300 || key === rawValue) continue;
-      params[key] = rawValue;
-    }
-    return params;
+    throw lastError || new Error(`Nie udało się pobrać ${url}`);
   }
 
   // Allegro
@@ -354,6 +327,20 @@
       return url.href;
     } catch {
       return rawUrl;
+    }
+  }
+
+  function inferAllegroComparisonUrl(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      if (!(url.hostname === 'allegro.pl' || url.hostname.endsWith('.allegro.pl'))) return null;
+      if (!url.pathname.startsWith('/produkt/')) return null;
+      url.pathname = url.pathname.replace(/^\/produkt\//, '/oferty-produktu/');
+      url.search = '';
+      url.hash = '';
+      return url.href;
+    } catch {
+      return null;
     }
   }
 
@@ -521,15 +508,28 @@
       try {
         const url = new URL(href);
         if (!(url.hostname === 'allegro.pl' || url.hostname.endsWith('.allegro.pl'))) continue;
-        if (!url.pathname.startsWith('/oferty-produktu/')) continue;
-        url.hash = '';
-        // Parametr p jest używany tylko do paginacji listy ofert danego produktu.
-        // Na tym etapie chcemy zawsze bazowy adres produktu.
-        url.searchParams.delete('p');
-        comparisonUrls.push(url.href);
+        const text = singleLine(anchor.textContent || '');
+        if (url.pathname.startsWith('/oferty-produktu/') || /zobacz\s+\d+\s+ofert/i.test(text)) {
+          url.hash = '';
+          url.searchParams.delete('p');
+          comparisonUrls.push(url.href);
+        }
       } catch {
         // no-op
       }
+    }
+
+    // Gdy Allegro nie umieszcza linku "zobacz X ofert" w statycznym DOM,
+    // adres porównania można wiarygodnie wyprowadzić z linku /produkt/... .
+    for (const offer of map.values()) {
+      const inferred = inferAllegroComparisonUrl(offer.url);
+      if (inferred) comparisonUrls.push(inferred);
+    }
+
+    // Dodatkowe zabezpieczenie dla adresów zapisanych w osadzonym JSON-ie.
+    for (const match of String(html).matchAll(/(?:https?:\/\/(?:www\.)?allegro\.pl)?\/oferty-produktu\/[^"'<>\s\\]+/gi)) {
+      const href = absoluteUrl(match[0], baseUrl);
+      if (href) comparisonUrls.push(href);
     }
 
     return {
@@ -1501,7 +1501,7 @@
 
   async function getHistory(provider) {
     const key = historyKey(provider);
-    const data = await chrome.storage.local.get(key);
+    const data = await storageGet(key);
     const raw = data[key];
     if (!raw || typeof raw !== 'object') return { version: 1, items: {} };
     return {
@@ -1524,13 +1524,13 @@
         url: offer.url || '',
       };
     }
-    await chrome.storage.local.set({ [key]: history });
+    await storageSet({ [key]: history });
   }
 
   async function setState(provider, patch) {
     const key = stateKey(provider);
-    const existing = (await chrome.storage.local.get(key))[key] || {};
-    await chrome.storage.local.set({
+    const existing = (await storageGet(key))[key] || {};
+    await storageSet({
       [key]: {
         ...existing,
         ...patch,
@@ -1571,9 +1571,7 @@
 
       let html;
       try {
-        html = page === currentPage && page === firstPage
-          ? document.documentElement.outerHTML
-          : await fetchHtml(url, signal, provider === 'allegro' ? 5 : provider === 'olx' ? 4 : 3);
+        html = await fetchHtml(url, signal, provider === 'allegro' ? 3 : provider === 'olx' ? 2 : 2);
       } catch (error) {
         // Nie traktujemy pojedynczego błędu strony listingu jako końca paginacji.
         // Przy Allegro chwilowe blokady są częste, więc robimy dłuższą przerwę i próbujemy dalej.
@@ -1699,28 +1697,19 @@
       else filteredOut += 1;
     }
 
-    const groups = Array.isArray(scanResult.comparisonUrls) ? scanResult.comparisonUrls : [];
+    const groups = Array.isArray(scanResult.comparisonUrls) ? [...new Set(scanResult.comparisonUrls)] : [];
     let groupsExpanded = 0;
     let groupPagesScanned = 0;
     let groupErrors = 0;
     let rawOffersSeen = all.size;
+    let nextGroup = 0;
 
-    for (let index = 0; index < groups.length; index += 1) {
-      if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-      const compareUrl = groups[index];
+    async function expandOne(compareUrl) {
       const groupMap = new Map();
       let declaredForGroup = null;
       let groupTotalPages = null;
       let consecutiveEmpty = 0;
-
-      await setState('allegro', {
-        phase: `Rozwijanie produktów Allegro ${index + 1}/${groups.length}`,
-        currentItem: compareUrl,
-        offersFound: all.size,
-        declaredCount: scanResult.declaredCount,
-        totalPages: scanResult.totalPages,
-        percent: groups.length ? 15 + ((index / groups.length) * 12) : 27,
-      });
+      let localPages = 0;
 
       for (let page = 1; page <= 20; page += 1) {
         if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -1729,13 +1718,13 @@
         const url = allegroProductOffersPageUrl(compareUrl, page);
         let html;
         try {
-          html = await fetchHtml(url, signal, 4);
+          html = await fetchHtml(url, signal, 2);
         } catch (error) {
-          groupErrors += 1;
-          break;
+          if (error?.name === 'AbortError') throw error;
+          return { offers: [...groupMap.values()], pages: localPages, error: true };
         }
 
-        groupPagesScanned += 1;
+        localPages += 1;
         const parsed = parseAllegroProductOffersPage(html, url);
         if (parsed.declaredCount) declaredForGroup = Math.max(declaredForGroup || 0, parsed.declaredCount);
         if (parsed.totalPages) groupTotalPages = Math.max(groupTotalPages || 0, parsed.totalPages);
@@ -1753,29 +1742,57 @@
         if (declaredForGroup && groupMap.size >= declaredForGroup) break;
         if (groupTotalPages && page >= groupTotalPages) break;
         if (page > 1 && consecutiveEmpty >= 1) break;
-        await sleep(Math.max(500, Math.min(options.delayMs || 1200, 1500)));
+        await sleep(Math.max(180, Math.min((options.delayMs || 700) * 0.4, 600)));
       }
 
-      rawOffersSeen += groupMap.size;
-      for (const offer of groupMap.values()) {
-        const key = String(offer.itemId || offer.url);
-        if (!matchesAllegroSourceFilters(offer, filters)) {
-          filteredOut += 1;
-          continue;
-        }
-        all.set(key, offer);
-      }
-
-      groupsExpanded += 1;
-      await setState('allegro', {
-        phase: `Rozwijanie produktów Allegro ${index + 1}/${groups.length}`,
-        currentItem: `Produkt ${index + 1}/${groups.length}: znaleziono ${groupMap.size} ofert, łącznie unikalnych ${all.size}`,
-        offersFound: all.size,
-        percent: groups.length ? 15 + (((index + 1) / groups.length) * 12) : 27,
-      });
-
-      await sleep(Math.max(400, Math.min(options.delayMs || 1200, 1200)));
+      return { offers: [...groupMap.values()], pages: localPages, error: false };
     }
+
+    async function groupWorker(workerNo) {
+      while (true) {
+        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        const index = nextGroup;
+        nextGroup += 1;
+        if (index >= groups.length) return;
+        const compareUrl = groups[index];
+
+        await setState('allegro', {
+          phase: `Rozwijanie produktów Allegro ${groupsExpanded}/${groups.length}`,
+          currentItem: `Worker grup ${workerNo}: ${index + 1}/${groups.length}`,
+          offersFound: all.size,
+          declaredCount: scanResult.declaredCount,
+          totalPages: scanResult.totalPages,
+          activeWorkers: scheduler.activeByProvider.allegro || 0,
+          percent: groups.length ? 15 + ((groupsExpanded / groups.length) * 12) : 27,
+        });
+
+        const expanded = await expandOne(compareUrl);
+        groupPagesScanned += expanded.pages;
+        if (expanded.error) groupErrors += 1;
+        rawOffersSeen += expanded.offers.length;
+
+        for (const offer of expanded.offers) {
+          const key = String(offer.itemId || offer.url);
+          if (!matchesAllegroSourceFilters(offer, filters)) {
+            filteredOut += 1;
+            continue;
+          }
+          all.set(key, offer);
+        }
+
+        groupsExpanded += 1;
+        await setState('allegro', {
+          phase: `Rozwijanie produktów Allegro ${groupsExpanded}/${groups.length}`,
+          currentItem: `Rozwinięto ${groupsExpanded}/${groups.length}, unikalnych ofert: ${all.size}`,
+          offersFound: all.size,
+          activeWorkers: scheduler.activeByProvider.allegro || 0,
+          percent: groups.length ? 15 + ((groupsExpanded / groups.length) * 12) : 27,
+        });
+      }
+    }
+
+    const workerCount = Math.min(3, Math.max(1, groups.length));
+    await Promise.all(Array.from({ length: workerCount }, (_, i) => groupWorker(i + 1)));
 
     const queue = buildQueueFromOffers([...all.values()], options, seenIds);
     return {
@@ -1791,35 +1808,74 @@
     };
   }
 
-  async function fetchOfferDetails(provider, listingOffers, options, signal) {
+  async function fetchOfferDetails(provider, listingOffers, options, signal, progressMeta = {}) {
     const total = listingOffers.length;
     const results = new Array(total);
+    const baseOffers = Array.isArray(progressMeta.baseOffers) ? progressMeta.baseOffers.filter((offer) => offer && !offer.error) : [];
     let nextIndex = 0;
     let processed = 0;
     let errors = 0;
-    let consecutiveErrors = 0;
-    let cooldownUntil = 0;
+    let lastPartialAt = 0;
+    let savingPartial = Promise.resolve();
+    const historyBuffer = [];
 
-    async function maybeCooldown() {
-      const wait = cooldownUntil - Date.now();
-      if (wait > 0) await sleep(wait);
+    function mergedOffers() {
+      const map = new Map();
+      for (const offer of baseOffers) {
+        const key = String(offer.itemId || offer.url || Math.random());
+        map.set(key, offer);
+      }
+      for (const offer of results.filter(Boolean)) {
+        const key = String(offer.itemId || offer.url || Math.random());
+        map.set(key, offer);
+      }
+      return [...map.values()];
+    }
+
+    async function flushHistory(force = false) {
+      if (!force && historyBuffer.length < 10) return;
+      if (!historyBuffer.length) return;
+      const batch = historyBuffer.splice(0, historyBuffer.length);
+      await addSuccessfulOffersToHistory(provider, batch);
+    }
+
+    async function savePartial(force = false) {
+      const now = Date.now();
+      if (!force && processed > 0 && processed % 25 !== 0 && (now - lastPartialAt) < 12000) return;
+      lastPartialAt = now;
+      const task = async () => {
+        const snapshot = mergedOffers();
+        const successCount = snapshot.filter((offer) => !offer.error).length;
+        const errorCount = results.filter((offer) => offer?.error).length;
+        const diagnostics = {
+          ...(progressMeta.diagnostics || {}),
+          successCount,
+          errorCount,
+        };
+        const partialResult = buildExport(snapshot, progressMeta.sourceUrl || '', options.mode, provider, diagnostics);
+        partialResult.partial = true;
+        partialResult.totalQueued = total;
+        partialResult.processedCount = processed;
+        partialResult.successCount = successCount;
+        partialResult.errorCount = errorCount;
+        Object.assign(partialResult, progressMeta.resultFields || {});
+        await storageSet({ [resultKey(provider)]: partialResult });
+        await setState(provider, { partial: true });
+      };
+      savingPartial = savingPartial.then(task, task);
+      await savingPartial;
     }
 
     async function fetchOne(listing, index, retryPass = false) {
-      await maybeCooldown();
       try {
-        const html = await fetchHtml(listing.url, signal, provider === 'allegro' ? 5 : provider === 'olx' ? 4 : 3);
+        const retries = provider === 'ceneo' ? 1 : 2;
+        const html = await fetchHtml(listing.url, signal, retries);
         const parsed = parseOffer(provider, html, listing, options.mode);
         if (!parsed.title && listing.listingTitle) parsed.title = listing.listingTitle;
-        consecutiveErrors = 0;
+        parsed._listingIndex = index;
         return parsed;
       } catch (error) {
-        consecutiveErrors += 1;
-        if (provider === 'allegro' && consecutiveErrors >= 3) {
-          cooldownUntil = Math.max(cooldownUntil, Date.now() + 20000);
-        } else if (provider === 'olx' && consecutiveErrors >= 3) {
-          cooldownUntil = Math.max(cooldownUntil, Date.now() + 12000);
-        }
+        if (error?.name === 'AbortError') throw error;
         return {
           provider,
           itemId: listing.itemId,
@@ -1829,7 +1885,7 @@
           reviewCount: listing.reviewCount || null,
           shopsCount: listing.shopsCount || null,
           offersCount: listing.offersCount || null,
-          condition: '',
+          condition: listing.listingCondition || '',
           seller: '',
           sellerRating: '',
           shipping: '',
@@ -1838,6 +1894,7 @@
           description: `Błąd pobierania${retryPass ? ' po ponownej próbie' : ''}: ${error?.message || String(error)}`,
           url: listing.url,
           error: true,
+          _retryable: isRetryableError(error),
           _listingIndex: index,
         };
       }
@@ -1845,7 +1902,7 @@
 
     async function worker(workerNo) {
       while (true) {
-        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (signal.aborted) return;
         const index = nextIndex;
         nextIndex += 1;
         if (index >= total) return;
@@ -1857,108 +1914,132 @@
           queued: total,
           processed,
           errors,
-          percent: total ? 15 + (processed / total) * 75 : 90,
+          activeWorkers: scheduler.activeByProvider[provider] || 0,
+          percent: total ? 27 + (processed / total) * 66 : 93,
         });
 
-        const parsed = await fetchOne(listing, index, false);
+        let parsed;
+        try {
+          parsed = await fetchOne(listing, index, false);
+        } catch (error) {
+          if (error?.name === 'AbortError') return;
+          throw error;
+        }
         results[index] = parsed;
-        if (parsed.error) errors += 1;
-
         processed += 1;
+        errors = results.filter((offer) => offer?.error).length;
+        if (!parsed.error) historyBuffer.push(parsed);
+
+        if (historyBuffer.length >= 10) await flushHistory(false);
         await setState(provider, {
           processed,
           errors,
-          percent: total ? 15 + (processed / total) * 75 : 90,
+          activeWorkers: scheduler.activeByProvider[provider] || 0,
+          percent: total ? 27 + (processed / total) * 66 : 93,
           currentItem: `Worker ${workerNo}: ukończono ${processed}/${total}`,
         });
+        await savePartial(false);
 
         const baseDelay = provider === 'allegro'
-          ? Math.max(options.delayMs, 1000)
+          ? Math.max(450, Math.round((options.delayMs || 700) * 0.85))
           : provider === 'olx'
-            ? Math.max(options.delayMs, 900)
-            : options.delayMs;
+            ? Math.max(220, Math.round((options.delayMs || 700) * 0.5))
+            : Math.max(120, Math.round((options.delayMs || 700) * 0.22));
         await sleep(baseDelay);
       }
     }
 
-    const safeConcurrency = provider === 'allegro'
-      ? Math.max(1, Math.min(options.concurrency, 2))
-      : provider === 'olx'
-        ? Math.max(1, Math.min(options.concurrency, 2))
-        : Math.max(1, Math.min(options.concurrency, 5));
-    const workerCount = Math.max(1, Math.min(safeConcurrency, total || 1));
+    const workerCount = Math.max(1, Math.min(PROVIDER_MAX_WORKERS[provider] || 2, total || 1));
     await Promise.all(Array.from({ length: workerCount }, (_, i) => worker(i + 1)));
+    await flushHistory(true);
+    await savePartial(true);
 
-    // Druga, wolniejsza próba tylko dla błędów. To szczególnie ważne dla Allegro,
-    // które potrafi po kilkudziesięciu żądaniach chwilowo ograniczyć kolejne pobrania.
+    if (signal.aborted) {
+      return { offers: mergedOffers(), errors: results.filter((offer) => offer?.error).length, aborted: true };
+    }
+
+    // Druga próba tylko dla błędów przejściowych. Błędów 404 lub niepoprawnych stron
+    // nie mielimy wielokrotnie, co wcześniej mocno spowalniało Ceneo.
     const failedIndexes = results
-      .map((offer, index) => offer?.error ? index : -1)
+      .map((offer, index) => offer?.error && offer?._retryable ? index : -1)
       .filter((index) => index >= 0);
 
-    if (failedIndexes.length && !signal.aborted) {
+    if (failedIndexes.length) {
       await setState(provider, {
-        phase: `Ponawianie ${failedIndexes.length} błędów`,
-        currentItem: provider === 'allegro'
-          ? 'Dłuższa przerwa przed ponowną próbą'
-          : provider === 'olx'
-            ? 'Krótka przerwa przed ponowną próbą OLX'
-            : 'Ponowna próba pobierania',
-        percent: 91,
+        phase: `Ponawianie ${failedIndexes.length} błędów przejściowych`,
+        currentItem: 'Automatyczny retry z adaptacyjnym ograniczeniem szybkości',
+        percent: 94,
       });
-      await sleep(provider === 'allegro' ? 15000 : provider === 'olx' ? 8000 : 3000);
 
       let retried = 0;
       for (const index of failedIndexes) {
-        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (signal.aborted) break;
         const listing = listingOffers[index];
-        await setState(provider, {
-          phase: `Ponawianie błędów ${retried + 1}/${failedIndexes.length}`,
-          currentItem: listing.listingTitle || listing.url,
-          percent: 91 + ((retried / failedIndexes.length) * 5),
-        });
-
-        const parsed = await fetchOne(listing, index, true);
-        if (!parsed.error) {
-          results[index] = parsed;
-          errors -= 1;
-        } else {
-          results[index] = parsed;
+        let parsed;
+        try {
+          parsed = await fetchOne(listing, index, true);
+        } catch (error) {
+          if (error?.name === 'AbortError') break;
+          throw error;
         }
+        results[index] = parsed;
+        if (!parsed.error) historyBuffer.push(parsed);
         retried += 1;
-        await sleep(provider === 'allegro'
-          ? Math.max(2500, options.delayMs * 2)
-          : provider === 'olx'
-            ? Math.max(1800, options.delayMs * 1.5)
-            : Math.max(1200, options.delayMs));
+        errors = results.filter((offer) => offer?.error).length;
+        await setState(provider, {
+          phase: `Ponawianie błędów ${retried}/${failedIndexes.length}`,
+          currentItem: listing.listingTitle || listing.url,
+          errors,
+          activeWorkers: scheduler.activeByProvider[provider] || 0,
+          percent: 94 + ((retried / failedIndexes.length) * 3),
+        });
+        if (historyBuffer.length >= 10) await flushHistory(false);
+        await savePartial(false);
+        await sleep(provider === 'allegro' ? 900 : provider === 'olx' ? 600 : 350);
       }
     }
 
-    return { offers: results.filter(Boolean), errors };
+    await flushHistory(true);
+    await savePartial(true);
+    return {
+      offers: mergedOffers(),
+      errors: results.filter((offer) => offer?.error).length,
+      aborted: signal.aborted,
+    };
   }
 
-  async function run(options) {
+  async function run(provider, sourceUrl, options, resume = false) {
     const controller = new AbortController();
-    job = { controller };
-
-    const sourceUrl = location.href;
-    const provider = detectProvider(sourceUrl);
     const startedAt = Date.now();
+    jobs[provider] = { controller, sourceUrl, options, startedAt };
+    scheduler.setLimit(options.concurrency || 6);
 
-    if (!provider) {
-      job = null;
-      throw new Error('Obsługiwane są tylko Allegro, Ceneo i OLX.');
+    if (!provider || detectProvider(sourceUrl) !== provider) {
+      jobs[provider] = null;
+      throw new Error('Nieprawidłowy adres źródłowy dla wybranego serwisu.');
     }
 
     const stateStorageKey = stateKey(provider);
     const resultStorageKey = resultKey(provider);
-    await chrome.storage.local.remove(resultStorageKey);
-    await chrome.storage.local.set({
+    const previousResult = (await storageGet(resultStorageKey))[resultStorageKey] || null;
+    const baseOffers = resume && Array.isArray(previousResult?.offers)
+      ? previousResult.offers.filter((offer) => offer && !offer.error)
+      : [];
+
+    await storageSet({
+      [metaKey(provider)]: {
+        provider,
+        sourceUrl,
+        options,
+        updatedAt: startedAt,
+      },
       [stateStorageKey]: {
         running: true,
         done: false,
         failed: false,
+        partial: Boolean(baseOffers.length),
         provider,
-        phase: 'Start',
+        phase: resume ? 'Wznawianie' : 'Start',
         pagesScanned: 0,
         offersFound: 0,
         queued: 0,
@@ -1967,6 +2048,7 @@
         errors: 0,
         declaredCount: null,
         totalPages: null,
+        activeWorkers: 0,
         currentItem: sourceUrl,
         percent: 0,
         startedAt,
@@ -1998,43 +2080,53 @@
       }
 
       const listingOffers = scanResult.queuedOffers;
-
       if (!scanResult.allOffers.length) {
-        throw new Error(`Nie znaleziono pozycji na stronie ${providerLabel(provider)}. Otwórz stronę kategorii/wyników z ustawionymi filtrami.`);
+        throw new Error(`Nie znaleziono pozycji na stronie ${providerLabel(provider)}. Sprawdź zapisany adres i filtry.`);
       }
 
+      const diagnosticsBase = {
+        discoveredCount: scanResult.allOffers.length,
+        declaredCount: scanResult.declaredCount,
+        totalPages: scanResult.totalPages,
+        pagesScanned: scanResult.pagesScanned,
+        skippedSeen: scanResult.skippedSeen,
+        listingProductCount: scanResult.listingProductCount,
+        groupsFound: scanResult.groupsFound,
+        groupsExpanded: scanResult.groupsExpanded,
+        groupPagesScanned: scanResult.groupPagesScanned,
+        groupErrors: scanResult.groupErrors,
+        filteredOut: scanResult.filteredOut,
+      };
+      const resultFields = {
+        skippedSeen: scanResult.skippedSeen,
+        discoveredCount: scanResult.allOffers.length,
+        declaredCount: scanResult.declaredCount,
+        totalPages: scanResult.totalPages,
+        pagesScanned: scanResult.pagesScanned,
+        listingProductCount: scanResult.listingProductCount || null,
+        groupsFound: scanResult.groupsFound || 0,
+        groupsExpanded: scanResult.groupsExpanded || 0,
+        groupPagesScanned: scanResult.groupPagesScanned || 0,
+        groupErrors: scanResult.groupErrors || 0,
+        filteredOut: scanResult.filteredOut || 0,
+      };
+
       if (!listingOffers.length) {
-        const emptyDiagnostics = {
-          discoveredCount: scanResult.allOffers.length,
-          declaredCount: scanResult.declaredCount,
-          totalPages: scanResult.totalPages,
-          pagesScanned: scanResult.pagesScanned,
-          skippedSeen: scanResult.skippedSeen,
-          successCount: 0,
-          errorCount: 0,
-          listingProductCount: scanResult.listingProductCount,
-          groupsFound: scanResult.groupsFound,
-          groupsExpanded: scanResult.groupsExpanded,
-          groupPagesScanned: scanResult.groupPagesScanned,
-          groupErrors: scanResult.groupErrors,
-          filteredOut: scanResult.filteredOut,
-        };
-        const emptyResult = buildExport([], sourceUrl, options.mode, provider, emptyDiagnostics);
-        emptyResult.skippedSeen = scanResult.skippedSeen;
-        emptyResult.discoveredCount = scanResult.allOffers.length;
-        emptyResult.declaredCount = scanResult.declaredCount;
-        emptyResult.totalPages = scanResult.totalPages;
-        emptyResult.pagesScanned = scanResult.pagesScanned;
-        await chrome.storage.local.set({ [resultStorageKey]: emptyResult });
+        if (!baseOffers.length) {
+          const emptyResult = buildExport([], sourceUrl, options.mode, provider, { ...diagnosticsBase, successCount: 0, errorCount: 0 });
+          Object.assign(emptyResult, resultFields);
+          await storageSet({ [resultStorageKey]: emptyResult });
+        }
         await setState(provider, {
           running: false,
           done: true,
           failed: false,
+          partial: false,
           phase: 'Gotowe, brak nowych pozycji',
           offersFound: scanResult.allOffers.length,
           queued: 0,
           skippedSeen: scanResult.skippedSeen,
-          processed: 0,
+          processed: baseOffers.length,
           errors: 0,
           declaredCount: scanResult.declaredCount,
           totalPages: scanResult.totalPages,
@@ -2052,88 +2144,91 @@
         skippedSeen: scanResult.skippedSeen,
         declaredCount: scanResult.declaredCount,
         totalPages: scanResult.totalPages,
-        percent: 15,
+        percent: provider === 'allegro' ? 27 : 20,
         currentItem: provider === 'allegro'
-          ? `Karty produktów: ${scanResult.listingProductCount || 0}, po rozwinięciu: ${scanResult.allOffers.length} ofert, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`
-          : `Znaleziono ${scanResult.allOffers.length}, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`,
+          ? `Karty produktów: ${scanResult.listingProductCount || 0}, po rozwinięciu: ${scanResult.allOffers.length} ofert, nowych ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`
+          : `Znaleziono ${scanResult.allOffers.length}, nowych ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`,
       });
 
-      const detailResult = await fetchOfferDetails(provider, listingOffers, options, controller.signal);
+      const detailResult = await fetchOfferDetails(provider, listingOffers, options, controller.signal, {
+        sourceUrl,
+        diagnostics: diagnosticsBase,
+        resultFields,
+        baseOffers,
+      });
+
+      if (detailResult.aborted || controller.signal.aborted) {
+        await setState(provider, {
+          running: false,
+          done: false,
+          failed: false,
+          partial: true,
+          phase: 'Przerwano, wynik częściowy zapisany',
+          errors: detailResult.errors,
+          currentItem: 'Możesz otworzyć częściowy wynik albo kliknąć Wznów. Poprawne pozycje są już w historii.',
+          finishedAt: Date.now(),
+        });
+        return;
+      }
 
       await setState(provider, {
         phase: 'Budowanie eksportu',
         currentItem: 'Dzielę wynik na fragmenty do ChatGPT',
-        percent: 97,
+        percent: 98,
       });
 
-      const diagnostics = {
-        discoveredCount: scanResult.allOffers.length,
-        declaredCount: scanResult.declaredCount,
-        totalPages: scanResult.totalPages,
-        pagesScanned: scanResult.pagesScanned,
-        skippedSeen: scanResult.skippedSeen,
-        successCount: detailResult.offers.filter((offer) => !offer.error).length,
-        errorCount: detailResult.errors,
-        listingProductCount: scanResult.listingProductCount,
-        groupsFound: scanResult.groupsFound,
-        groupsExpanded: scanResult.groupsExpanded,
-        groupPagesScanned: scanResult.groupPagesScanned,
-        groupErrors: scanResult.groupErrors,
-        filteredOut: scanResult.filteredOut,
-      };
+      const successCount = detailResult.offers.filter((offer) => !offer.error).length;
+      const diagnostics = { ...diagnosticsBase, successCount, errorCount: detailResult.errors };
       const result = buildExport(detailResult.offers, sourceUrl, options.mode, provider, diagnostics);
-      result.skippedSeen = scanResult.skippedSeen;
-      result.discoveredCount = scanResult.allOffers.length;
-      result.declaredCount = scanResult.declaredCount;
-      result.totalPages = scanResult.totalPages;
-      result.pagesScanned = scanResult.pagesScanned;
-      result.successCount = detailResult.offers.filter((offer) => !offer.error).length;
-      result.errorCount = detailResult.errors;
-      result.listingProductCount = scanResult.listingProductCount || null;
-      result.groupsFound = scanResult.groupsFound || 0;
-      result.groupsExpanded = scanResult.groupsExpanded || 0;
-      result.groupPagesScanned = scanResult.groupPagesScanned || 0;
-      result.groupErrors = scanResult.groupErrors || 0;
-      result.filteredOut = scanResult.filteredOut || 0;
-      await chrome.storage.local.set({ [resultStorageKey]: result });
-
-      // Do historii trafiają wyłącznie pozycje pobrane poprawnie. Błędy zostają do ponowienia.
+      Object.assign(result, resultFields, {
+        successCount,
+        errorCount: detailResult.errors,
+        partial: false,
+      });
+      await storageSet({ [resultStorageKey]: result });
       await addSuccessfulOffersToHistory(provider, detailResult.offers);
 
       await setState(provider, {
         running: false,
         done: true,
         failed: false,
+        partial: false,
         phase: detailResult.errors ? 'Gotowe z błędami' : 'Gotowe',
         processed: detailResult.offers.length,
         errors: detailResult.errors,
-        currentItem: `${result.successCount} poprawnie, ${detailResult.errors} błędów, ${result.chunks.length} fragmentów`,
+        activeWorkers: 0,
+        currentItem: `${successCount} poprawnie, ${detailResult.errors} błędów, ${result.chunks.length} fragmentów`,
         percent: 100,
         finishedAt: Date.now(),
       });
     } catch (error) {
-      const aborted = error?.name === 'AbortError';
+      const aborted = error?.name === 'AbortError' || controller.signal.aborted;
       await setState(provider, {
         running: false,
         done: false,
         failed: !aborted,
+        partial: Boolean((await storageGet(resultStorageKey))[resultStorageKey]?.chunks?.length),
         phase: aborted ? 'Przerwano' : 'Błąd',
-        currentItem: aborted ? 'Eksport przerwany przez użytkownika.' : (error?.message || String(error)),
+        currentItem: aborted
+          ? 'Eksport przerwany. Jeśli istnieje wynik częściowy, możesz go otworzyć i później wznowić.'
+          : (error?.message || String(error)),
+        activeWorkers: 0,
         finishedAt: Date.now(),
       });
     } finally {
-      job = null;
+      jobs[provider] = null;
+      scheduler.pump();
     }
   }
 
   async function migrateLegacyStorage() {
-    const legacy = await chrome.storage.local.get([LEGACY_STORAGE_STATE, LEGACY_STORAGE_RESULT]);
+    const legacy = await storageGet([LEGACY_STORAGE_STATE, LEGACY_STORAGE_RESULT]);
     const oldResult = legacy[LEGACY_STORAGE_RESULT];
     if (oldResult?.provider && (oldResult.provider === 'allegro' || oldResult.provider === 'ceneo' || oldResult.provider === 'olx')) {
       const provider = oldResult.provider;
       const newResultKey = resultKey(provider);
-      const existing = (await chrome.storage.local.get(newResultKey))[newResultKey];
-      if (!existing) await chrome.storage.local.set({ [newResultKey]: oldResult });
+      const existing = (await storageGet(newResultKey))[newResultKey];
+      if (!existing) await storageSet({ [newResultKey]: oldResult });
       await addSuccessfulOffersToHistory(provider, oldResult.offers || []);
     }
 
@@ -2141,56 +2236,69 @@
     if (oldState?.provider && (oldState.provider === 'allegro' || oldState.provider === 'ceneo' || oldState.provider === 'olx')) {
       const provider = oldState.provider;
       const newStateKey = stateKey(provider);
-      const existing = (await chrome.storage.local.get(newStateKey))[newStateKey];
-      if (!existing) await chrome.storage.local.set({ [newStateKey]: oldState });
+      const existing = (await storageGet(newStateKey))[newStateKey];
+      if (!existing) await storageSet({ [newStateKey]: oldState });
     }
   }
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type === 'MARKETPLACE_EXPORTER_START' || message?.type === 'ALLEGRO_EXPORTER_START') {
-      if (job) {
-        sendResponse({ ok: false, error: 'Eksport już trwa na tej karcie.' });
+    if (message?.target !== 'marketplace-runner') return false;
+
+    if (message?.type === 'MARKETPLACE_RUNNER_START') {
+      const provider = message.provider || detectProvider(message.sourceUrl);
+      if (!provider || !['allegro', 'ceneo', 'olx'].includes(provider)) {
+        sendResponse({ ok: false, error: 'Nie rozpoznano serwisu.' });
+        return false;
+      }
+      if (jobs[provider]) {
+        sendResponse({ ok: false, error: `Eksport ${providerLabel(provider)} już trwa.` });
         return false;
       }
 
-      const provider = detectProvider(location.href);
       const options = {
         startFromFirst: message.options?.startFromFirst !== false,
         mode: message.options?.mode === 'full' ? 'full' : 'compact',
         maxOffers: Math.max(0, Number(message.options?.maxOffers || 0)),
-        concurrency: Math.max(1, Math.min(5, Number(message.options?.concurrency || (provider === 'ceneo' ? 2 : 1)))),
-        delayMs: Math.max(200, Number(message.options?.delayMs || (provider === 'ceneo' ? 600 : 1200))),
+        concurrency: Math.max(2, Math.min(9, Number(message.options?.concurrency || 6))),
+        delayMs: Math.max(200, Math.min(2000, Number(message.options?.delayMs || 700))),
         skipSeen: message.options?.skipSeen !== false,
       };
 
-      run(options).catch(async (error) => {
-        const providerNow = detectProvider(location.href);
-        if (providerNow) {
-          await setState(providerNow, {
-            running: false,
-            done: false,
-            failed: true,
-            phase: 'Błąd',
-            currentItem: error?.message || String(error),
-          });
-        }
+      run(provider, message.sourceUrl, options, Boolean(message.resume)).catch(async (error) => {
+        jobs[provider] = null;
+        await setState(provider, {
+          running: false,
+          done: false,
+          failed: true,
+          phase: 'Błąd',
+          currentItem: error?.message || String(error),
+          activeWorkers: 0,
+        });
       });
       sendResponse({ ok: true, provider });
       return false;
     }
 
-    if (message?.type === 'MARKETPLACE_EXPORTER_STOP' || message?.type === 'ALLEGRO_EXPORTER_STOP') {
-      if (job?.controller) job.controller.abort();
-      sendResponse({ ok: true });
+    if (message?.type === 'MARKETPLACE_RUNNER_STOP') {
+      const provider = message.provider;
+      if (jobs[provider]?.controller) jobs[provider].controller.abort();
+      sendResponse({ ok: true, provider });
       return false;
     }
 
-    if (message?.type === 'MARKETPLACE_EXPORTER_PING') {
-      sendResponse({ ok: true, provider: detectProvider(location.href), running: Boolean(job) });
+    if (message?.type === 'MARKETPLACE_RUNNER_STATUS') {
+      sendResponse({
+        ok: true,
+        activeProviders: Object.keys(jobs).filter((provider) => Boolean(jobs[provider])),
+        scheduler: {
+          limit: scheduler.limit,
+          active: scheduler.active,
+          activeByProvider: { ...scheduler.activeByProvider },
+        },
+      });
       return false;
     }
 
-    sendResponse({ ok: false, error: 'Nieznany komunikat.' });
     return false;
   });
 
