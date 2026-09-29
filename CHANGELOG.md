@@ -2,6 +2,16 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.7.0
+
+- Naprawiono regresję `findProductJsonLd is not defined` dla wszystkich serwisów.
+- Allegro otrzymało twardy limit 1 workera, minimum ok. 3,2 s między żądaniami i dodatkowe przerwy.
+- Po pierwszym 403/429 lub stronie ochronnej dany serwis jest natychmiast wstrzymywany.
+- Dodano cache skanu listingu na 6 godzin do szybszego wznowienia.
+- Allegro rozwija tylko grupy odpowiadające kartom z głównego listingu.
+- Ceneo odrzuca oczywiste SSD/NVMe/M.2 przy skanie kategorii HDD.
+- OLX preferuje cenę z właściwej strony ogłoszenia.
+
 ## v1.6.0
 
 - Przeniesiono zadania do dokumentu tła, aby skan nie zależał od otwartej karty źródłowej.
