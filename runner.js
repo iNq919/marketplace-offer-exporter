@@ -17,7 +17,7 @@
   // żeby nie powtarzać sytuacji z blokadą antybotową. Wolne sloty mogą
   // przechodzić na Ceneo/OLX, ale nigdy nie zwiększają limitu Allegro.
   const PROVIDER_DEFAULT_WORKERS = { allegro: 1, ceneo: 1, olx: 4 };
-  const PROVIDER_HARD_MAX_WORKERS = { allegro: 2, ceneo: 3, olx: 6 };
+  const PROVIDER_HARD_MAX_WORKERS = { allegro: 2, ceneo: 1, olx: 6 };
   const providerControl = {
     allegro: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0, requestCount: 0 },
     ceneo: { penalty: 0, successStreak: 0, cooldownUntil: 0, nextRequestAt: 0, requestCount: 0 },
@@ -136,6 +136,44 @@
       keys,
     });
     if (!response?.ok) throw new Error(response?.error || 'Nie udało się usunąć danych ze storage.');
+  }
+
+  async function fetchCeneoViaBrowserTab(url, signal) {
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+
+    let abortHandler;
+    const abortPromise = signal ? new Promise((_, reject) => {
+      abortHandler = () => reject(new DOMException('Aborted', 'AbortError'));
+      signal.addEventListener('abort', abortHandler, { once: true });
+    }) : null;
+
+    const requestPromise = chrome.runtime.sendMessage({
+      target: 'marketplace-background',
+      type: 'RUNNER_CENEO_TAB_FETCH',
+      url,
+    });
+
+    try {
+      const response = abortPromise
+        ? await Promise.race([requestPromise, abortPromise])
+        : await requestPromise;
+      if (!response?.ok) throw new Error(response?.error || 'Nie udało się pobrać Ceneo przez kartę przeglądarki.');
+      if (!response.html) throw new Error('Karta Ceneo nie zwróciła HTML.');
+      return response.html;
+    } finally {
+      if (abortHandler && signal) signal.removeEventListener('abort', abortHandler);
+    }
+  }
+
+  async function closeCeneoBrowserTab() {
+    try {
+      await chrome.runtime.sendMessage({
+        target: 'marketplace-background',
+        type: 'RUNNER_CENEO_TAB_CLOSE',
+      });
+    } catch {
+      // Zamknięcie karty roboczej nie może wywrócić wyniku eksportu.
+    }
   }
 
   function cleanText(value) {
@@ -470,46 +508,51 @@
           control.nextRequestAt = Math.max(control.nextRequestAt, Date.now() + 8000);
         }
 
-        const response = await fetch(url, {
-          method: 'GET',
-          credentials: 'include',
-          cache: 'no-store',
-          redirect: 'follow',
-          signal,
-          headers: {
-            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'pl-PL,pl;q=0.9,en;q=0.7',
-          },
-        });
-
-        if (response.status === 403 || response.status === 429) {
-          noteProviderThrottle(provider, response.status);
+        let html;
+        if (provider === 'ceneo') {
+          // Ceneo wykonujemy w pojedynczej, normalnej karcie Chrome. Dzięki temu
+          // działa JavaScript strony oraz ta sama sesja/cookies co przy ręcznym
+          // przeglądaniu. Nadal respektujemy stronę ochronną i natychmiast stopujemy.
+          html = await fetchCeneoViaBrowserTab(url, signal);
           if (release) { release(); release = null; }
-          // Nie próbujemy obchodzić ochrony ani walić kolejnymi requestami.
-          // Zatrzymujemy tylko ten serwis i zostawiamy częściowy wynik do wznowienia.
-          throw makeProtectionError(provider, url, response.status);
-        }
+        } else {
+          const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            redirect: 'follow',
+            signal,
+            headers: {
+              Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Accept-Language': 'pl-PL,pl;q=0.9,en;q=0.7',
+            },
+          });
 
-        if (response.status >= 500) {
-          noteProviderThrottle(provider, response.status);
-          const retryAfter = Number.parseInt(response.headers.get('Retry-After') || '0', 10);
-          lastError = new Error(`HTTP ${response.status} dla ${url}`);
-          if (release) { release(); release = null; }
-          if (attempt < retries) {
-            const fallbackWait = provider === 'olx'
-              ? Math.min(15000, 1800 * (attempt + 1))
-              : provider === 'ceneo'
-                ? Math.min(9000, 1200 * (attempt + 1))
-                : Math.min(15000, 2000 * (attempt + 1));
-            await sleep(retryAfter > 0 ? retryAfter * 1000 : fallbackWait);
-            continue;
+          if (response.status === 403 || response.status === 429) {
+            noteProviderThrottle(provider, response.status);
+            if (release) { release(); release = null; }
+            throw makeProtectionError(provider, url, response.status);
           }
-          throw lastError;
-        }
 
-        if (!response.ok) throw new Error(`HTTP ${response.status} dla ${url}`);
-        const html = await response.text();
-        if (release) { release(); release = null; }
+          if (response.status >= 500) {
+            noteProviderThrottle(provider, response.status);
+            const retryAfter = Number.parseInt(response.headers.get('Retry-After') || '0', 10);
+            lastError = new Error(`HTTP ${response.status} dla ${url}`);
+            if (release) { release(); release = null; }
+            if (attempt < retries) {
+              const fallbackWait = provider === 'olx'
+                ? Math.min(15000, 1800 * (attempt + 1))
+                : Math.min(15000, 2000 * (attempt + 1));
+              await sleep(retryAfter > 0 ? retryAfter * 1000 : fallbackWait);
+              continue;
+            }
+            throw lastError;
+          }
+
+          if (!response.ok) throw new Error(`HTTP ${response.status} dla ${url}`);
+          html = await response.text();
+          if (release) { release(); release = null; }
+        }
 
         if (/nietypow(?:y|a) ruch|access denied|potwierdź.{0,80}robotem|verify.{0,80}human|sprawdź.{0,80}człowiekiem|captcha|zostałeś zablokowany/i.test(html) && html.length < 250000) {
           noteProviderThrottle(provider, 429);
@@ -2524,6 +2567,7 @@
         finishedAt: Date.now(),
       });
     } finally {
+      if (provider === 'ceneo') await closeCeneoBrowserTab();
       jobs[provider] = null;
       scheduler.pump();
     }
@@ -2570,7 +2614,7 @@
         concurrency: Math.max(2, Math.min(9, Number(message.options?.concurrency || 6))),
         workerLimits: {
           allegro: Math.max(1, Math.min(2, Number(message.options?.workerLimits?.allegro || 1))),
-          ceneo: Math.max(1, Math.min(3, Number(message.options?.workerLimits?.ceneo || 1))),
+          ceneo: 1,
           olx: Math.max(1, Math.min(6, Number(message.options?.workerLimits?.olx || 4))),
         },
         delayMs: Math.max(200, Math.min(2000, Number(message.options?.delayMs || 700))),

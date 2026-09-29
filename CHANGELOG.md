@@ -2,6 +2,14 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.9.0
+
+- Ceneo przestało pobierać szczegóły przez surowy `fetch()` w dokumencie offscreen.
+- Dodano tryb jednej normalnej, nieaktywnej karty Chrome dla Ceneo, z oczekiwaniem na JavaScript strony.
+- Karta robocza Ceneo jest odtwarzana po przypadkowym zamknięciu i zamykana po zakończeniu zadania.
+- Ceneo ma stały limit 1 workera w trybie karty.
+- Strona ochronna nadal natychmiast zatrzymuje skan, bez prób obchodzenia zabezpieczeń.
+
 ## v1.8.0
 
 - Dodano osobny, widoczny limit workerów dla każdego serwisu.

@@ -1,8 +1,8 @@
-# Allegro + Ceneo + OLX Offer Exporter v1.8.0
+# Allegro + Ceneo + OLX Offer Exporter v1.9.0
 
 Rozszerzenie Chrome zbiera oferty z Allegro, produkty z Ceneo i ogłoszenia z OLX oraz przygotowuje eksport TXT/JSON i fragmenty do wklejenia do ChatGPT.
 
-## Najważniejsze zmiany v1.8.0
+## Najważniejsze zmiany v1.9.0
 
 - Każdy serwis ma osobny, widoczny limit workerów bezpośrednio na swojej karcie.
 - Domyślne limity: Allegro 1, Ceneo 1, OLX 4.
@@ -84,3 +84,10 @@ Ceneo może zwracać stronę ochronną przy dużej liczbie requestów. W v1.7 pi
 ## OLX
 
 Każde ogłoszenie ma własne ID. Po naprawie parsera szczegóły obejmują m.in. tytuł, cenę, stan, parametry i opis, w którym często znajdują się dane SMART, liczba godzin i informacje o bad sectorach.
+
+
+## Ceneo - tryb normalnej karty Chrome
+
+Od v1.9 Ceneo nie jest pobierane przez surowy `fetch()` z dokumentu offscreen. Eksporter tworzy jedną nieaktywną kartę Ceneo, ładuje kolejne adresy jak zwykła przeglądarka, czeka na JavaScript strony i dopiero wtedy odczytuje HTML. Karta jest ponownie tworzona, jeśli użytkownik przypadkiem ją zamknie, a po zakończeniu zadania jest zamykana.
+
+Ceneo ma stały limit 1 workera. To nie jest mechanizm obchodzenia ochrony serwisu: jeśli normalna karta Ceneo pokaże stronę ochronną, eksport nadal natychmiast się zatrzyma.

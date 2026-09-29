@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Allegro + Ceneo + OLX Offer Exporter for ChatGPT",
-  "version": "1.8.0",
-  "description": "Eksportuje Allegro, Ceneo i OLX w tle, ma osobne limity workerów, bezpieczne tempo, checkpointy i eksport bieżącej historii.",
+  "version": "1.9.0",
+  "description": "Eksportuje Allegro, Ceneo i OLX. Ceneo używa pojedynczej normalnej karty przeglądarki z JavaScript, a Allegro ma konserwatywne tempo i historię.",
   "permissions": [
     "tabs",
     "offscreen",
     "storage",
     "unlimitedStorage",
-    "clipboardWrite"
+    "clipboardWrite",
+    "scripting"
   ],
   "host_permissions": [
     "https://allegro.pl/*",

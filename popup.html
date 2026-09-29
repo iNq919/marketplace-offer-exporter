@@ -60,7 +60,7 @@
         <button id="startCurrentBtn" class="primary">Uruchom bieżącą kartę</button>
         <button id="startBothBtn">Uruchom Allegro + Ceneo + OLX</button>
       </div>
-      <p class="hint">Po uruchomieniu możesz zamknąć karty Allegro, Ceneo i OLX. Zadania działają w tle rozszerzenia. Domyślnie Allegro = 1 worker, Ceneo = 1 worker, OLX = 4 workery. Limity możesz zmienić osobno przed startem lub wznowieniem.</p>
+      <p class="hint">Po uruchomieniu możesz zamknąć karty Allegro, Ceneo i OLX. Zadania działają w tle rozszerzenia. Domyślnie Allegro = 1 worker, Ceneo = 1 worker w zwykłej karcie Chrome, OLX = 4 workery. Allegro i OLX możesz regulować osobno. Ceneo pozostaje na 1 workerze, żeby JavaScript i cookies działały jak przy normalnym przeglądaniu.</p>
     </section>
 
     <section class="providers-grid">
@@ -112,8 +112,8 @@
         </div>
         <div class="worker-control">
           <label for="ceneoWorkers">Limit workerów</label>
-          <input id="ceneoWorkers" type="number" min="1" max="3" step="1" value="1" title="zalecane 1">
-          <small id="ceneoWorkerStatus">Aktywne: 0 / limit: 1</small>
+          <input id="ceneoWorkers" type="number" min="1" max="1" step="1" value="1" title="Ceneo działa w jednej normalnej karcie Chrome" readonly>
+          <small id="ceneoWorkerStatus">Aktywne: 0 / limit: 1, tryb karty Chrome</small>
         </div>
         <div class="progress-head">
           <span id="ceneoPhase">Gotowy</span>

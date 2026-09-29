@@ -123,7 +123,7 @@ async function getActiveMarketplaceTab() {
 }
 
 const WORKER_DEFAULTS = { allegro: 1, ceneo: 1, olx: 4 };
-const WORKER_HARD_MAX = { allegro: 2, ceneo: 3, olx: 6 };
+const WORKER_HARD_MAX = { allegro: 2, ceneo: 1, olx: 6 };
 
 function clampWorkerLimit(provider, value) {
   const max = WORKER_HARD_MAX[provider] || 1;
@@ -257,7 +257,9 @@ function renderState(provider, rawState) {
   const configuredLimit = state.workerLimit || clampWorkerLimit(provider, metas[provider]?.options?.workerLimits?.[provider] ?? ui.workerInput?.value);
   if (ui.workerInput && !state.running) ui.workerInput.value = configuredLimit;
   if (ui.workerInput) ui.workerInput.disabled = state.running;
-  if (ui.workerStatus) ui.workerStatus.textContent = `Aktywne: ${state.activeWorkers} / limit: ${configuredLimit}`;
+  if (ui.workerStatus) ui.workerStatus.textContent = provider === 'ceneo'
+    ? `Aktywne: ${state.activeWorkers} / limit: ${configuredLimit}, tryb karty Chrome`
+    : `Aktywne: ${state.activeWorkers} / limit: ${configuredLimit}`;
 
   const diagnostics = [];
   if (state.declaredCount) diagnostics.push(`Serwis deklaruje: ${state.declaredCount}`);

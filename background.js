@@ -6,6 +6,101 @@ const metaKey = (provider) => `${STORAGE_PREFIX}:jobMeta:${provider}`;
 
 let creatingOffscreen = null;
 
+let ceneoWorkerTabId = null;
+let ceneoTabQueue = Promise.resolve();
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function getCeneoWorkerTab() {
+  if (ceneoWorkerTabId != null) {
+    try {
+      const tab = await chrome.tabs.get(ceneoWorkerTabId);
+      if (tab?.id != null) return tab.id;
+    } catch {
+      ceneoWorkerTabId = null;
+    }
+  }
+
+  const tab = await chrome.tabs.create({
+    url: 'https://www.ceneo.pl/',
+    active: false,
+  });
+  ceneoWorkerTabId = tab.id;
+  return tab.id;
+}
+
+async function waitForCeneoTab(tabId, timeoutMs = 45000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    let tab;
+    try {
+      tab = await chrome.tabs.get(tabId);
+    } catch {
+      throw new Error('Karta robocza Ceneo została zamknięta.');
+    }
+    if (tab?.status === 'complete' && /^https:\/\/(?:www\.)?ceneo\.pl\//i.test(tab.url || '')) {
+      // Ceneo renderuje część danych po JS. Krótka pauza pozwala stronie zakończyć inicjalizację.
+      await delay(1100);
+      return tab;
+    }
+    await delay(250);
+  }
+  throw new Error('Przekroczono czas oczekiwania na załadowanie strony Ceneo.');
+}
+
+async function readCeneoTabHtml(tabId) {
+  const results = await chrome.scripting.executeScript({
+    target: { tabId },
+    world: 'ISOLATED',
+    func: () => ({
+      html: document.documentElement?.outerHTML || '',
+      url: location.href,
+      title: document.title || '',
+      readyState: document.readyState,
+    }),
+  });
+  const result = results?.[0]?.result;
+  if (!result?.html) throw new Error('Nie udało się odczytać HTML z karty Ceneo.');
+  return result;
+}
+
+async function fetchCeneoInBrowserTab(url) {
+  // Jedna kolejka i jedna normalna karta. Nie próbujemy omijać ochrony serwisu,
+  // tylko pozwalamy Ceneo wykonać JavaScript i użyć zwykłej sesji/cookies Chrome.
+  ceneoTabQueue = ceneoTabQueue.catch(() => {}).then(async () => {
+    let tabId = await getCeneoWorkerTab();
+    try {
+      await chrome.tabs.update(tabId, { url, active: false });
+      await waitForCeneoTab(tabId);
+      return { ok: true, ...(await readCeneoTabHtml(tabId)) };
+    } catch (error) {
+      // Jeżeli użytkownik przypadkiem zamknął kartę roboczą, odtwarzamy ją raz.
+      const message = String(error?.message || error || '');
+      if (/zamknięta|No tab with id|tab was closed/i.test(message)) {
+        ceneoWorkerTabId = null;
+        tabId = await getCeneoWorkerTab();
+        await chrome.tabs.update(tabId, { url, active: false });
+        await waitForCeneoTab(tabId);
+        return { ok: true, ...(await readCeneoTabHtml(tabId)) };
+      }
+      throw error;
+    }
+  });
+  return ceneoTabQueue;
+}
+
+async function closeCeneoWorkerTab() {
+  const tabId = ceneoWorkerTabId;
+  ceneoWorkerTabId = null;
+  if (tabId == null) return;
+  try {
+    await chrome.tabs.remove(tabId);
+  } catch {
+    // Karta mogła zostać zamknięta ręcznie.
+  }
+}
+
+
 async function hasOffscreenDocument() {
   if (!chrome.runtime.getContexts) return false;
   const contexts = await chrome.runtime.getContexts({
@@ -78,6 +173,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         .catch((error) => sendResponse({ ok: false, error: error?.message || String(error) }));
       return true;
     }
+    if (message.type === 'RUNNER_CENEO_TAB_FETCH') {
+      fetchCeneoInBrowserTab(message.url).then((data) => sendResponse(data))
+        .catch((error) => sendResponse({ ok: false, error: error?.message || String(error) }));
+      return true;
+    }
+    if (message.type === 'RUNNER_CENEO_TAB_CLOSE') {
+      closeCeneoWorkerTab().then(() => sendResponse({ ok: true }))
+        .catch((error) => sendResponse({ ok: false, error: error?.message || String(error) }));
+      return true;
+    }
     return false;
   }
 
@@ -100,6 +205,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'EXPORTER_BG_STOP') {
     (async () => {
       const response = await sendRunner({ type: 'MARKETPLACE_RUNNER_STOP', provider: message.provider });
+      if (message.provider === 'ceneo') await closeCeneoWorkerTab();
       sendResponse(response);
     })().catch((error) => sendResponse({ ok: false, error: error?.message || String(error) }));
     return true;
