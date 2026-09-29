@@ -365,18 +365,29 @@
   }
 
   function parseAllegroDeclaredCount(doc) {
-    const candidates = [];
+    // Allegro od 2024 r. pokazuje na głównym listingu liczbę OFERT, ale same
+    // wyniki są grupowane w PRODUKTY. Szukamy najpierw samodzielnego elementu
+    // tekstowego typu "587 ofert". Dzięki temu nie mylimy licznika z filtrami
+    // typu "4TB (120) ofert" ani z przyciskiem "zobacz 18 ofert".
+    const exact = [];
+    for (const el of doc.querySelectorAll('main *, body *')) {
+      if (el.children.length > 0) continue;
+      const text = singleLine(el.textContent || '');
+      const match = text.match(/^([\d\s]+)\s+ofert(?:a|y)?$/i);
+      if (!match) continue;
+      const count = Number.parseInt(match[1].replace(/\s/g, ''), 10);
+      if (Number.isFinite(count) && count > 0 && count < 1000000) exact.push(count);
+    }
+    if (exact.length) return exact[0];
 
-    // Najpierw patrzymy w okolice głównego nagłówka. Allegro ma w dalszej części
-    // strony wiele innych napisów typu "X ofert", które nie oznaczają całego wyniku.
+    const candidates = [];
     for (const heading of doc.querySelectorAll('h1, [role="heading"][aria-level="1"]')) {
       const own = singleLine(heading.textContent || '');
-      const parent = singleLine(heading.parentElement?.textContent || '').slice(0, 1200);
-      candidates.push(own, parent);
+      const parent = singleLine(heading.parentElement?.textContent || '').slice(0, 1600);
+      const grandParent = singleLine(heading.parentElement?.parentElement?.textContent || '').slice(0, 2200);
+      candidates.push(own, parent, grandParent);
     }
-
-    // Fallback tylko do początku dokumentu, zamiast skanowania całego body.
-    candidates.push(singleLine(doc.body?.textContent || '').slice(0, 3500));
+    candidates.push(singleLine(doc.body?.textContent || '').slice(0, 5000));
 
     for (const value of candidates) {
       const matches = [...String(value).matchAll(/([\d\s]+)\s+ofert(?:a|y)?\b/gi)]
@@ -386,6 +397,83 @@
     }
 
     return null;
+  }
+
+  function parsePlnAmount(value) {
+    const match = String(value || '').match(/(\d[\d\s]*[,.]\d{2}|\d[\d\s]*)\s*zł/i);
+    if (!match) return null;
+    const normalized = match[1].replace(/\s/g, '').replace(',', '.');
+    const amount = Number.parseFloat(normalized);
+    return Number.isFinite(amount) ? amount : null;
+  }
+
+  function extractAllegroCardMetadata(anchor) {
+    let node = anchor;
+    let bestText = singleLine(anchor.textContent || '');
+
+    for (let depth = 0; depth < 8 && node; depth += 1) {
+      const text = singleLine(node.textContent || '');
+      if (text.length >= bestText.length && text.length <= 6000) bestText = text;
+      if (/\d[\d\s]*[,.]\d{2}\s*zł/i.test(text) && /\bStan\b/i.test(text)) {
+        bestText = text;
+        break;
+      }
+      node = node.parentElement;
+    }
+
+    const conditionMatch = bestText.match(/\bStan\s*[:\-]?\s*(Nowy|Nowe|Używany|Używane|Powystawowy|Powystawowe|Po zwrocie|Odnowiony(?: przez (?:producenta|sprzedawcę))?|Uszkodzony|Uszkodzone|Jak nowy|Jak nowe)\b/i);
+    return {
+      listingPrice: (() => {
+        const amount = parsePlnAmount(bestText);
+        return amount === null ? '' : `${amount.toFixed(2)} zł`;
+      })(),
+      listingPriceAmount: parsePlnAmount(bestText),
+      listingCondition: conditionMatch ? singleLine(conditionMatch[1]) : '',
+    };
+  }
+
+  function allegroSourceFilters(sourceUrl) {
+    try {
+      const url = new URL(sourceUrl);
+      const priceToRaw = (url.searchParams.get('price_to') || '').replace(',', '.');
+      const priceFromRaw = (url.searchParams.get('price_from') || '').replace(',', '.');
+      const priceTo = Number.parseFloat(priceToRaw);
+      const priceFrom = Number.parseFloat(priceFromRaw);
+      const states = url.searchParams.getAll('stan').map((value) => value.toLowerCase());
+      const stateGroups = url.searchParams.getAll('stan-grupa').map((value) => value.toLowerCase());
+      return {
+        priceTo: Number.isFinite(priceTo) ? priceTo : null,
+        priceFrom: Number.isFinite(priceFrom) ? priceFrom : null,
+        states,
+        stateGroups,
+      };
+    } catch {
+      return { priceTo: null, priceFrom: null, states: [], stateGroups: [] };
+    }
+  }
+
+  function matchesAllegroSourceFilters(offer, filters) {
+    const price = offer.listingPriceAmount;
+    if (Number.isFinite(price)) {
+      if (filters.priceTo !== null && price > filters.priceTo + 0.001) return false;
+      if (filters.priceFrom !== null && price < filters.priceFrom - 0.001) return false;
+    }
+
+    const condition = String(offer.listingCondition || '').toLowerCase();
+    if (!condition) return true;
+
+    const wantsNew = filters.states.some((value) => value === 'nowe' || value === 'nowy');
+    const wantsUsed = filters.states.some((value) => value.includes('używ') || value.includes('uzyw'));
+    const wantsDamaged = filters.states.some((value) => value.includes('uszkodz'));
+    const wantsLikeNew = filters.stateGroups.some((value) => value.includes('jak nowe') || value.includes('jak+nowe'));
+
+    if (!wantsNew && !wantsUsed && !wantsDamaged && !wantsLikeNew) return true;
+
+    if (wantsNew && /^now/.test(condition)) return true;
+    if (wantsUsed && /używ|uzyw/.test(condition)) return true;
+    if (wantsDamaged && /uszkodz/.test(condition)) return true;
+    if (wantsLikeNew && /powystaw|po zwrocie|jak now/.test(condition)) return true;
+    return false;
   }
 
   function parseAllegroListing(html, baseUrl) {
@@ -399,11 +487,13 @@
       const offerId = getAllegroOfferId(href);
       const key = offerId || normalizeAllegroOfferUrl(href);
       if (!map.has(key)) {
+        const meta = extractAllegroCardMetadata(anchor);
         map.set(key, {
           provider: 'allegro',
           url: normalizeAllegroOfferUrl(href),
           itemId: offerId,
           listingTitle: singleLine(anchor.textContent),
+          ...meta,
         });
       }
     }
@@ -424,11 +514,84 @@
       }
     }
 
+    const comparisonUrls = [];
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href) continue;
+      try {
+        const url = new URL(href);
+        if (!(url.hostname === 'allegro.pl' || url.hostname.endsWith('.allegro.pl'))) continue;
+        if (!url.pathname.startsWith('/oferty-produktu/')) continue;
+        url.hash = '';
+        // Parametr p jest używany tylko do paginacji listy ofert danego produktu.
+        // Na tym etapie chcemy zawsze bazowy adres produktu.
+        url.searchParams.delete('p');
+        comparisonUrls.push(url.href);
+      } catch {
+        // no-op
+      }
+    }
+
     return {
       offers: [...map.values()],
+      comparisonUrls: [...new Set(comparisonUrls)],
       declaredCount,
       totalPages: pageNumbers.length ? Math.max(...pageNumbers) : null,
     };
+  }
+
+  function parseAllegroProductOffersPage(html, baseUrl) {
+    const doc = parseDocument(html);
+    const pageText = cleanText(doc.body?.textContent || '');
+    const countMatch = pageText.match(/([\d\s]+)\s+ofert(?:a|y)?\s+tego\s+produktu/i);
+    const declaredCount = countMatch
+      ? Number.parseInt(countMatch[1].replace(/\s/g, ''), 10)
+      : null;
+
+    const map = new Map();
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || !isAllegroOfferUrl(href)) continue;
+      const offerId = getAllegroOfferId(href);
+      if (!offerId) continue;
+      const key = String(offerId);
+      if (!map.has(key)) {
+        const meta = extractAllegroCardMetadata(anchor);
+        map.set(key, {
+          provider: 'allegro',
+          url: normalizeAllegroOfferUrl(href),
+          itemId: offerId,
+          listingTitle: singleLine(anchor.textContent),
+          ...meta,
+        });
+      }
+      if (declaredCount && map.size >= declaredCount) break;
+    }
+
+    let totalPages = null;
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href) continue;
+      try {
+        const url = new URL(href);
+        if (!url.pathname.startsWith('/oferty-produktu/')) continue;
+        const page = Number.parseInt(url.searchParams.get('p') || '', 10);
+        if (Number.isFinite(page) && page >= 2 && page <= 100) {
+          totalPages = Math.max(totalPages || 0, page);
+        }
+      } catch {
+        // no-op
+      }
+    }
+
+    return { offers: [...map.values()], declaredCount, totalPages };
+  }
+
+  function allegroProductOffersPageUrl(baseUrl, page) {
+    const url = new URL(baseUrl);
+    if (page <= 1) url.searchParams.delete('p');
+    else url.searchParams.set('p', String(page));
+    return url.href;
   }
 
   function extractAllegroPrice(doc, productLd, pageText) {
@@ -1279,17 +1442,23 @@
       ? 'Na Ceneo cena "od" pochodzi z porównywarki danego produktu i może obejmować wiele sklepów.'
       : provider === 'olx'
         ? 'Na OLX każda pozycja odpowiada konkretnemu ogłoszeniu. Dane o SMART, przebiegu i stanie mogą znajdować się wyłącznie w opisie sprzedającego.'
-        : 'Na Allegro każda pozycja odpowiada konkretnej ofercie.';
+        : 'Na Allegro główny listing jest listą produktów. Eksporter rozwija grupy przez "zobacz X ofert", aby każda pozycja eksportu odpowiadała konkretnej ofercie sprzedawcy.';
     const header = [
       `# Eksport z ${site}`,
       '',
       `Źródło: ${sourceUrl}`,
       `Wygenerowano: ${generatedAt}`,
       `Liczba pozycji w eksporcie: ${offers.length}`,
-      diagnostics.discoveredCount !== undefined ? `Znalezione na listingu: ${diagnostics.discoveredCount}` : null,
+      provider === 'allegro' && diagnostics.listingProductCount !== undefined ? `Karty produktów na listingu Allegro: ${diagnostics.listingProductCount}` : null,
+      provider === 'allegro' && diagnostics.groupsFound !== undefined ? `Produkty z linkiem do wielu ofert: ${diagnostics.groupsFound}` : null,
+      provider === 'allegro' && diagnostics.groupsExpanded !== undefined ? `Rozwinięte grupy produktów: ${diagnostics.groupsExpanded}` : null,
+      provider === 'allegro' && diagnostics.groupPagesScanned ? `Strony list ofert produktów: ${diagnostics.groupPagesScanned}` : null,
+      diagnostics.discoveredCount !== undefined ? (provider === 'allegro' ? `Oferty po rozwinięciu grup: ${diagnostics.discoveredCount}` : `Znalezione na listingu: ${diagnostics.discoveredCount}`) : null,
       diagnostics.declaredCount ? `Liczba deklarowana przez serwis: ${diagnostics.declaredCount}` : null,
-      diagnostics.pagesScanned ? `Przeskanowane strony: ${diagnostics.pagesScanned}` : null,
+      diagnostics.pagesScanned ? (provider === 'allegro' ? `Przeskanowane strony produktów: ${diagnostics.pagesScanned}` : `Przeskanowane strony: ${diagnostics.pagesScanned}`) : null,
       diagnostics.totalPages ? `Wskazówka paginacji: ${diagnostics.totalPages}` : null,
+      provider === 'allegro' && diagnostics.filteredOut ? `Odrzucone przy ponownym zastosowaniu filtrów: ${diagnostics.filteredOut}` : null,
+      provider === 'allegro' && diagnostics.groupErrors ? `Błędy rozwijania grup: ${diagnostics.groupErrors}` : null,
       diagnostics.skippedSeen ? `Pominięto z historii: ${diagnostics.skippedSeen}` : null,
       diagnostics.successCount !== undefined ? `Pobrane poprawnie: ${diagnostics.successCount}` : null,
       diagnostics.errorCount ? `Błędy pobierania: ${diagnostics.errorCount}` : null,
@@ -1374,6 +1543,7 @@
   async function scanListingPages(provider, sourceUrl, options, signal, seenIds) {
     const allOffers = new Map();
     const queuedOffers = new Map();
+    const comparisonUrls = new Set();
     const currentPage = currentPageNumber(provider, sourceUrl);
     const firstPage = options.startFromFirst ? 1 : currentPage;
     let declaredCount = null;
@@ -1418,6 +1588,9 @@
       const parsed = parseListing(provider, html, url);
       if (parsed.declaredCount) declaredCount = Math.max(declaredCount || 0, parsed.declaredCount);
       if (parsed.totalPages) totalPages = Math.max(totalPages || 0, parsed.totalPages);
+      if (provider === 'allegro' && Array.isArray(parsed.comparisonUrls)) {
+        for (const compareUrl of parsed.comparisonUrls) comparisonUrls.add(compareUrl);
+      }
 
       let addedAll = 0;
       let addedQueued = 0;
@@ -1460,7 +1633,7 @@
         currentItem: `Strona ${page}: +${addedAll} ofert, +${addedQueued} do pobrania, pominięto ${pageSkippedSeen}`,
       });
 
-      if (options.maxOffers > 0 && queuedOffers.size >= options.maxOffers) break;
+      if (provider !== 'allegro' && options.maxOffers > 0 && queuedOffers.size >= options.maxOffers) break;
 
       if (provider === 'ceneo') {
         // Ceneo ma stabilną numerację stron. Gdy znamy ostatnią stronę, dochodzimy do niej.
@@ -1472,12 +1645,12 @@
         if (totalPages && page >= totalPages) break;
         if (page > firstPage && consecutiveEmptyPages >= 2) break;
       } else {
-        // Na Allegro numery widoczne w paginacji są tylko oknem wokół bieżącej strony,
-        // a teksty typu "X ofert" występują także w innych modułach. Nie używamy ich
-        // jako warunku zakończenia. Idziemy dalej, dopóki kolejne strony przynoszą
-        // nowe ID ofert. Strony poza końcem wyników zwykle zwracają powtórkę/redirect,
-        // więc dwie kolejne strony bez nowych ID bezpiecznie kończą skan.
-        if (page > firstPage && consecutiveEmptyPages >= 2) break;
+        // Główny listing Allegro jest obecnie listą PRODUKTÓW, nie pojedynczych ofert.
+        // Paginacja dotyczy więc kart produktów i tutaj możemy zakończyć na ostatniej
+        // stronie widocznej w paginacji. Wszystkie oferty sprzedawców rozwijamy potem
+        // przez /oferty-produktu/... .
+        if (totalPages && page >= totalPages) break;
+        if (!totalPages && page > firstPage && consecutiveEmptyPages >= 2) break;
       }
 
       await sleep(provider === 'ceneo' ? 500 : provider === 'olx' ? 800 : 700);
@@ -1490,6 +1663,131 @@
       skippedSeen,
       declaredCount,
       totalPages,
+      comparisonUrls: [...comparisonUrls],
+    };
+  }
+
+  function buildQueueFromOffers(offers, options, seenIds) {
+    const queued = [];
+    let skippedSeen = 0;
+    const skippedIds = new Set();
+
+    for (const offer of offers) {
+      const id = offer.itemId ? String(offer.itemId) : null;
+      if (options.skipSeen && id && seenIds.has(id)) {
+        if (!skippedIds.has(id)) {
+          skippedIds.add(id);
+          skippedSeen += 1;
+        }
+        continue;
+      }
+      if (options.maxOffers > 0 && queued.length >= options.maxOffers) continue;
+      queued.push(offer);
+    }
+
+    return { queuedOffers: queued, skippedSeen };
+  }
+
+  async function expandAllegroProductGroups(scanResult, sourceUrl, options, signal, seenIds) {
+    const filters = allegroSourceFilters(sourceUrl);
+    const all = new Map();
+    let filteredOut = 0;
+
+    for (const offer of scanResult.allOffers) {
+      const key = String(offer.itemId || offer.url);
+      if (matchesAllegroSourceFilters(offer, filters)) all.set(key, offer);
+      else filteredOut += 1;
+    }
+
+    const groups = Array.isArray(scanResult.comparisonUrls) ? scanResult.comparisonUrls : [];
+    let groupsExpanded = 0;
+    let groupPagesScanned = 0;
+    let groupErrors = 0;
+    let rawOffersSeen = all.size;
+
+    for (let index = 0; index < groups.length; index += 1) {
+      if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+      const compareUrl = groups[index];
+      const groupMap = new Map();
+      let declaredForGroup = null;
+      let groupTotalPages = null;
+      let consecutiveEmpty = 0;
+
+      await setState('allegro', {
+        phase: `Rozwijanie produktów Allegro ${index + 1}/${groups.length}`,
+        currentItem: compareUrl,
+        offersFound: all.size,
+        declaredCount: scanResult.declaredCount,
+        totalPages: scanResult.totalPages,
+        percent: groups.length ? 15 + ((index / groups.length) * 12) : 27,
+      });
+
+      for (let page = 1; page <= 20; page += 1) {
+        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        if (groupTotalPages && page > groupTotalPages) break;
+
+        const url = allegroProductOffersPageUrl(compareUrl, page);
+        let html;
+        try {
+          html = await fetchHtml(url, signal, 4);
+        } catch (error) {
+          groupErrors += 1;
+          break;
+        }
+
+        groupPagesScanned += 1;
+        const parsed = parseAllegroProductOffersPage(html, url);
+        if (parsed.declaredCount) declaredForGroup = Math.max(declaredForGroup || 0, parsed.declaredCount);
+        if (parsed.totalPages) groupTotalPages = Math.max(groupTotalPages || 0, parsed.totalPages);
+
+        let added = 0;
+        for (const offer of parsed.offers) {
+          const key = String(offer.itemId || offer.url);
+          if (!groupMap.has(key)) {
+            groupMap.set(key, offer);
+            added += 1;
+          }
+        }
+
+        consecutiveEmpty = added === 0 ? consecutiveEmpty + 1 : 0;
+        if (declaredForGroup && groupMap.size >= declaredForGroup) break;
+        if (groupTotalPages && page >= groupTotalPages) break;
+        if (page > 1 && consecutiveEmpty >= 1) break;
+        await sleep(Math.max(500, Math.min(options.delayMs || 1200, 1500)));
+      }
+
+      rawOffersSeen += groupMap.size;
+      for (const offer of groupMap.values()) {
+        const key = String(offer.itemId || offer.url);
+        if (!matchesAllegroSourceFilters(offer, filters)) {
+          filteredOut += 1;
+          continue;
+        }
+        all.set(key, offer);
+      }
+
+      groupsExpanded += 1;
+      await setState('allegro', {
+        phase: `Rozwijanie produktów Allegro ${index + 1}/${groups.length}`,
+        currentItem: `Produkt ${index + 1}/${groups.length}: znaleziono ${groupMap.size} ofert, łącznie unikalnych ${all.size}`,
+        offersFound: all.size,
+        percent: groups.length ? 15 + (((index + 1) / groups.length) * 12) : 27,
+      });
+
+      await sleep(Math.max(400, Math.min(options.delayMs || 1200, 1200)));
+    }
+
+    const queue = buildQueueFromOffers([...all.values()], options, seenIds);
+    return {
+      allOffers: [...all.values()],
+      queuedOffers: queue.queuedOffers,
+      skippedSeen: queue.skippedSeen,
+      groupsFound: groups.length,
+      groupsExpanded,
+      groupPagesScanned,
+      groupErrors,
+      filteredOut,
+      rawOffersSeen,
     };
   }
 
@@ -1679,7 +1977,26 @@
     try {
       const history = await getHistory(provider);
       const seenIds = new Set(Object.keys(history.items || {}));
-      const scanResult = await scanListingPages(provider, sourceUrl, options, controller.signal, seenIds);
+      let scanResult = await scanListingPages(provider, sourceUrl, options, controller.signal, seenIds);
+      const listingProductCount = scanResult.allOffers.length;
+
+      if (provider === 'allegro') {
+        const expanded = await expandAllegroProductGroups(scanResult, sourceUrl, options, controller.signal, seenIds);
+        scanResult = {
+          ...scanResult,
+          allOffers: expanded.allOffers,
+          queuedOffers: expanded.queuedOffers,
+          skippedSeen: expanded.skippedSeen,
+          listingProductCount,
+          groupsFound: expanded.groupsFound,
+          groupsExpanded: expanded.groupsExpanded,
+          groupPagesScanned: expanded.groupPagesScanned,
+          groupErrors: expanded.groupErrors,
+          filteredOut: expanded.filteredOut,
+          rawOffersSeen: expanded.rawOffersSeen,
+        };
+      }
+
       const listingOffers = scanResult.queuedOffers;
 
       if (!scanResult.allOffers.length) {
@@ -1695,6 +2012,12 @@
           skippedSeen: scanResult.skippedSeen,
           successCount: 0,
           errorCount: 0,
+          listingProductCount: scanResult.listingProductCount,
+          groupsFound: scanResult.groupsFound,
+          groupsExpanded: scanResult.groupsExpanded,
+          groupPagesScanned: scanResult.groupPagesScanned,
+          groupErrors: scanResult.groupErrors,
+          filteredOut: scanResult.filteredOut,
         };
         const emptyResult = buildExport([], sourceUrl, options.mode, provider, emptyDiagnostics);
         emptyResult.skippedSeen = scanResult.skippedSeen;
@@ -1730,7 +2053,9 @@
         declaredCount: scanResult.declaredCount,
         totalPages: scanResult.totalPages,
         percent: 15,
-        currentItem: `Znaleziono ${scanResult.allOffers.length}, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`,
+        currentItem: provider === 'allegro'
+          ? `Karty produktów: ${scanResult.listingProductCount || 0}, po rozwinięciu: ${scanResult.allOffers.length} ofert, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`
+          : `Znaleziono ${scanResult.allOffers.length}, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`,
       });
 
       const detailResult = await fetchOfferDetails(provider, listingOffers, options, controller.signal);
@@ -1749,6 +2074,12 @@
         skippedSeen: scanResult.skippedSeen,
         successCount: detailResult.offers.filter((offer) => !offer.error).length,
         errorCount: detailResult.errors,
+        listingProductCount: scanResult.listingProductCount,
+        groupsFound: scanResult.groupsFound,
+        groupsExpanded: scanResult.groupsExpanded,
+        groupPagesScanned: scanResult.groupPagesScanned,
+        groupErrors: scanResult.groupErrors,
+        filteredOut: scanResult.filteredOut,
       };
       const result = buildExport(detailResult.offers, sourceUrl, options.mode, provider, diagnostics);
       result.skippedSeen = scanResult.skippedSeen;
@@ -1758,6 +2089,12 @@
       result.pagesScanned = scanResult.pagesScanned;
       result.successCount = detailResult.offers.filter((offer) => !offer.error).length;
       result.errorCount = detailResult.errors;
+      result.listingProductCount = scanResult.listingProductCount || null;
+      result.groupsFound = scanResult.groupsFound || 0;
+      result.groupsExpanded = scanResult.groupsExpanded || 0;
+      result.groupPagesScanned = scanResult.groupPagesScanned || 0;
+      result.groupErrors = scanResult.groupErrors || 0;
+      result.filteredOut = scanResult.filteredOut || 0;
       await chrome.storage.local.set({ [resultStorageKey]: result });
 
       // Do historii trafiają wyłącznie pozycje pobrane poprawnie. Błędy zostają do ponowienia.

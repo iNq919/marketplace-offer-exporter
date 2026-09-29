@@ -2,6 +2,13 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.5.0
+
+- Dodano dwustopniowe skanowanie Allegro: karta produktu -> konkretne oferty sprzedawców.
+- Rozwijane są strony `/oferty-produktu/...` i zbierane indywidualne ID ofert.
+- Podstawowe filtry ceny i stanu są ponownie stosowane po rozwinięciu grup.
+- Eksport rozróżnia liczbę kart produktów od liczby indywidualnych ofert.
+
 ## v1.4.0
 
 - Dodano obsługę OLX.

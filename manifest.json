@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Allegro + Ceneo + OLX Offer Exporter for ChatGPT",
-  "version": "1.4.0",
-  "description": "Eksportuje oferty z Allegro, produkty z Ceneo i ogłoszenia z OLX, obsługuje równoległe skanowanie 3 serwisów i pamięta wcześniej sprawdzone pozycje.",
+  "version": "1.5.0",
+  "description": "Eksportuje wszystkie oferty z Allegro (rozwija grupy produktów), produkty z Ceneo i ogłoszenia z OLX, z równoległym skanowaniem 3 serwisów i historią.",
   "permissions": [
     "activeTab",
     "scripting",

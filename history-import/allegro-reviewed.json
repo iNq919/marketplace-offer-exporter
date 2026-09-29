@@ -1,7 +1,7 @@
 {
   "provider": "allegro",
-  "source": "Historia skumulowana z dotychczasowych eksportów użytkownika",
-  "count": 149,
+  "source": "Połączona historia wcześniejszych eksportów Allegro, uzupełniona o skan 2026-09-28 12:41Z",
+  "count": 151,
   "offers": [
     {
       "provider": "allegro",
@@ -1044,6 +1044,20 @@
       "itemId": "16326253864",
       "title": "HP 2TB MB2000EAZNL 7,2K Sata2 3,5'' 584786-001",
       "url": "https://allegro.pl/produkt/dysk-twardy-hp-mb2000eaznl-2tb-sata-ii-3-5-8145a63b-307d-4482-bd2f-a014069f3e21?offerId=16326253864",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17805209695",
+      "title": "Dysk Twardy Do Monitoringu Hikvision Dahua 2TB 3.5 35 2000GB Do Kamer CCTV",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-purple-wd2tbpurz-2tb-sata-3-5-b95a708a-798e-424b-8828-b1e7130d3ad5?offerId=17805209695",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18880454670",
+      "title": "SEAGATE BarraCuda 2TB 5.4K 256MB SATA III 3.5'' ST2000DM005",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-st2000dm005-2tb-sata-iii-3-5-d4ae34ff-7d97-451a-8ecc-753f6ece28d0?offerId=18880454670",
       "error": false
     }
   ]

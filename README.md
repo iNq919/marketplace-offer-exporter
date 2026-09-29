@@ -1,4 +1,4 @@
-# Allegro + Ceneo + OLX Offer Exporter for ChatGPT v1.4.0
+# Allegro + Ceneo + OLX Offer Exporter for ChatGPT v1.5.0
 
 Rozszerzenie Chrome Manifest V3 do eksportowania ofert z Allegro, produktów z Ceneo i ogłoszeń z OLX.
 
@@ -29,3 +29,9 @@ Otwórz po jednej karcie z filtrami Allegro, Ceneo i OLX, a następnie kliknij `
 ## OLX
 
 Rozszerzenie rozpoznaje ogłoszenia po adresach `/d/oferta/...-ID....html`, skanuje paginację `page=N` i usuwa duplikaty po stabilnym identyfikatorze z URL. Przy ofertach używanych warto korzystać z trybu AI compact lub pełnego opisu, bo informacje o SMART i Power On Hours często są wyłącznie w opisie.
+
+## Allegro: produkty a oferty
+
+Od października 2024 główny listing Allegro grupuje wiele ofert tego samego produktu w jedną kartę produktu. Wersja 1.5.0 wykrywa linki `zobacz X ofert` (`/oferty-produktu/...`), pobiera listę konkretnych ofert sprzedawców, deduplikuje je po ID oferty i ponownie stosuje podstawowe filtry ceny oraz stanu z adresu źródłowego.
+
+W eksporcie Allegro zobaczysz osobno liczbę kart produktów i liczbę indywidualnych ofert po rozwinięciu grup.
