@@ -1,0 +1,182 @@
+{
+  "provider": "allegro",
+  "source": "previous-export-reviewed-in-chat",
+  "count": 25,
+  "offers": [
+    {
+      "provider": "allegro",
+      "itemId": "18470119420",
+      "title": "Dysk twardy Seagate Desktop ST2000DM001 2TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-desktop-st2000dm001-2tb-sata-iii-3-5-aeb91d55-d08e-4792-8a68-3b645bfc2183?offerId=18470119420",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14208539659",
+      "title": "Dysk HDD Seagate SkyHawk ST2000VX017 2 TB 3,5\" SATA III",
+      "url": "https://allegro.pl/produkt/dysk-do-cctv-twardy-seagate-skyhawk-2-tb-sata-iii-3-5-734cedc4-07e8-4952-b940-a8662afe8af8?offerId=14208539659",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18955598931",
+      "title": "Dysk twardy Hitachi Ultrastar A7K2000 HUA722020ALA330 2TB SATA II 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hitachi-ultrastar-a7k2000-hua722020ala330-2tb-sata-ii-3-5-ef62f40e-d027-4bd8-a582-a26e7866aa21?offerId=18955598931",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18462395688",
+      "title": "SEAGATE BARRACUDA 2TB 7.2K 256MB SATA III 3.5'' ST2000DM008",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-st2000dm008-2tb-sata-iii-3-5-fc73942d-b383-45ed-bb66-5038c3cece70?offerId=18462395688",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18482424662",
+      "title": "Dysk TOSHIBA Canvio Basics Exclusive 2TB HDD Czarny",
+      "url": "https://allegro.pl/produkt/dysk-zewnetrzny-hdd-toshiba-canvio-basics-exclusive-2tb-czarny-e5705d34-2b05-4542-992f-67d2861b0644?offerId=18482424662",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18921045316",
+      "title": "HDD SEAGATE 4TB ST4000VX016 SkyHawk / SATA III / DO SYSTEMÓW MONITORINGU",
+      "url": "https://allegro.pl/produkt/seagate-skyhawk-st4000vx016-dysk-twardy-4-tb-256-mb-3-5-sata-iii-091ad1e7-c72a-4877-8b56-95f95ad1fce5?offerId=18921045316",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18877349411",
+      "title": "Dysk twardy WD Blue WD20SPZX 2TB SATA III 2,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-blue-wd20spzx-2tb-sata-iii-2-5-ae9de53b-b8f9-4838-a85c-72c660149aeb?offerId=18877349411",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18635249776",
+      "title": "NOWY Dysk Toshiba S300 2TB Surveillance do monitoringu CCTV 24/7",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-hdwt720uzsva-2tb-sata-iii-3-5-3a6afa79-7881-4568-b0e7-a85e8146f216?offerId=18635249776",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18625758835",
+      "title": "NOWY Dysk twardy Toshiba S300 Surveillance 4TB SATA III 3,5\" do CCTV",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-surveillance-s300-4tb-hdwt840uzsva-sata3-5400rpm-3-5-59e93bfb-9d27-4c44-92bc-ce432c257249?offerId=18625758835",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18868098228",
+      "title": "Dysk twardy Seagate Barracuda 2TB SATA III 2,5\" 7MM",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hdd-2-5-2tb-5400rpm-do-pc-laptopa-seagate-st2000lm007-11f8b164-09e2-431f-8765-464d0870b49e?offerId=18868098228",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18635622965",
+      "title": "Dysk twardy WD WD2003FYYS 2TB SATA II 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-wd2003fyys-2tb-sata-ii-3-5-984ffd71-7ce0-4211-98f9-dfee11963705?offerId=18635622965",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18621842881",
+      "title": "HDD WD Purple 2TB SATA WD23PURZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-western-digital-wd-purple-wd23purz-2tb-sata-3-5-do-cctv-24-7-56ab81ef-cd1b-449b-a52d-dcdd9dac968c?offerId=18621842881",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17731813411",
+      "title": "SEAGATE CONSTELLATION ES.3 2TB 7,2K 128MB SAS-2 3,5'' ST2000NM0023",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-constellation-es-3-2tb-sas-3-5-fbbd23ba-b249-42cb-b1ce-db7dc13e06ef?offerId=17731813411",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18923233906",
+      "title": "Dysk twardy Toshiba Canvio basics 2TB 2,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-canvio-basics-2tb-2-5-f248378f-69d5-4c4e-afa2-92b801870377?offerId=18923233906",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17118360389",
+      "title": "Dysk WD Black 2TB 3.5\" SATA PRO",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-black-2tb-sata-3-5-26cb563a-946a-40cb-b7f2-bf99bfff7b9a?offerId=17118360389",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18931032232",
+      "title": "Western Digital Purple dysk twardy 2 TB 5400 RPM 64 MB 3.5\" SATA III",
+      "url": "https://allegro.pl/produkt/western-digital-purple-dysk-twardy-2-tb-5400-rpm-64-mb-3-5-sata-iii-5be3b546-b9c4-48db-a56e-3813fc369667?offerId=18931032232",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18470128206",
+      "title": "Dysk twardy Toshiba HDD 2TB SATA 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-toshiba-2tb-dt01aca200-3-5-sata-iii-64mb-7200-obr-32ef81d4-4b75-43fd-92c6-7cecc0659739?offerId=18470128206",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18949126323",
+      "title": "Dysk twardy WD RE4-GP WD2002FYPS 2TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-re4-gp-wd2002fyps-2tb-sata-iii-3-5-ad04c071-c0ec-4682-83bd-567fc6ce9999?offerId=18949126323",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18861149067",
+      "title": "NOWY Dysk HDD Toshiba S300 2TB Surveillance do rejestratorów CCTV",
+      "url": "https://allegro.pl/produkt/dysk-hdd-toshiba-s300-2tb-surveillance-do-rejestratorow-cctv-d399a3a3-e59d-43d1-bf3f-bd2de5c80ed2?offerId=18861149067",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18952826460",
+      "title": "Dysk twardy NAS HDD Seagate IronWolf 4TB ST4000VN006 SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-st4000vn006-ironwolf-4tb-sata-iii-3-5-3bc5e04c-ee58-48c2-bf51-9cce75d1f509?offerId=18952826460",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18302886726",
+      "title": "DYSK DO REJESTRATORA MONITORING ST2000VX017 2TB 24/7 SkyHawk SEAGATE aw",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-skyhawk-2tb-do-monitoringu-cctv-1b319727-d69f-4643-b911-318e0631e8bf?offerId=18302886726",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18842060507",
+      "title": "DYSK TWARDY WD BLUE WD20EZBX 3.5\" SATA",
+      "url": "https://allegro.pl/produkt/dysk-hdd-wd-blue-2tb-wd20ezbx-3-5-sata-iii-7200rpm-256mb-cache-b1d35348-f399-4cf4-b6a7-e6b9b0a26186?offerId=18842060507",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18931023753",
+      "title": "Dysk twardy WD Green WD20EURS 2TB SATA II 3,5\" CCTV",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-green-wd20eurs-2tb-sata-ii-3-5-8b26a823-6d69-4c31-a7f1-83d34308297c?offerId=18931023753",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18949312229",
+      "title": "Dysk twardy HP SEAGATE ST4000NM0165 4TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-seagate-st4000nm0165-4tb-sata-iii-3-5-d2364490-1cab-4005-9500-53373fe40cc8?offerId=18949312229",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17947938865",
+      "title": "Dysk twardy Western Digital Red WD20EFRX 2TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/serwerowy-dysk-hdd-3-5-wd-red-wd20efrx-2tb-5400rpm-sata-iii-u-99d4dc31-aa50-42df-8b91-a342ddafd3ac?offerId=17947938865",
+      "error": false
+    }
+  ]
+}

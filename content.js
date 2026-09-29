@@ -1,6 +1,11 @@
 (() => {
-  const STORAGE_STATE = 'marketplaceExporterState';
-  const STORAGE_RESULT = 'marketplaceExporterResult';
+  const LEGACY_STORAGE_STATE = 'marketplaceExporterState';
+  const LEGACY_STORAGE_RESULT = 'marketplaceExporterResult';
+  const STORAGE_PREFIX = 'marketplaceExporter';
+
+  const stateKey = (provider) => `${STORAGE_PREFIX}:state:${provider}`;
+  const resultKey = (provider) => `${STORAGE_PREFIX}:result:${provider}`;
+  const historyKey = (provider) => `${STORAGE_PREFIX}:history:${provider}`;
   const MAX_LISTING_PAGES = 100;
   const MAX_CHAT_CHUNK = 48000;
 
@@ -73,11 +78,19 @@
           },
         });
 
-        if (response.status === 429 || response.status >= 500) {
+        if (response.status === 403 || response.status === 429 || response.status >= 500) {
           const retryAfter = Number.parseInt(response.headers.get('Retry-After') || '0', 10);
-          const wait = retryAfter > 0 ? retryAfter * 1000 : 1500 * (attempt + 1);
-          await sleep(wait);
-          continue;
+          const provider = detectProvider(url);
+          const fallbackWait = provider === 'allegro'
+            ? Math.min(30000, 3000 * (2 ** attempt))
+            : Math.min(12000, 1500 * (attempt + 1));
+          const wait = retryAfter > 0 ? retryAfter * 1000 : fallbackWait;
+          lastError = new Error(`HTTP ${response.status} dla ${url}`);
+          if (attempt < retries) {
+            await sleep(wait);
+            continue;
+          }
+          throw lastError;
         }
 
         if (!response.ok) {
@@ -92,7 +105,14 @@
       } catch (error) {
         lastError = error;
         if (error?.name === 'AbortError') throw error;
-        if (attempt < retries) await sleep(1000 * (attempt + 1));
+        if (attempt < retries) {
+          const protective = /stronę ochronną|access denied|robotem|verify/i.test(error?.message || '');
+          const provider = detectProvider(url);
+          const wait = protective && provider === 'allegro'
+            ? Math.min(30000, 5000 * (attempt + 1))
+            : 1000 * (attempt + 1);
+          await sleep(wait);
+        }
       }
     }
 
@@ -360,13 +380,39 @@
     }
 
     const bodyText = cleanText(doc.body?.textContent || '');
-    const countMatch = bodyText.match(/([\d\s]+)\s+ofert(?:a|y)?\b/i);
-    const declaredCount = countMatch ? Number.parseInt(countMatch[1].replace(/\s/g, ''), 10) : null;
+
+    // Allegro potrafi umieszczać na stronie kilka napisów typu „60 ofert”.
+    // Pierwsza wersja brała pierwszy znaleziony numer, co mogło błędnie kończyć
+    // skanowanie po jednej stronie. Bierzemy największą sensowną wartość.
+    const declaredCounts = [...bodyText.matchAll(/([\d\s]+)\s+ofert(?:a|y)?\b/gi)]
+      .map((match) => Number.parseInt(match[1].replace(/\s/g, ''), 10))
+      .filter((value) => Number.isFinite(value) && value > 0 && value < 1000000);
+    const declaredCount = declaredCounts.length ? Math.max(...declaredCounts) : null;
+
+    // Najpewniejszy sygnał liczby stron to linki paginacji z parametrem p.
+    // Nie ograniczamy się do tekstu strony, bo Allegro często renderuje tam
+    // liczbę ofert na pojedynczą sekcję, a nie cały wynik filtrowania.
+    const pageNumbers = [];
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || detectProvider(href) !== 'allegro') continue;
+      try {
+        const value = Number.parseInt(new URL(href).searchParams.get('p') || '', 10);
+        if (Number.isFinite(value) && value >= 1 && value <= MAX_LISTING_PAGES) pageNumbers.push(value);
+      } catch {
+        // no-op
+      }
+    }
+    let totalPages = pageNumbers.length ? Math.max(...pageNumbers) : null;
+    if (declaredCount && map.size >= 10) {
+      const estimatedPages = Math.min(MAX_LISTING_PAGES, Math.ceil(declaredCount / map.size));
+      totalPages = Math.max(totalPages || 0, estimatedPages);
+    }
 
     return {
       offers: [...map.values()],
-      declaredCount: Number.isFinite(declaredCount) ? declaredCount : null,
-      totalPages: null,
+      declaredCount,
+      totalPages,
     };
   }
 
@@ -785,7 +831,7 @@
     return lines.join('\n').trim();
   }
 
-  function buildExport(offers, sourceUrl, mode, provider) {
+  function buildExport(offers, sourceUrl, mode, provider, diagnostics = {}) {
     const generatedAt = new Date().toISOString();
     const site = providerLabel(provider);
     const sourceNote = provider === 'ceneo'
@@ -796,13 +842,19 @@
       '',
       `Źródło: ${sourceUrl}`,
       `Wygenerowano: ${generatedAt}`,
-      `Liczba pozycji: ${offers.length}`,
+      `Liczba pozycji w eksporcie: ${offers.length}`,
+      diagnostics.discoveredCount !== undefined ? `Znalezione na listingu: ${diagnostics.discoveredCount}` : null,
+      diagnostics.declaredCount ? `Liczba deklarowana przez serwis: ${diagnostics.declaredCount}` : null,
+      diagnostics.totalPages ? `Liczba stron: ${diagnostics.totalPages}` : null,
+      diagnostics.skippedSeen ? `Pominięto z historii: ${diagnostics.skippedSeen}` : null,
+      diagnostics.successCount !== undefined ? `Pobrane poprawnie: ${diagnostics.successCount}` : null,
+      diagnostics.errorCount ? `Błędy pobierania: ${diagnostics.errorCount}` : null,
       `Tryb: ${mode === 'full' ? 'pełne opisy' : 'AI compact'}`,
       sourceNote,
       '',
       'Przeanalizuj pozycje pod kątem ceny, opłacalności, parametrów i informacji z opisu. Dla dysków zwróć szczególną uwagę na model, pojemność, technologię zapisu CMR/SMR, przeznaczenie NAS/enterprise, obroty, cache, gwarancję i ewentualne informacje o przebiegu/SMART.',
       '',
-    ].join('\n');
+    ].filter((line) => line !== null).join('\n');
 
     const blocks = offers.map((offer, index) => formatOffer(offer, index + 1));
     const fullText = `${header}${blocks.join('\n\n---\n\n')}`;
@@ -834,70 +886,154 @@
     };
   }
 
-  async function setState(patch) {
-    const existing = (await chrome.storage.local.get(STORAGE_STATE))[STORAGE_STATE] || {};
+  async function getHistory(provider) {
+    const key = historyKey(provider);
+    const data = await chrome.storage.local.get(key);
+    const raw = data[key];
+    if (!raw || typeof raw !== 'object') return { version: 1, items: {} };
+    return {
+      version: 1,
+      items: raw.items && typeof raw.items === 'object' ? raw.items : {},
+    };
+  }
+
+  async function addSuccessfulOffersToHistory(provider, offers) {
+    const successful = offers.filter((offer) => offer && !offer.error && offer.itemId);
+    if (!successful.length) return;
+
+    const key = historyKey(provider);
+    const history = await getHistory(provider);
+    const now = Date.now();
+    for (const offer of successful) {
+      history.items[String(offer.itemId)] = {
+        seenAt: now,
+        title: truncate(offer.title || '', 180),
+        url: offer.url || '',
+      };
+    }
+    await chrome.storage.local.set({ [key]: history });
+  }
+
+  async function setState(provider, patch) {
+    const key = stateKey(provider);
+    const existing = (await chrome.storage.local.get(key))[key] || {};
     await chrome.storage.local.set({
-      [STORAGE_STATE]: {
+      [key]: {
         ...existing,
         ...patch,
+        provider,
         updatedAt: Date.now(),
       },
     });
   }
 
-  async function scanListingPages(provider, sourceUrl, options, signal) {
-    const offers = new Map();
+  async function scanListingPages(provider, sourceUrl, options, signal, seenIds) {
+    const allOffers = new Map();
+    const queuedOffers = new Map();
     const currentPage = currentPageNumber(provider, sourceUrl);
     const firstPage = options.startFromFirst ? 1 : currentPage;
     let declaredCount = null;
     let totalPages = null;
     let pagesScanned = 0;
+    let skippedSeen = 0;
+    const skippedSeenIds = new Set();
+    let consecutiveEmptyPages = 0;
 
     for (let page = firstPage; page <= MAX_LISTING_PAGES; page += 1) {
       if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
 
       const url = listingPageUrl(provider, sourceUrl, page);
-      await setState({
+      await setState(provider, {
         phase: `Skanowanie ${providerLabel(provider)}, strona ${page}`,
         currentItem: url,
         pagesScanned,
-        offersFound: offers.size,
+        offersFound: allOffers.size,
+        queued: queuedOffers.size,
+        skippedSeen,
+        declaredCount,
+        totalPages,
         percent: Math.min(15, Math.max(1, pagesScanned)),
       });
 
-      const html = page === currentPage && page === firstPage
-        ? document.documentElement.outerHTML
-        : await fetchHtml(url, signal);
-
-      const parsed = parseListing(provider, html, url);
-      if (declaredCount === null && parsed.declaredCount) declaredCount = parsed.declaredCount;
-      if (parsed.totalPages) totalPages = Math.max(totalPages || 0, parsed.totalPages);
-
-      let added = 0;
-      for (const offer of parsed.offers) {
-        const key = offer.itemId || offer.url;
-        if (!offers.has(key)) {
-          offers.set(key, offer);
-          added += 1;
-        }
-        if (options.maxOffers > 0 && offers.size >= options.maxOffers) break;
+      let html;
+      try {
+        html = page === currentPage && page === firstPage
+          ? document.documentElement.outerHTML
+          : await fetchHtml(url, signal, provider === 'allegro' ? 5 : 3);
+      } catch (error) {
+        // Nie traktujemy pojedynczego błędu strony listingu jako końca paginacji.
+        // Przy Allegro chwilowe blokady są częste, więc robimy dłuższą przerwę i próbujemy dalej.
+        await setState(provider, {
+          currentItem: `Błąd strony ${page}: ${error?.message || String(error)}. Przerwa i dalsza próba.`,
+        });
+        await sleep(provider === 'allegro' ? 8000 : 3000);
+        if (totalPages && page < totalPages) continue;
+        throw error;
       }
 
+      const parsed = parseListing(provider, html, url);
+      if (parsed.declaredCount) declaredCount = Math.max(declaredCount || 0, parsed.declaredCount);
+      if (parsed.totalPages) totalPages = Math.max(totalPages || 0, parsed.totalPages);
+
+      let addedAll = 0;
+      let addedQueued = 0;
+      let pageSkippedSeen = 0;
+      for (const offer of parsed.offers) {
+        const key = String(offer.itemId || offer.url);
+        if (!allOffers.has(key)) {
+          allOffers.set(key, offer);
+          addedAll += 1;
+        }
+
+        if (options.skipSeen && offer.itemId && seenIds.has(String(offer.itemId))) {
+          const seenKey = String(offer.itemId);
+          if (!skippedSeenIds.has(seenKey)) {
+            skippedSeenIds.add(seenKey);
+            pageSkippedSeen += 1;
+          }
+          continue;
+        }
+
+        if (!queuedOffers.has(key)) {
+          if (options.maxOffers === 0 || queuedOffers.size < options.maxOffers) {
+            queuedOffers.set(key, offer);
+            addedQueued += 1;
+          }
+        }
+      }
+
+      skippedSeen += pageSkippedSeen;
       pagesScanned += 1;
-      await setState({
+      consecutiveEmptyPages = addedAll === 0 ? consecutiveEmptyPages + 1 : 0;
+
+      await setState(provider, {
         pagesScanned,
-        offersFound: offers.size,
-        currentItem: `Strona ${page}: +${added} nowych pozycji`,
+        offersFound: allOffers.size,
+        queued: queuedOffers.size,
+        skippedSeen,
+        declaredCount,
+        totalPages,
+        currentItem: `Strona ${page}: +${addedAll} ofert, +${addedQueued} do pobrania, pominięto ${pageSkippedSeen}`,
       });
 
-      if (options.maxOffers > 0 && offers.size >= options.maxOffers) break;
+      if (options.maxOffers > 0 && queuedOffers.size >= options.maxOffers) break;
       if (totalPages && page >= totalPages) break;
-      if (page > firstPage && added === 0) break;
-      if (declaredCount && offers.size >= declaredCount) break;
-      await sleep(provider === 'ceneo' ? 400 : 250);
+      if (declaredCount && allOffers.size >= declaredCount) break;
+
+      // Jeśli znamy liczbę stron, skanujemy do końca nawet gdy jedna strona nie da nowych linków.
+      // Bez znanej liczby stron kończymy dopiero po dwóch kolejnych pustych stronach.
+      if (!totalPages && page > firstPage && consecutiveEmptyPages >= 2) break;
+      await sleep(provider === 'ceneo' ? 500 : 700);
     }
 
-    return [...offers.values()].slice(0, options.maxOffers > 0 ? options.maxOffers : undefined);
+    return {
+      allOffers: [...allOffers.values()],
+      queuedOffers: [...queuedOffers.values()],
+      pagesScanned,
+      skippedSeen,
+      declaredCount,
+      totalPages,
+    };
   }
 
   async function fetchOfferDetails(provider, listingOffers, options, signal) {
@@ -906,6 +1042,49 @@
     let nextIndex = 0;
     let processed = 0;
     let errors = 0;
+    let consecutiveErrors = 0;
+    let cooldownUntil = 0;
+
+    async function maybeCooldown() {
+      const wait = cooldownUntil - Date.now();
+      if (wait > 0) await sleep(wait);
+    }
+
+    async function fetchOne(listing, index, retryPass = false) {
+      await maybeCooldown();
+      try {
+        const html = await fetchHtml(listing.url, signal, provider === 'allegro' ? 5 : 3);
+        const parsed = parseOffer(provider, html, listing, options.mode);
+        if (!parsed.title && listing.listingTitle) parsed.title = listing.listingTitle;
+        consecutiveErrors = 0;
+        return parsed;
+      } catch (error) {
+        consecutiveErrors += 1;
+        if (provider === 'allegro' && consecutiveErrors >= 3) {
+          cooldownUntil = Math.max(cooldownUntil, Date.now() + 20000);
+        }
+        return {
+          provider,
+          itemId: listing.itemId,
+          title: listing.listingTitle || 'Nie udało się pobrać szczegółów',
+          price: listing.listingPrice || '',
+          rating: listing.rating || '',
+          reviewCount: listing.reviewCount || null,
+          shopsCount: listing.shopsCount || null,
+          offersCount: listing.offersCount || null,
+          condition: '',
+          seller: '',
+          sellerRating: '',
+          shipping: '',
+          params: listing.listingParams || {},
+          parametersText: '',
+          description: `Błąd pobierania${retryPass ? ' po ponownej próbie' : ''}: ${error?.message || String(error)}`,
+          url: listing.url,
+          error: true,
+          _listingIndex: index,
+        };
+      }
+    }
 
     async function worker(workerNo) {
       while (true) {
@@ -915,57 +1094,73 @@
         if (index >= total) return;
 
         const listing = listingOffers[index];
-        await setState({
+        await setState(provider, {
           phase: provider === 'ceneo' ? 'Pobieranie danych produktów' : 'Pobieranie szczegółów ofert',
           currentItem: `${index + 1}/${total}: ${listing.listingTitle || listing.url}`,
-          offersFound: total,
+          queued: total,
           processed,
           errors,
-          percent: total ? 15 + (processed / total) * 80 : 95,
+          percent: total ? 15 + (processed / total) * 75 : 90,
         });
 
-        try {
-          const html = await fetchHtml(listing.url, signal);
-          const parsed = parseOffer(provider, html, listing, options.mode);
-          if (!parsed.title && listing.listingTitle) parsed.title = listing.listingTitle;
-          results[index] = parsed;
-        } catch (error) {
-          errors += 1;
-          results[index] = {
-            provider,
-            itemId: listing.itemId,
-            title: listing.listingTitle || 'Nie udało się pobrać szczegółów',
-            price: listing.listingPrice || '',
-            rating: listing.rating || '',
-            reviewCount: listing.reviewCount || null,
-            shopsCount: listing.shopsCount || null,
-            offersCount: listing.offersCount || null,
-            condition: '',
-            seller: '',
-            sellerRating: '',
-            shipping: '',
-            params: listing.listingParams || {},
-            parametersText: '',
-            description: `Błąd pobierania: ${error?.message || String(error)}`,
-            url: listing.url,
-            error: true,
-          };
-        }
+        const parsed = await fetchOne(listing, index, false);
+        results[index] = parsed;
+        if (parsed.error) errors += 1;
 
         processed += 1;
-        await setState({
+        await setState(provider, {
           processed,
           errors,
-          percent: total ? 15 + (processed / total) * 80 : 95,
+          percent: total ? 15 + (processed / total) * 75 : 90,
           currentItem: `Worker ${workerNo}: ukończono ${processed}/${total}`,
         });
 
-        await sleep(options.delayMs);
+        const baseDelay = provider === 'allegro' ? Math.max(options.delayMs, 1000) : options.delayMs;
+        await sleep(baseDelay);
       }
     }
 
-    const workerCount = Math.max(1, Math.min(options.concurrency, total || 1));
+    const safeConcurrency = provider === 'allegro'
+      ? Math.max(1, Math.min(options.concurrency, 2))
+      : Math.max(1, Math.min(options.concurrency, 5));
+    const workerCount = Math.max(1, Math.min(safeConcurrency, total || 1));
     await Promise.all(Array.from({ length: workerCount }, (_, i) => worker(i + 1)));
+
+    // Druga, wolniejsza próba tylko dla błędów. To szczególnie ważne dla Allegro,
+    // które potrafi po kilkudziesięciu żądaniach chwilowo ograniczyć kolejne pobrania.
+    const failedIndexes = results
+      .map((offer, index) => offer?.error ? index : -1)
+      .filter((index) => index >= 0);
+
+    if (failedIndexes.length && !signal.aborted) {
+      await setState(provider, {
+        phase: `Ponawianie ${failedIndexes.length} błędów`,
+        currentItem: provider === 'allegro' ? 'Dłuższa przerwa przed ponowną próbą' : 'Ponowna próba pobierania',
+        percent: 91,
+      });
+      await sleep(provider === 'allegro' ? 15000 : 3000);
+
+      let retried = 0;
+      for (const index of failedIndexes) {
+        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        const listing = listingOffers[index];
+        await setState(provider, {
+          phase: `Ponawianie błędów ${retried + 1}/${failedIndexes.length}`,
+          currentItem: listing.listingTitle || listing.url,
+          percent: 91 + ((retried / failedIndexes.length) * 5),
+        });
+
+        const parsed = await fetchOne(listing, index, true);
+        if (!parsed.error) {
+          results[index] = parsed;
+          errors -= 1;
+        } else {
+          results[index] = parsed;
+        }
+        retried += 1;
+        await sleep(provider === 'allegro' ? Math.max(2500, options.delayMs * 2) : Math.max(1200, options.delayMs));
+      }
+    }
 
     return { offers: results.filter(Boolean), errors };
   }
@@ -983,9 +1178,11 @@
       throw new Error('Obsługiwane są tylko Allegro i Ceneo.');
     }
 
-    await chrome.storage.local.remove(STORAGE_RESULT);
+    const stateStorageKey = stateKey(provider);
+    const resultStorageKey = resultKey(provider);
+    await chrome.storage.local.remove(resultStorageKey);
     await chrome.storage.local.set({
-      [STORAGE_STATE]: {
+      [stateStorageKey]: {
         running: true,
         done: false,
         failed: false,
@@ -993,8 +1190,12 @@
         phase: 'Start',
         pagesScanned: 0,
         offersFound: 0,
+        queued: 0,
+        skippedSeen: 0,
         processed: 0,
         errors: 0,
+        declaredCount: null,
+        totalPages: null,
         currentItem: sourceUrl,
         percent: 0,
         startedAt,
@@ -1003,44 +1204,102 @@
     });
 
     try {
-      const listingOffers = await scanListingPages(provider, sourceUrl, options, controller.signal);
+      const history = await getHistory(provider);
+      const seenIds = new Set(Object.keys(history.items || {}));
+      const scanResult = await scanListingPages(provider, sourceUrl, options, controller.signal, seenIds);
+      const listingOffers = scanResult.queuedOffers;
 
-      if (!listingOffers.length) {
+      if (!scanResult.allOffers.length) {
         throw new Error(`Nie znaleziono pozycji na stronie ${providerLabel(provider)}. Otwórz stronę kategorii/wyników z ustawionymi filtrami.`);
       }
 
-      await setState({
+      if (!listingOffers.length) {
+        const emptyDiagnostics = {
+          discoveredCount: scanResult.allOffers.length,
+          declaredCount: scanResult.declaredCount,
+          totalPages: scanResult.totalPages,
+          skippedSeen: scanResult.skippedSeen,
+          successCount: 0,
+          errorCount: 0,
+        };
+        const emptyResult = buildExport([], sourceUrl, options.mode, provider, emptyDiagnostics);
+        emptyResult.skippedSeen = scanResult.skippedSeen;
+        emptyResult.discoveredCount = scanResult.allOffers.length;
+        emptyResult.declaredCount = scanResult.declaredCount;
+        emptyResult.totalPages = scanResult.totalPages;
+        await chrome.storage.local.set({ [resultStorageKey]: emptyResult });
+        await setState(provider, {
+          running: false,
+          done: true,
+          failed: false,
+          phase: 'Gotowe, brak nowych pozycji',
+          offersFound: scanResult.allOffers.length,
+          queued: 0,
+          skippedSeen: scanResult.skippedSeen,
+          processed: 0,
+          errors: 0,
+          declaredCount: scanResult.declaredCount,
+          totalPages: scanResult.totalPages,
+          currentItem: `Wszystkie znalezione pozycje były już w historii (${scanResult.skippedSeen}).`,
+          percent: 100,
+          finishedAt: Date.now(),
+        });
+        return;
+      }
+
+      await setState(provider, {
         phase: 'Lista gotowa, pobieram szczegóły',
-        offersFound: listingOffers.length,
+        offersFound: scanResult.allOffers.length,
+        queued: listingOffers.length,
+        skippedSeen: scanResult.skippedSeen,
+        declaredCount: scanResult.declaredCount,
+        totalPages: scanResult.totalPages,
         percent: 15,
-        currentItem: `Znaleziono ${listingOffers.length} unikalnych pozycji`,
+        currentItem: `Znaleziono ${scanResult.allOffers.length}, do pobrania ${listingOffers.length}, pominięto ${scanResult.skippedSeen}`,
       });
 
       const detailResult = await fetchOfferDetails(provider, listingOffers, options, controller.signal);
 
-      await setState({
+      await setState(provider, {
         phase: 'Budowanie eksportu',
         currentItem: 'Dzielę wynik na fragmenty do ChatGPT',
         percent: 97,
       });
 
-      const result = buildExport(detailResult.offers, sourceUrl, options.mode, provider);
-      await chrome.storage.local.set({ [STORAGE_RESULT]: result });
+      const diagnostics = {
+        discoveredCount: scanResult.allOffers.length,
+        declaredCount: scanResult.declaredCount,
+        totalPages: scanResult.totalPages,
+        skippedSeen: scanResult.skippedSeen,
+        successCount: detailResult.offers.filter((offer) => !offer.error).length,
+        errorCount: detailResult.errors,
+      };
+      const result = buildExport(detailResult.offers, sourceUrl, options.mode, provider, diagnostics);
+      result.skippedSeen = scanResult.skippedSeen;
+      result.discoveredCount = scanResult.allOffers.length;
+      result.declaredCount = scanResult.declaredCount;
+      result.totalPages = scanResult.totalPages;
+      result.successCount = detailResult.offers.filter((offer) => !offer.error).length;
+      result.errorCount = detailResult.errors;
+      await chrome.storage.local.set({ [resultStorageKey]: result });
 
-      await setState({
+      // Do historii trafiają wyłącznie pozycje pobrane poprawnie. Błędy zostają do ponowienia.
+      await addSuccessfulOffersToHistory(provider, detailResult.offers);
+
+      await setState(provider, {
         running: false,
         done: true,
         failed: false,
-        phase: 'Gotowe',
+        phase: detailResult.errors ? 'Gotowe z błędami' : 'Gotowe',
         processed: detailResult.offers.length,
         errors: detailResult.errors,
-        currentItem: `${detailResult.offers.length} pozycji, ${result.chunks.length} fragmentów`,
+        currentItem: `${result.successCount} poprawnie, ${detailResult.errors} błędów, ${result.chunks.length} fragmentów`,
         percent: 100,
         finishedAt: Date.now(),
       });
     } catch (error) {
       const aborted = error?.name === 'AbortError';
-      await setState({
+      await setState(provider, {
         running: false,
         done: false,
         failed: !aborted,
@@ -1053,6 +1312,26 @@
     }
   }
 
+  async function migrateLegacyStorage() {
+    const legacy = await chrome.storage.local.get([LEGACY_STORAGE_STATE, LEGACY_STORAGE_RESULT]);
+    const oldResult = legacy[LEGACY_STORAGE_RESULT];
+    if (oldResult?.provider && (oldResult.provider === 'allegro' || oldResult.provider === 'ceneo')) {
+      const provider = oldResult.provider;
+      const newResultKey = resultKey(provider);
+      const existing = (await chrome.storage.local.get(newResultKey))[newResultKey];
+      if (!existing) await chrome.storage.local.set({ [newResultKey]: oldResult });
+      await addSuccessfulOffersToHistory(provider, oldResult.offers || []);
+    }
+
+    const oldState = legacy[LEGACY_STORAGE_STATE];
+    if (oldState?.provider && (oldState.provider === 'allegro' || oldState.provider === 'ceneo')) {
+      const provider = oldState.provider;
+      const newStateKey = stateKey(provider);
+      const existing = (await chrome.storage.local.get(newStateKey))[newStateKey];
+      if (!existing) await chrome.storage.local.set({ [newStateKey]: oldState });
+    }
+  }
+
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === 'MARKETPLACE_EXPORTER_START' || message?.type === 'ALLEGRO_EXPORTER_START') {
       if (job) {
@@ -1060,24 +1339,29 @@
         return false;
       }
 
+      const provider = detectProvider(location.href);
       const options = {
         startFromFirst: message.options?.startFromFirst !== false,
         mode: message.options?.mode === 'full' ? 'full' : 'compact',
         maxOffers: Math.max(0, Number(message.options?.maxOffers || 0)),
-        concurrency: Math.max(1, Math.min(5, Number(message.options?.concurrency || 2))),
-        delayMs: Math.max(200, Number(message.options?.delayMs || 500)),
+        concurrency: Math.max(1, Math.min(5, Number(message.options?.concurrency || (provider === 'allegro' ? 1 : 2)))),
+        delayMs: Math.max(200, Number(message.options?.delayMs || (provider === 'allegro' ? 1200 : 600))),
+        skipSeen: message.options?.skipSeen !== false,
       };
 
       run(options).catch(async (error) => {
-        await setState({
-          running: false,
-          done: false,
-          failed: true,
-          phase: 'Błąd',
-          currentItem: error?.message || String(error),
-        });
+        const providerNow = detectProvider(location.href);
+        if (providerNow) {
+          await setState(providerNow, {
+            running: false,
+            done: false,
+            failed: true,
+            phase: 'Błąd',
+            currentItem: error?.message || String(error),
+          });
+        }
       });
-      sendResponse({ ok: true });
+      sendResponse({ ok: true, provider });
       return false;
     }
 
@@ -1087,7 +1371,14 @@
       return false;
     }
 
+    if (message?.type === 'MARKETPLACE_EXPORTER_PING') {
+      sendResponse({ ok: true, provider: detectProvider(location.href), running: Boolean(job) });
+      return false;
+    }
+
     sendResponse({ ok: false, error: 'Nieznany komunikat.' });
     return false;
   });
+
+  migrateLegacyStorage().catch(() => {});
 })();

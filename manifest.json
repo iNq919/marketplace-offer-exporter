@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Allegro + Ceneo Offer Exporter for ChatGPT",
-  "version": "1.1.1",
-  "description": "Zbiera oferty i produkty ze wszystkich stron bieżącego filtrowania Allegro lub Ceneo i przygotowuje eksport do ChatGPT.",
+  "version": "1.2.0",
+  "description": "Eksportuje Allegro i Ceneo równolegle, obsługuje historię pomijanych pozycji i bezpieczniejsze ponawianie pobrań.",
   "permissions": [
     "activeTab",
     "scripting",

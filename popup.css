@@ -10,27 +10,33 @@
 
 body {
   margin: 0;
-  width: 520px;
-  min-height: 520px;
+  width: 650px;
+  min-height: 650px;
   background: #f6f7f9;
 }
 
 main { padding: 16px; }
 
-header {
+header,
+.provider-head,
+.result-head,
+.progress-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
 }
+
+header { margin-bottom: 12px; }
 
 h1 {
   margin: 0 0 3px;
   font-size: 20px;
 }
 
-header p, .result-head p {
+header p,
+.result-head p,
+.history-tools p {
   margin: 0;
   color: #667085;
 }
@@ -52,7 +58,9 @@ label {
   font-weight: 600;
 }
 
-small, .hint {
+small,
+.hint,
+.diagnostic {
   color: #667085;
   font-weight: 400;
 }
@@ -64,7 +72,8 @@ small, .hint {
 
 input[type="checkbox"] { margin-top: 2px; }
 
-input[type="number"], select {
+input[type="number"],
+select {
   width: 100%;
   min-height: 38px;
   border: 1px solid #d0d5dd;
@@ -82,7 +91,7 @@ input[type="number"], select {
 
 .range-row {
   display: grid;
-  grid-template-columns: 1fr 72px;
+  grid-template-columns: 1fr 78px;
   gap: 10px;
   align-items: center;
 }
@@ -125,14 +134,35 @@ button.danger { color: #b42318; border-color: #fda29b; }
   color: #475467;
   white-space: nowrap;
 }
+
 .badge.running { background: #fff4e5; color: #b54708; }
 .badge.done { background: #ecfdf3; color: #027a48; }
 .badge.error { background: #fef3f2; color: #b42318; }
 
+.providers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.provider-card {
+  min-width: 0;
+}
+
+.provider-head strong {
+  display: block;
+  font-size: 16px;
+}
+
+.provider-head small {
+  display: block;
+  margin-top: 2px;
+}
+
 .progress-head {
-  display: flex;
-  justify-content: space-between;
+  margin-top: 12px;
   margin-bottom: 8px;
+  font-size: 12px;
 }
 
 progress {
@@ -143,30 +173,48 @@ progress {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   margin-top: 10px;
   color: #667085;
-  font-size: 12px;
+  font-size: 11px;
 }
 
+.stats6 { grid-template-columns: repeat(3, 1fr); }
 .stats strong { color: #344054; }
 
+.current-item,
+.diagnostic {
+  margin: 8px 0 0;
+  font-size: 11px;
+  min-height: 16px;
+}
+
 .current-item {
-  margin: 10px 0 0;
   color: #475467;
-  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 18px;
 }
 
-.result-head {
+.compact-actions { margin-top: 10px; }
+.compact-actions button { padding: 7px 9px; font-size: 12px; }
+
+.history-tools {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.history-tools p {
+  margin-top: 4px;
+  font-size: 12px;
+  max-width: 430px;
+}
+
+.result-head select {
+  width: 120px;
+  min-height: 34px;
 }
 
 .chunk-nav {
@@ -174,7 +222,7 @@ progress {
   grid-template-columns: 42px 1fr 42px;
   gap: 8px;
   align-items: center;
-  margin-bottom: 12px;
+  margin: 12px 0;
 }
 
 .chunk-nav span {
@@ -199,4 +247,3 @@ progress {
 }
 
 .hidden { display: none !important; }
-code { font-size: .92em; }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Allegro + Ceneo Offer Exporter</title>
+  <title>Allegro + Ceneo Exporter</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -11,9 +11,9 @@
     <header>
       <div>
         <h1>Allegro + Ceneo</h1>
-        <p>Zbierz wszystkie pozycje z aktywnych filtrów.</p>
+        <p id="activeSiteLabel">Eksport ofert i produktów do ChatGPT.</p>
       </div>
-      <span id="statusBadge" class="badge idle">gotowy</span>
+      <span id="globalBadge" class="badge idle">gotowy</span>
     </header>
 
     <section class="card settings">
@@ -22,68 +22,136 @@
         <span>Zacznij od strony 1, niezależnie od aktualnej strony wyników</span>
       </label>
 
+      <label class="checkbox-row">
+        <input id="skipSeen" type="checkbox" checked>
+        <span>Pomiń wcześniej poprawnie wyeksportowane pozycje</span>
+      </label>
+
       <label>
         Tryb eksportu
         <select id="mode">
-          <option value="compact" selected>AI compact, opis do 1200 znaków</option>
+          <option value="compact" selected>AI compact, opis do 1200-1400 znaków</option>
           <option value="full">Pełne opisy</option>
         </select>
       </label>
 
       <div class="grid2">
         <label>
-          Maks. pozycji
+          Maks. nowych pozycji
           <input id="maxOffers" type="number" min="0" step="1" value="0">
-          <small>0 = wszystkie</small>
+          <small>0 = wszystkie nowe</small>
         </label>
         <label>
           Równoległe pobieranie
-          <input id="concurrency" type="number" min="1" max="5" step="1" value="2">
-          <small>2 jest bezpiecznym ustawieniem</small>
+          <input id="concurrency" type="number" min="1" max="5" step="1" value="1">
+          <small>Dla Allegro zalecane 1</small>
         </label>
       </div>
 
       <label>
         Przerwa między pobraniami na worker
         <div class="range-row">
-          <input id="delayMs" type="range" min="200" max="2000" step="50" value="500">
-          <output id="delayOutput">500 ms</output>
+          <input id="delayMs" type="range" min="400" max="3000" step="100" value="1200">
+          <output id="delayOutput">1200 ms</output>
         </div>
       </label>
 
       <div class="actions">
-        <button id="startBtn" class="primary">Zbierz pozycje</button>
-        <button id="stopBtn" class="danger" disabled>Przerwij</button>
+        <button id="startCurrentBtn" class="primary">Uruchom bieżącą kartę</button>
+        <button id="startBothBtn">Uruchom Allegro + Ceneo</button>
       </div>
+      <p class="hint">Aby uruchomić oba jednocześnie, otwórz po jednej karcie z ustawionymi filtrami Allegro i Ceneo. Oba zadania mają osobny postęp, wynik i historię.</p>
     </section>
 
-    <section class="card progress-card">
-      <div class="progress-head">
-        <strong id="phase">Gotowy</strong>
-        <span id="percent">0%</span>
+    <section class="providers-grid">
+      <article class="card provider-card" data-provider="allegro">
+        <div class="provider-head">
+          <div>
+            <strong>Allegro</strong>
+            <small id="allegroHistoryCount">Historia: 0</small>
+          </div>
+          <span id="allegroBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="progress-head">
+          <span id="allegroPhase">Gotowy</span>
+          <span id="allegroPercent">0%</span>
+        </div>
+        <progress id="allegroProgress" max="100" value="0"></progress>
+        <div class="stats stats6">
+          <span>Strony <strong id="allegroPages">0</strong></span>
+          <span>Znalezione <strong id="allegroFound">0</strong></span>
+          <span>Kolejka <strong id="allegroQueued">0</strong></span>
+          <span>Pominięte <strong id="allegroSkipped">0</strong></span>
+          <span>Pobrane <strong id="allegroProcessed">0</strong></span>
+          <span>Błędy <strong id="allegroErrors">0</strong></span>
+        </div>
+        <p id="allegroDeclared" class="diagnostic"></p>
+        <p id="allegroCurrent" class="current-item"></p>
+        <div class="actions compact-actions">
+          <button id="allegroStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="allegroResultBtn" disabled>Pokaż wynik</button>
+          <button id="allegroClearHistoryBtn">Wyczyść historię</button>
+        </div>
+      </article>
+
+      <article class="card provider-card" data-provider="ceneo">
+        <div class="provider-head">
+          <div>
+            <strong>Ceneo</strong>
+            <small id="ceneoHistoryCount">Historia: 0</small>
+          </div>
+          <span id="ceneoBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="progress-head">
+          <span id="ceneoPhase">Gotowy</span>
+          <span id="ceneoPercent">0%</span>
+        </div>
+        <progress id="ceneoProgress" max="100" value="0"></progress>
+        <div class="stats stats6">
+          <span>Strony <strong id="ceneoPages">0</strong></span>
+          <span>Znalezione <strong id="ceneoFound">0</strong></span>
+          <span>Kolejka <strong id="ceneoQueued">0</strong></span>
+          <span>Pominięte <strong id="ceneoSkipped">0</strong></span>
+          <span>Pobrane <strong id="ceneoProcessed">0</strong></span>
+          <span>Błędy <strong id="ceneoErrors">0</strong></span>
+        </div>
+        <p id="ceneoDeclared" class="diagnostic"></p>
+        <p id="ceneoCurrent" class="current-item"></p>
+        <div class="actions compact-actions">
+          <button id="ceneoStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="ceneoResultBtn" disabled>Pokaż wynik</button>
+          <button id="ceneoClearHistoryBtn">Wyczyść historię</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="card history-tools">
+      <div>
+        <strong>Historia wcześniejszych eksportów</strong>
+        <p>Możesz zaimportować stare TXT lub JSON. Pozycje z błędem pobierania nie zostaną oznaczone jako sprawdzone.</p>
       </div>
-      <progress id="progress" max="100" value="0"></progress>
-      <div class="stats">
-        <span>Strony: <strong id="pagesScanned">0</strong></span>
-        <span>Znalezione: <strong id="offersFound">0</strong></span>
-        <span>Pobrane: <strong id="processed">0</strong></span>
-        <span>Błędy: <strong id="errors">0</strong></span>
+      <div class="actions">
+        <button id="importHistoryBtn">Importuj TXT / JSON</button>
+        <input id="historyFiles" type="file" accept=".txt,.json,text/plain,application/json" multiple hidden>
       </div>
-      <p id="currentItem" class="current-item"></p>
     </section>
 
     <section id="resultCard" class="card result-card hidden">
       <div class="result-head">
         <div>
-          <strong>Eksport gotowy</strong>
+          <strong id="resultTitle">Eksport gotowy</strong>
           <p id="resultMeta"></p>
         </div>
+        <select id="resultProvider" aria-label="Wybierz wynik">
+          <option value="allegro">Allegro</option>
+          <option value="ceneo">Ceneo</option>
+        </select>
       </div>
 
       <div class="chunk-nav">
-        <button id="prevChunkBtn" title="Poprzedni fragment">←</button>
+        <button id="prevChunkBtn" title="Poprzedni fragment">&larr;</button>
         <span id="chunkLabel">Fragment 1/1</span>
-        <button id="nextChunkBtn" title="Następny fragment">→</button>
+        <button id="nextChunkBtn" title="Następny fragment">&rarr;</button>
       </div>
 
       <div class="actions vertical-mobile">
@@ -92,7 +160,7 @@
         <button id="downloadTxtBtn">Pobierz TXT</button>
         <button id="downloadJsonBtn">Pobierz JSON</button>
       </div>
-      <p class="hint">Do ChatGPT najlepiej wklejaj fragmenty po kolei. Każdy fragment zawiera kompletne pozycje, bez przecinania ich w połowie.</p>
+      <p class="hint">Eksporty Allegro i Ceneo są przechowywane osobno. Ponowne uruchomienie jednego serwisu nie kasuje wyniku drugiego.</p>
     </section>
 
     <section id="messageBox" class="message hidden"></section>

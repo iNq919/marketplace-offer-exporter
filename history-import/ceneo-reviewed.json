@@ -1,0 +1,2597 @@
+{
+  "provider": "ceneo",
+  "source": "previous-export-reviewed-in-chat",
+  "count": 370,
+  "offers": [
+    {
+      "provider": "ceneo",
+      "itemId": "50018510",
+      "title": "Toshiba N300 4TB HDWQ140UZSVA",
+      "url": "https://www.ceneo.pl/50018510",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186934529",
+      "title": "Dysk twardy Seagate 3.5 4 TB (ST4000NM0165)",
+      "url": "https://www.ceneo.pl/186934529",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "134907625",
+      "title": "Seagate IronWolf 4TB (ST4000VN006)",
+      "url": "https://www.ceneo.pl/134907625",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185043228",
+      "title": "Dysk twardy Dell 3.5\" 4 TB",
+      "url": "https://www.ceneo.pl/185043228",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "184933687",
+      "title": "Dysk twardy Hp 693721-001-RFB 3.5 4 TB (W127213447)",
+      "url": "https://www.ceneo.pl/184933687",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "143972868",
+      "title": "WD Red Plus WD40EFPX 4TB sATA III 256MB 5400rpm CRM",
+      "url": "https://www.ceneo.pl/143972868",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "4743372",
+      "title": "WD WD Caviar Green 2TB 64MB 7200rpm SAT2 3,5cala (WD20EARS)",
+      "url": "https://www.ceneo.pl/4743372",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "66746140",
+      "title": "Seagate Barracuda 2TB 3,5\" (ST2000DM008)",
+      "url": "https://www.ceneo.pl/66746140",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47522403",
+      "title": "Seagate SkyHawk 3TB 3,5\" (ST3000VX009)",
+      "url": "https://www.ceneo.pl/47522403",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "45714130",
+      "title": "Toshiba X300 4TB HDWE140UZSVA",
+      "url": "https://www.ceneo.pl/45714130",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47523117",
+      "title": "Seagate IronWolf 2TB SATA 6 Gb/s (ST2000VN004)",
+      "url": "https://www.ceneo.pl/47523117",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260933",
+      "title": "Dell 1Tb 7.2K 128Mb Sata III 3.5'' St1000Nm0033 (0T4XNN)",
+      "url": "https://www.ceneo.pl/186260933",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211773",
+      "title": "Dell Dysk Twardy Wd Black 500Gb 2,5'' Sata Iii 7200Rpm (0Cxkck)",
+      "url": "https://www.ceneo.pl/179211773",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "195802885",
+      "title": "Dysk twardy Hitachi 3.5 320 GB (HTS725032A9A364)",
+      "url": "https://www.ceneo.pl/195802885",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198484826",
+      "title": "Dysk twardy Seagate 3.5 4 TB (SEAGATESKYHAWKNOXEL4TB4000GB)",
+      "url": "https://www.ceneo.pl/198484826",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260867",
+      "title": "Dell 1Tb 0Hnwhh 7.2K Sata III 3.5'' (HNWHH_HUS722T1TALA600)",
+      "url": "https://www.ceneo.pl/186260867",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198479648",
+      "title": "Dysk twardy Hp 3.5 250 GB (519599003)",
+      "url": "https://www.ceneo.pl/198479648",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "43693495",
+      "title": "Toshiba P300 2TB HDWD120UZSVA",
+      "url": "https://www.ceneo.pl/43693495",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193537495",
+      "title": "Dysk twardy Toshiba 3.5 3 TB (HDWD130)",
+      "url": "https://www.ceneo.pl/193537495",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211782",
+      "title": "Seagate Dell 500Gb 7.2K Sata Ii 2.5'' St9500420As (08Pdnc)",
+      "url": "https://www.ceneo.pl/179211782",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "43693494",
+      "title": "Toshiba P300 1TB HDWD110UZSVA",
+      "url": "https://www.ceneo.pl/43693494",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "82101268",
+      "title": "Seagate Hdd St4000Vx000 4Tb 24/7 Skyhawk",
+      "url": "https://www.ceneo.pl/82101268",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "81881876",
+      "title": "Ibm 300Gb 10K 6Gbps 2.5\" Sas H/S Hdd 42D0638",
+      "url": "https://www.ceneo.pl/81881876",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186256468",
+      "title": "Dysk twardy Seagate 3.5 4 TB (ST4000DM004)",
+      "url": "https://www.ceneo.pl/186256468",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "120740223",
+      "title": "Seagate Enterprise 1 Tb 2.5\" Hdd Sata Iii (St1000Nx0423)",
+      "url": "https://www.ceneo.pl/120740223",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300365",
+      "title": "Toshiba S300 1TB HDWV110UZSVA",
+      "url": "https://www.ceneo.pl/105300365",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "22651238",
+      "title": "Seagate Barracuda 4TB 3,5\" (ST4000DM000)",
+      "url": "https://www.ceneo.pl/22651238",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260841",
+      "title": "Hp 507613-002 2Tb 7.2K 16Mb Sas-2 3.5'' (MB2000FAMYV)",
+      "url": "https://www.ceneo.pl/186260841",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194806384",
+      "title": "Western Digital Blue 3,5\" 4TB SATA 128MB",
+      "url": "https://www.ceneo.pl/194806384",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "190413354",
+      "title": "Dysk twardy Western digital 3.5 2 TB (WD20EFPX)",
+      "url": "https://www.ceneo.pl/190413354",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "15622130",
+      "title": "Seagate SV35 3TB 3,5\" (ST3000VX000)",
+      "url": "https://www.ceneo.pl/15622130",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "119770157",
+      "title": "Toshiba S300 4TB HDWT840UZSVA",
+      "url": "https://www.ceneo.pl/119770157",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "51186213",
+      "title": "Seagate Barracuda 4TB 3,5\" (ST4000DM004)",
+      "url": "https://www.ceneo.pl/51186213",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200112616",
+      "title": "Dysk twardy Seagate 3,5 cala 4TB ST4000NM001CFR",
+      "url": "https://www.ceneo.pl/200112616",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "153401152",
+      "title": "Dysk WD Purple WD43PURZ 4TB sATA III 256MB",
+      "url": "https://www.ceneo.pl/153401152",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "191383658",
+      "title": "Dysk twardy Western digital 3.5 4 TB (WD40EFZZ)",
+      "url": "https://www.ceneo.pl/191383658",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "14648812",
+      "title": "Seagate Barracuda 2TB 3,5\" (ST2000DM001)",
+      "url": "https://www.ceneo.pl/14648812",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "184814109",
+      "title": "Dysk twardy Hp 3.5 4 TB (DK_NR_EGD_W127374178)",
+      "url": "https://www.ceneo.pl/184814109",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193844453",
+      "title": "Dysk twardy Dell 2.5 2 TB (38387UNIW)",
+      "url": "https://www.ceneo.pl/193844453",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47523119",
+      "title": "Seagate IronWolf 4TB SATA 6 Gb/s (ST4000VN008)",
+      "url": "https://www.ceneo.pl/47523119",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300380",
+      "title": "Wd Western Digital Blue 2Tb Sata 6Gb/S Hdd Internal 3.5Inch Serial Ata 256Mb Cache 7200 Rpm Rohs Compliant Bulk (WD20EZBX",
+      "url": "https://www.ceneo.pl/105300380",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "26381546",
+      "title": "WD 4TB 7200obr. 64MB GP (WD40EzRX)",
+      "url": "https://www.ceneo.pl/26381546",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "134487367",
+      "title": "Seagate Skyhawk 4TB HDD 3,5\" SATA 6Gb/s (ST4000VX016)",
+      "url": "https://www.ceneo.pl/134487367",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "50217187",
+      "title": "Seagate SkyHawk 2TB 3,5\" (ST2000VX008)",
+      "url": "https://www.ceneo.pl/50217187",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "156021672",
+      "title": "Western Digital Red Plus WD20EFPX dysk twardy 3.5\" 2 TB SATA",
+      "url": "https://www.ceneo.pl/156021672",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "81882043",
+      "title": "Hp M6612 2Tb 6G Sas 7.2K Rpm Lff Dp Midline Hdd Aw590A",
+      "url": "https://www.ceneo.pl/81882043",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198674812",
+      "title": "Dysk twardy Seagate 3.5 2 TB (ST2000DM005FR)",
+      "url": "https://www.ceneo.pl/198674812",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "140803184",
+      "title": "Seagate IronWolfPro 4TB 3.5'' 256MB (ST4000NT001)",
+      "url": "https://www.ceneo.pl/140803184",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260962",
+      "title": "Western Digital Wd Se 3.5\" Sata (WD2000F9YZ)",
+      "url": "https://www.ceneo.pl/186260962",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192594094",
+      "title": "Dysk twardy Wd 3.5 4 TB (WD40EZZX)",
+      "url": "https://www.ceneo.pl/192594094",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "61125716",
+      "title": "WD Blue 2,5'' 2TB SATA/600 (WD20SPZX)",
+      "url": "https://www.ceneo.pl/61125716",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "153479488",
+      "title": "Dysk WD Purple WD23PURZ 2TB sATA III 256MB",
+      "url": "https://www.ceneo.pl/153479488",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "155083464",
+      "title": "WD Blue 3,5\" 2TB SATA III (WD20EARZ)",
+      "url": "https://www.ceneo.pl/155083464",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "157713467",
+      "title": "Synology DS223J (2x 4TB HDD HAT3300 Plus) (DS223J+WZESTAWIE2XHAT33004T)",
+      "url": "https://www.ceneo.pl/157713467",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "29301931",
+      "title": "Seagate Surveillance 4TB 3,5\" (ST4000VX000)",
+      "url": "https://www.ceneo.pl/29301931",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193537662",
+      "title": "Dysk twardy Seagate 3.5 6 TB (ST6000NM0195)",
+      "url": "https://www.ceneo.pl/193537662",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260834",
+      "title": "Seagate 4Tb 7.2K 128Mb Sata III 3.5'' (ST4000VN0001)",
+      "url": "https://www.ceneo.pl/186260834",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "67637063",
+      "title": "WD Black 4TB 3,5\" (WD4005FZBX)",
+      "url": "https://www.ceneo.pl/67637063",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "96525671",
+      "title": "WD Blue 4TB 3,5\" SATA III (WD40EZAZ)",
+      "url": "https://www.ceneo.pl/96525671",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47522398",
+      "title": "Seagate BarraCuda 4TB 3,5\" (ST4000DM005)",
+      "url": "https://www.ceneo.pl/47522398",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "46385749",
+      "title": "Seagate FireCuda 2TB 3,5\" (ST2000DX002)",
+      "url": "https://www.ceneo.pl/46385749",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "134779",
+      "title": "SEAGATE ST380021A 80GB BARRACUDA IV ATA/100",
+      "url": "https://www.ceneo.pl/134779",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "46385746",
+      "title": "Seagate Barracuda 2TB 3,5\" (ST2000DM006)",
+      "url": "https://www.ceneo.pl/46385746",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260956",
+      "title": "Seagate Nas 3Tb Sata III 5.9K 64Mb 3.5'' (ST3000VN000)",
+      "url": "https://www.ceneo.pl/186260956",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "26815990",
+      "title": "WD Black 4TB (WD4003FZEX)",
+      "url": "https://www.ceneo.pl/26815990",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "26210836",
+      "title": "WD Red 4TB 3,5\" (WD40EFRX)",
+      "url": "https://www.ceneo.pl/26210836",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "13703452",
+      "title": "Seagate BARRACUDA IV 20GB ATA100 (ST320011A)",
+      "url": "https://www.ceneo.pl/13703452",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "24873901",
+      "title": "Seagate Video HDD 3TB 3,5\" (ST3000VM002)",
+      "url": "https://www.ceneo.pl/24873901",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "38953440",
+      "title": "WD WD6001F4PZ 3,5\" 6TB",
+      "url": "https://www.ceneo.pl/38953440",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "13705280",
+      "title": "Seagate Barracuda 7200.9 80, Ultra ATA/100 (ST-3802110A)",
+      "url": "https://www.ceneo.pl/13705280",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "199798641",
+      "title": "Dysk twardy WD 3,5 cala 4TB WD49EFZZSPCPAN0",
+      "url": "https://www.ceneo.pl/199798641",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "14670898",
+      "title": "Seagate Barracuda 3TB 3,5\" (ST3000DM001)",
+      "url": "https://www.ceneo.pl/14670898",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211938",
+      "title": "Western Digital Dysk Twardy Wd Black 3.5\" Sata (Wd4001Faex)",
+      "url": "https://www.ceneo.pl/179211938",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "46385747",
+      "title": "Seagate Barracuda 3TB 3,5\" (ST3000DM008)",
+      "url": "https://www.ceneo.pl/46385747",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192482650",
+      "title": "Dysk twardy Western digital 3.5 12 TB (WD120EDBZ)",
+      "url": "https://www.ceneo.pl/192482650",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "14612864",
+      "title": "Seagate Barracuda 1TB 3,5\" (ST1000DM003)",
+      "url": "https://www.ceneo.pl/14612864",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "18741780",
+      "title": "WD Re 4TB 3,5\" (WD4000FYYZ)",
+      "url": "https://www.ceneo.pl/18741780",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "13705032",
+      "title": "Seagate Barracuda 7200.10 250GB ATA100 (ST-3250620A)",
+      "url": "https://www.ceneo.pl/13705032",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "196525722",
+      "title": "Dysk twardy Western digital 3.5 3 TB (WD30PURX64AKYY0)",
+      "url": "https://www.ceneo.pl/196525722",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211895",
+      "title": "Seagate Barracuda Lp 2Tb 5.9K 32Mb Sata Ii 3.5'' (St2000Dl001)",
+      "url": "https://www.ceneo.pl/179211895",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "90954667",
+      "title": "WD RED 4TB (WD40EFAX)",
+      "url": "https://www.ceneo.pl/90954667",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "66843448",
+      "title": "HGST Ultrastar 4TB 3.5\" SATA3 HUS726T4TALA6L4 (0B35950)",
+      "url": "https://www.ceneo.pl/66843448",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179690574",
+      "title": "Dysk Toshiba N300 MN10ADA400ES 4TB sATA III 512MB 7200obr/min",
+      "url": "https://www.ceneo.pl/179690574",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47523242",
+      "title": "Seagate BarraCuda 4TB 2,5\" (ST4000LM024)",
+      "url": "https://www.ceneo.pl/47523242",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "172154671",
+      "title": "Dysk Lexar SSD NQ790 4TB M.2 PCIe NVMe Gen4 LNQ790X004T-RNNNG",
+      "url": "https://www.ceneo.pl/172154671",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "90897092",
+      "title": "Seagate Exos 7E8 2TB SAS FastFormat (ST2000NM004A)",
+      "url": "https://www.ceneo.pl/90897092",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "83373575",
+      "title": "Seagate IronWolf Pro 4TB 3,5\" SATA Powietrze (ST4000NE001)",
+      "url": "https://www.ceneo.pl/83373575",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300335",
+      "title": "Toshiba S300 2TB HDWT720UZSVA",
+      "url": "https://www.ceneo.pl/105300335",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47522404",
+      "title": "Seagate SkyHawk 4TB 3,5\" (ST4000VX007)",
+      "url": "https://www.ceneo.pl/47522404",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "173778001",
+      "title": "Wd Red Pro 4TB (WD4005FFBX)",
+      "url": "https://www.ceneo.pl/173778001",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211854",
+      "title": "Inne Dysk Do Monitoringu Seagate Skyhawk 2Tb 3.5\" 64Mb (St2000Vx017)",
+      "url": "https://www.ceneo.pl/179211854",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "155207985",
+      "title": "Synology HAT3300 3,5'' 4 TB (HAT33004T)",
+      "url": "https://www.ceneo.pl/155207985",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "20358838",
+      "title": "Toshiba 2TB DT01ACA200",
+      "url": "https://www.ceneo.pl/20358838",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "24873897",
+      "title": "WD Green 2TB 2,5\" (WD20NPVX)",
+      "url": "https://www.ceneo.pl/24873897",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300360",
+      "title": "Seagate Dysk Backup Plus Ultra Touch 2,5 (STHH2000400)",
+      "url": "https://www.ceneo.pl/105300360",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "62528610",
+      "title": "WD Red Pro 4TB (WD4003FFBX)",
+      "url": "https://www.ceneo.pl/62528610",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "88966453",
+      "title": "WD Blue 2TB HDD 3,5\" SATA III (WD20EZAZ)",
+      "url": "https://www.ceneo.pl/88966453",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "4901985",
+      "title": "WD Caviar RE4 2TB (WD2003FYYS)",
+      "url": "https://www.ceneo.pl/4901985",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "24264022",
+      "title": "Seagate NAS HDD 2TB 3,5\" (ST2000VN000)",
+      "url": "https://www.ceneo.pl/24264022",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211796",
+      "title": "Seagate Dysk Twardy St2000Dm001 3,5\" Sata (0Y4N52)",
+      "url": "https://www.ceneo.pl/179211796",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "10961107",
+      "title": "Hitachi Ultrastar A7K3000 3,5cala 2TB SATA/600 7200rpm 64MB (HUA723020ALA640)",
+      "url": "https://www.ceneo.pl/10961107",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "191943258",
+      "title": "Dysk twardy Western digital 3.5 4 TB (WD44PURZ)",
+      "url": "https://www.ceneo.pl/191943258",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "142749868",
+      "title": "Seagate Exos 7E10 Sata 4Tb 256Mb Cache 512E/4Kn Blk (ST4000NM024B)",
+      "url": "https://www.ceneo.pl/142749868",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300355",
+      "title": "Wd My Passport 2Tb Ssd Szary (WDBAGF0020BGYWESN)",
+      "url": "https://www.ceneo.pl/105300355",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193993319",
+      "title": "Dysk twardy Msi M.2 2 TB (S78440Q1K0P83)",
+      "url": "https://www.ceneo.pl/193993319",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198484874",
+      "title": "Dysk twardy Seagate 3.5 4 TB (HDDST4000VX016)",
+      "url": "https://www.ceneo.pl/198484874",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "120386550",
+      "title": "Wd Dysk Hdd Purple (4 Tb ; 3.5\"; 256 Mb; 5400 Obr/Min) (Wd42Purz)",
+      "url": "https://www.ceneo.pl/120386550",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47752666",
+      "title": "Seagate Barracuda 2TB 2,5\" (ST2000LM015)",
+      "url": "https://www.ceneo.pl/47752666",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "143229656",
+      "title": "Western Digital 2TB 5400 RPM (WD20PURX64AKYY0)",
+      "url": "https://www.ceneo.pl/143229656",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "172154678",
+      "title": "Dysk WD Blue SN5000 SSD 2TB M.2 PCIe NVMe Gen4 WDS200T4B0E",
+      "url": "https://www.ceneo.pl/172154678",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "37877312",
+      "title": "Toshiba 4TB MD04ACA400",
+      "url": "https://www.ceneo.pl/37877312",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "43693492",
+      "title": "Toshiba MG Series Enterprise Capacity HDD 4TB MG04ACA400E",
+      "url": "https://www.ceneo.pl/43693492",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "147435744",
+      "title": "Seagate 2Tb 3,5\" Exos (ST2000NM018B)",
+      "url": "https://www.ceneo.pl/147435744",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "8973502",
+      "title": "Samsung EcoGreen F4 2TB (HD204UI)",
+      "url": "https://www.ceneo.pl/8973502",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "40639615",
+      "title": "WD Blue 2TB 3,5\" (WD20EZRZ)",
+      "url": "https://www.ceneo.pl/40639615",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193538288",
+      "title": "Dysk twardy Hgst 3.5 4 TB (HDS5C4040ALE630_DESKSTAR5K4000)",
+      "url": "https://www.ceneo.pl/193538288",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300350",
+      "title": "Seagate Surveillance Skyhawk 2Tb Hdd Sata 6Gb/S 256Mb Cache 8.9Cm 3.5Inch Smr Air 24X7 Blk (ST2000VX015)",
+      "url": "https://www.ceneo.pl/105300350",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "101129535",
+      "title": "Toshiba P300 2TB HDWD220UZSVA",
+      "url": "https://www.ceneo.pl/101129535",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "17825230",
+      "title": "WD Caviar 2TB (WD20EZRX)",
+      "url": "https://www.ceneo.pl/17825230",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "2657824",
+      "title": "WD Caviar RE4 GP Raid Edition 2TB (WD2002FYPS)",
+      "url": "https://www.ceneo.pl/2657824",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "129537632",
+      "title": "SEAGATE Exos 7E10 4TB 3.5\" (ST4000NM000B)",
+      "url": "https://www.ceneo.pl/129537632",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "28668098",
+      "title": "WD Purple 4TB 40PURX 3,5''(WD40PURX)",
+      "url": "https://www.ceneo.pl/28668098",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300374",
+      "title": "Wd Western Digital Red Plus 4Tb Sata 6Gb/S 3.5Inch Rpm5400 128Mb Cache Internal Hdd (WD40EFZX)",
+      "url": "https://www.ceneo.pl/105300374",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "112680027",
+      "title": "WD Dysk Elements Se 2TB HDD (WDBEPK0020BBKWESN)",
+      "url": "https://www.ceneo.pl/112680027",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260863",
+      "title": "Western Digital Wd Ultrastar Dc Hc310 4Tb 7.2K 256Mb Sas-3 3.5'' (HUS726T4TAL5204)",
+      "url": "https://www.ceneo.pl/186260863",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "163344770",
+      "title": "Western Digital Wd Purple 4Tb 24X7 (WD40PURX)",
+      "url": "https://www.ceneo.pl/163344770",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "52481711",
+      "title": "WD Purple 2TB 3,5\" (WD20PURZ)",
+      "url": "https://www.ceneo.pl/52481711",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "64095941",
+      "title": "Toshiba L200 2TB HDWL120UZSVA",
+      "url": "https://www.ceneo.pl/64095941",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "174172955",
+      "title": "Dysk Synology HAT3300-2T 2TB 256MB 5400 obr./min",
+      "url": "https://www.ceneo.pl/174172955",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "22553818",
+      "title": "Toshiba MG Series Enterprise Capacity HDD 2TB MG03SCA200",
+      "url": "https://www.ceneo.pl/22553818",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "145539447",
+      "title": "Wd Dysk Hdd Gold (22 Tb ; 3.5\"; 512 Mb; 7200 Obr/Min) (WD221KRYZ)",
+      "url": "https://www.ceneo.pl/145539447",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "26989350",
+      "title": "Seagate Constellation ES3 4TB 3,5\" (ST4000NM0033)",
+      "url": "https://www.ceneo.pl/26989350",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "17552943",
+      "title": "Hitachi Deskstar 7K400 4TB (HDS724040ALE640)",
+      "url": "https://www.ceneo.pl/17552943",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "17552992",
+      "title": "WD Red 2TB 3,5\" (WD20EFRX)",
+      "url": "https://www.ceneo.pl/17552992",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260881",
+      "title": "Hgst 4Tb 3,5\" (HDN724040ALE640)",
+      "url": "https://www.ceneo.pl/186260881",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "9940394",
+      "title": "WD Caviar Black 2TB (WD2002FAEX)",
+      "url": "https://www.ceneo.pl/9940394",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "47752654",
+      "title": "Seagate FireCuda 2TB 2.5\" (ST2000LX001)",
+      "url": "https://www.ceneo.pl/47752654",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "9940464",
+      "title": "Seagate ST2000DL003",
+      "url": "https://www.ceneo.pl/9940464",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "12315909",
+      "title": "WD Caviar Green 2TB (WD20EARX)",
+      "url": "https://www.ceneo.pl/12315909",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "50217237",
+      "title": "WD Blue 3.5\" 4TB (WD40EZRZ)",
+      "url": "https://www.ceneo.pl/50217237",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "22579144",
+      "title": "HGST Ultrastar 7K4000 4TB 3,5\" (HUS724040ALA640)",
+      "url": "https://www.ceneo.pl/22579144",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "173158972",
+      "title": "WD Red Pro WD4005FFBX 4TB SATA (WD4005FFBX)",
+      "url": "https://www.ceneo.pl/173158972",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198332898",
+      "title": "Dysk twardy Samsung M.2 2 TB (MZV9V2T0BW)",
+      "url": "https://www.ceneo.pl/198332898",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "140268900",
+      "title": "Dysk zewnętrzny HDD SEAGATE Expansion 4TB Rescue STKN4000400",
+      "url": "https://www.ceneo.pl/140268900",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "3785110",
+      "title": "Hitachi Ultrastar A7K2000 2TB SATA2 7200RPM 32MB 3,5cala (HUA722020ALA330)",
+      "url": "https://www.ceneo.pl/3785110",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "178867329",
+      "title": "Adata Dysk Legend 860 2TB SSD (SLEG8602000GCS)",
+      "url": "https://www.ceneo.pl/178867329",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "178887068",
+      "title": "Wd Dysk Green SN3000 2TB SSD (WDS200T4G0E)",
+      "url": "https://www.ceneo.pl/178887068",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "163619838",
+      "title": "Toshiba N300 4TB HDWG440UZSVA",
+      "url": "https://www.ceneo.pl/163619838",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "43610167",
+      "title": "Seagate Mobile HDD 2TB 2,5\" (ST2000LM007)",
+      "url": "https://www.ceneo.pl/43610167",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "88590418",
+      "title": "Toshiba P300 4TB HDWD240UZSVA",
+      "url": "https://www.ceneo.pl/88590418",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "155034189",
+      "title": "Synology Beedrive 2Tb Ssd Usb-C (BDS702T)",
+      "url": "https://www.ceneo.pl/155034189",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "52481793",
+      "title": "WD Purple 4TB 3,5\" (WD40PURZ)",
+      "url": "https://www.ceneo.pl/52481793",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179102984",
+      "title": "Dysk Toshiba N300 HDWG740EZSTC 4TB sATA III 512MB 7200obr/min",
+      "url": "https://www.ceneo.pl/179102984",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "44926889",
+      "title": "WD Red Pro 2TB 3.5\" (WD2002FFSX)",
+      "url": "https://www.ceneo.pl/44926889",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "139491584",
+      "title": "Dysk 0F48155 HDD DC HC570 22TB 3.5 SATA 7200 512MB cache WUH722222ALE6L4",
+      "url": "https://www.ceneo.pl/139491584",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "120380067",
+      "title": "Western Digital Purple 2TB 3.5\" 256 MB 5400 obr/min (WD22PURZ)",
+      "url": "https://www.ceneo.pl/120380067",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "91816982",
+      "title": "Toshiba 2TB MQ04ABD200",
+      "url": "https://www.ceneo.pl/91816982",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771589",
+      "title": "Hgst Dysk Hdd Ultrastar 7K6 Hus726T4Tale6L4 (4 Tb; 3.5 ; Sata Iii) (0B36040)",
+      "url": "https://www.ceneo.pl/106771589",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "18722551",
+      "title": "WD 2TB 7200obr. 64MB RE (WD2000FYYz)",
+      "url": "https://www.ceneo.pl/18722551",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183026441",
+      "title": "Wd Western Digital Dysk Black 4Tb 3,5'' 7200 256Mb Sata Iii (WD4006FZBX)",
+      "url": "https://www.ceneo.pl/183026441",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "140523129",
+      "title": "Adata Dysk Ssd Legend 960 2Tb Pcie 4X4 7.4/6.8 Gb/S M2 ALEG9602TCS",
+      "url": "https://www.ceneo.pl/140523129",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260801",
+      "title": "Hikvision 2Tb Surveillance Drive (DS20HKVSVX12TB)",
+      "url": "https://www.ceneo.pl/186260801",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211749",
+      "title": "Dell 4Tb 7.2K 128Mb Sata Iii 3.5\" St4000Nm0265 (0Mwhy9)",
+      "url": "https://www.ceneo.pl/179211749",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "156912731",
+      "title": "Synology DS124 (1x 4TB HDD HAT3300 Plus) (DS124WZESTAWIE1XHAT33004T)",
+      "url": "https://www.ceneo.pl/156912731",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "48979716",
+      "title": "HGST Ultrastar 7K2000 2TB 3,5\" HUS722T2TALA604 (1W10002)",
+      "url": "https://www.ceneo.pl/48979716",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "2692651",
+      "title": "WD AV-GP 2TB SATA2 7200rpm 32MB (WD20EVDS)",
+      "url": "https://www.ceneo.pl/2692651",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "84692616",
+      "title": "Seagate Exos 7E8 4TB SATA FastFormat (ST4000NM002A)",
+      "url": "https://www.ceneo.pl/84692616",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "40810596",
+      "title": "WD Blue 2TB 2,5\" (WD20NPVZ)",
+      "url": "https://www.ceneo.pl/40810596",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "170704525",
+      "title": "Crucial P310 M.2 PCI-e NVMe 2TB (CT2000P310SSD2)",
+      "url": "https://www.ceneo.pl/170704525",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200208472",
+      "title": "Dysk twardy SANDISK 2TB SDSS51200TAB000G0",
+      "url": "https://www.ceneo.pl/200208472",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183253387",
+      "title": "Dysk twardy Toshiba 3.5 2 TB (MG10ADA200E)",
+      "url": "https://www.ceneo.pl/183253387",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "138642324",
+      "title": "Dell 2Tb 7.2K Rpm Sata 6Gbps 512N 3.5In Hot-Plug Hard Drive (400ATKJ)",
+      "url": "https://www.ceneo.pl/138642324",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "28668100",
+      "title": "WD Purple 2TB 20PURX (WD20PURX)",
+      "url": "https://www.ceneo.pl/28668100",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596989",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53541UNIW)",
+      "url": "https://www.ceneo.pl/192596989",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596986",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53523UNIW)",
+      "url": "https://www.ceneo.pl/192596986",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183253949",
+      "title": "Dysk twardy Hpe 3.5 4 TB (DK_NR_EGD_W125834325)",
+      "url": "https://www.ceneo.pl/183253949",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260919",
+      "title": "Western Digital Wd Purple 3.5\" 2Tb Serial Ata III, Wd20Purz-Ss (WD20PURZSS)",
+      "url": "https://www.ceneo.pl/186260919",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "77855914",
+      "title": "Dell 4TB 7.2K RPM SATA(400auwy)",
+      "url": "https://www.ceneo.pl/77855914",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193839906",
+      "title": "Dysk twardy Dell 2.5 2 TB (38046UNIW)",
+      "url": "https://www.ceneo.pl/193839906",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "17552890",
+      "title": "Seagate Pipeline HD 2TB 3,5\" (ST2000VM003)",
+      "url": "https://www.ceneo.pl/17552890",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183768878",
+      "title": "Dysk twardy Fujitsu 3.5 4 TB (DK_NR_EGD_W128374920)",
+      "url": "https://www.ceneo.pl/183768878",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "142749872",
+      "title": "Seagate Exos 7E10 Sata 2Tb 256Mb Cache 512E/4Kn Blk (ST2000NM017B)",
+      "url": "https://www.ceneo.pl/142749872",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183557862",
+      "title": "Dysk twardy Adata M.2 2 TB (0081610082)",
+      "url": "https://www.ceneo.pl/183557862",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211860",
+      "title": "Seagate Desktop Hdd 4Tb 5.9K 128Mb Sata Iii 3.5'' (St4000Dx002)",
+      "url": "https://www.ceneo.pl/179211860",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "44227848",
+      "title": "WD Red Pro 4TB 3,5\" (WD4002FFWX)",
+      "url": "https://www.ceneo.pl/44227848",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211840",
+      "title": "Toshiba X300 4Tb 7.2K 128Mb Sata Iii 3.5'' Hdetr11Gca51 (Hdetr11Gea51_X300)",
+      "url": "https://www.ceneo.pl/179211840",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "199798832",
+      "title": "Dysk twardy HP 3,5 cala 4TB MB4000GVYZK",
+      "url": "https://www.ceneo.pl/199798832",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185288821",
+      "title": "Dysk twardy Crucial M.2 4 TB (DGCRCWKT04T7108)",
+      "url": "https://www.ceneo.pl/185288821",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "198674793",
+      "title": "Dysk twardy Seagate 3.5 2 TB (ST2000VX)",
+      "url": "https://www.ceneo.pl/198674793",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "26809793",
+      "title": "Seagate Desktop SSHD 4TB 3,5\" (St4000Dx001)",
+      "url": "https://www.ceneo.pl/26809793",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "179211791",
+      "title": "Dell 4Tb 5.9K 64Mb Sata Iii 3.5'' St4000Nc001 (08Jjhf)",
+      "url": "https://www.ceneo.pl/179211791",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "49678768",
+      "title": "Seagate BarraCuda Pro 2TB 3,5\" (ST2000DM009)",
+      "url": "https://www.ceneo.pl/49678768",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "11689760",
+      "title": "Seagate Constellation ES 2TB SATAIII/600 7200rpm 32MB 24x7 PowerChoice (ST2000NM0001)",
+      "url": "https://www.ceneo.pl/11689760",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771745",
+      "title": "Hgst Ultrastar 7K6 4Tb 3 5 7200Rpm Sas 256Mb 512E (0B36048)",
+      "url": "https://www.ceneo.pl/106771745",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771740",
+      "title": "Hp Enterprise Hewlett Packard Dysk Hpe 4Tb Sata 6G 7.2K Lff Sc Ds Hdd (872491B21)",
+      "url": "https://www.ceneo.pl/106771740",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "164507717",
+      "title": "Transcend ESD265C 2TB SSD (TS2TESD265C)",
+      "url": "https://www.ceneo.pl/164507717",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "164507713",
+      "title": "Transcend ESD360C 2TB SSD (TS2TESD360C)",
+      "url": "https://www.ceneo.pl/164507713",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762709",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53560UNIW)",
+      "url": "https://www.ceneo.pl/189762709",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771698",
+      "title": "Hp Enterprise Hewlett Packard Msa 4Tb 6G Sas 7.2K 3.5In Mdl Hdd (C8R26A)",
+      "url": "https://www.ceneo.pl/106771698",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "10810670",
+      "title": "Hitachi Deskstar 5K3000 2TB 3,5cala SATA/600 32MB cache (HDS5C3020ALA632)",
+      "url": "https://www.ceneo.pl/10810670",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771654",
+      "title": "Hewlett Packard Enterprise 2Tb 6G Sata 7.2K 3.5In Sc Mdl Hdd 658079-B21 (658079B21)",
+      "url": "https://www.ceneo.pl/106771654",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "174163639",
+      "title": "Kingston NV3 M.2 NVMe 4TB (SNV3S4000G)",
+      "url": "https://www.ceneo.pl/174163639",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "199801639",
+      "title": "Dysk twardy HGST 3,5 cala 2TB HUS724020ALE640",
+      "url": "https://www.ceneo.pl/199801639",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200497638",
+      "title": "Dysk twardy Seagate 2,5 cala 2TB ST2000NX0243",
+      "url": "https://www.ceneo.pl/200497638",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "199800614",
+      "title": "Dysk twardy Seagate 2,5 cala 2TB 5907894413839",
+      "url": "https://www.ceneo.pl/199800614",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980606",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52728UNIW)",
+      "url": "https://www.ceneo.pl/194980606",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "76967605",
+      "title": "Lenovo 2TB 3,5'' (4XB7A13555)",
+      "url": "https://www.ceneo.pl/76967605",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "49349585",
+      "title": "Seagate IronWolf Pro HDD SATA 4TB 3,5\" (ST4000NE0025)",
+      "url": "https://www.ceneo.pl/49349585",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980560",
+      "title": "Dysk twardy Dell 3.5 4 TB (52723UNIW)",
+      "url": "https://www.ceneo.pl/194980560",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980551",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52721UNIW)",
+      "url": "https://www.ceneo.pl/194980551",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980544",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52720UNIW)",
+      "url": "https://www.ceneo.pl/194980544",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980533",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52719UNIW)",
+      "url": "https://www.ceneo.pl/194980533",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183253492",
+      "title": "Dysk twardy Coreparts 3.5 2 TB (IA2T2I253)",
+      "url": "https://www.ceneo.pl/183253492",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183253489",
+      "title": "Dysk twardy Intenso 2.5 2 TB (DK_NR_EWR_1435820)",
+      "url": "https://www.ceneo.pl/183253489",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "81154428",
+      "title": "WD Red 2TB SATA III (WD20EFAX)",
+      "url": "https://www.ceneo.pl/81154428",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183026418",
+      "title": "Msi Dysk Spatium M560 2TB SSD (S78440Q940P83)",
+      "url": "https://www.ceneo.pl/183026418",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "195991400",
+      "title": "Dysk twardy Origin storage 2.5 2 TB (MXKB1B002T5001B)",
+      "url": "https://www.ceneo.pl/195991400",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185175398",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52722UNIW)",
+      "url": "https://www.ceneo.pl/185175398",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "15423398",
+      "title": "Seagate SV35 2TB 3,5\" (ST2000VX000)",
+      "url": "https://www.ceneo.pl/15423398",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "199517396",
+      "title": "Dysk twardy Western digital 3.5 4 TB (HUS726T4TALS201)",
+      "url": "https://www.ceneo.pl/199517396",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185175381",
+      "title": "Dysk twardy Wd M.2 2 TB (WDS200T1X0M)",
+      "url": "https://www.ceneo.pl/185175381",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183253373",
+      "title": "Dysk twardy Toshiba 3.5\" 4 TB (MG10ADA400E)",
+      "url": "https://www.ceneo.pl/183253373",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "84692347",
+      "title": "Seagate Exos 7E8 4TB SAS FastFormat (ST4000NM005A)",
+      "url": "https://www.ceneo.pl/84692347",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "191849309",
+      "title": "Dysk twardy Lenovo 3.5 4 TB (39319UNIW)",
+      "url": "https://www.ceneo.pl/191849309",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "195312304",
+      "title": "Dysk twardy Emc 3.5 4 TB (118000294)",
+      "url": "https://www.ceneo.pl/195312304",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982275",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52701UNIW)",
+      "url": "https://www.ceneo.pl/194982275",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185641242",
+      "title": "Dysk twardy Datalocker 2.5 2 TB (DK_NR_MKS_14266192)",
+      "url": "https://www.ceneo.pl/185641242",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "107244241",
+      "title": "DELL - HDD 2TB 3.5\" 7.2K SAS NL 6gb/s HP (1D9NN)",
+      "url": "https://www.ceneo.pl/107244241",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "107244238",
+      "title": "DELL - HDD 2TB 3.5\" 7.2K SAS NL 12gb/s HP (400-ALOB)",
+      "url": "https://www.ceneo.pl/107244238",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982233",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52698UNIW)",
+      "url": "https://www.ceneo.pl/194982233",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197662228",
+      "title": "Dysk twardy Hpe 3.5 4 TB (46553UNIW)",
+      "url": "https://www.ceneo.pl/197662228",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "187565216",
+      "title": "Toshiba 2TB 7.2K 64MB SAS-2 3.5 MG04SCA200E",
+      "url": "https://www.ceneo.pl/187565216",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "107244213",
+      "title": "DELL - HDD 4TB 3.5\" 7.2K SATA 6gb/s 512n HP G14 (400-ATKN)",
+      "url": "https://www.ceneo.pl/107244213",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "16808188",
+      "title": "Supermicro 2TB (HDD-T2000-ST2000NM0011)",
+      "url": "https://www.ceneo.pl/16808188",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "136609178",
+      "title": "Seagate Dysk Hdd Barracuda St4000Lm024 (4 Tb ; 2.5\"; 128 Mb; 5400 Obr/Min) (2447978) (2447978)",
+      "url": "https://www.ceneo.pl/136609178",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "54944177",
+      "title": "Fujitsu SATA III 2000GB 7,2k (S26361F3921L200)",
+      "url": "https://www.ceneo.pl/54944177",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200600174",
+      "title": "Dysk twardy HIKVISION 3,5 cala 4TB DS40HKVSVX1",
+      "url": "https://www.ceneo.pl/200600174",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "133764159",
+      "title": "Dysk SSD PNY M280CS3140-4TB-RB 4TB PCIe M.2 GEN4",
+      "url": "https://www.ceneo.pl/133764159",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "100572133",
+      "title": "Axis 1858001",
+      "url": "https://www.ceneo.pl/100572133",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "38813130",
+      "title": "WD Blue SSHD 4TB 3,5\" (WD40E31X)",
+      "url": "https://www.ceneo.pl/38813130",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "9606126",
+      "title": "WD AV-GP 2TB 3,5cala SATA2 7200rpm 64MB bulk (WD20EURS)",
+      "url": "https://www.ceneo.pl/9606126",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "3785121",
+      "title": "WD CAVIAR 2TB 64MB SATA2 (WD2001FASS)",
+      "url": "https://www.ceneo.pl/3785121",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "27493115",
+      "title": "HGST MEGASCALE 4TB 3,5cala COOLSPIN SATA 64MB (HMS5C4040BLE640)",
+      "url": "https://www.ceneo.pl/27493115",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597085",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53553UNIW)",
+      "url": "https://www.ceneo.pl/192597085",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597080",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53538UNIW)",
+      "url": "https://www.ceneo.pl/192597080",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982069",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53575UNIW)",
+      "url": "https://www.ceneo.pl/194982069",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189784067",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53580UNIW)",
+      "url": "https://www.ceneo.pl/189784067",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189784064",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53574UNIW)",
+      "url": "https://www.ceneo.pl/189784064",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597051",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53542UNIW)",
+      "url": "https://www.ceneo.pl/192597051",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "67842048",
+      "title": "Seagate BarraCuda 2TB, 3,5\" 256MB SATA (ST2000DM005)",
+      "url": "https://www.ceneo.pl/67842048",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "2500047",
+      "title": "Seagate Barracuda LP 2TB 3,5\" (ST32000542AS)",
+      "url": "https://www.ceneo.pl/2500047",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "163345047",
+      "title": "Hpe Hewlett Packard Enterprise 718160-B21 (718160S21)",
+      "url": "https://www.ceneo.pl/163345047",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982024",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53561UNIW)",
+      "url": "https://www.ceneo.pl/194982024",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597016",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52669UNIW)",
+      "url": "https://www.ceneo.pl/192597016",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597013",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52690UNIW)",
+      "url": "https://www.ceneo.pl/192597013",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597011",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52675UNIW)",
+      "url": "https://www.ceneo.pl/192597011",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "154518006",
+      "title": "MSI Spatium M480 Pro 2TB SSD",
+      "url": "https://www.ceneo.pl/154518006",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597000",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52685UNIW)",
+      "url": "https://www.ceneo.pl/192597000",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200190354",
+      "title": "Dysk twardy Dell 3,5 cala 2TB 0X7C91",
+      "url": "https://www.ceneo.pl/200190354",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "190413686",
+      "title": "Dysk twardy Dell 3.5 2 TB (65J74)",
+      "url": "https://www.ceneo.pl/190413686",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300354",
+      "title": "Hp Enterprise Hp 2Tb 3,5'' Sas (819078001)",
+      "url": "https://www.ceneo.pl/105300354",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771651",
+      "title": "Hp Enterprise Hewlett Packard 4Tb 12G Sas 7.2K 3.5In Mdl Lp (833928B21)",
+      "url": "https://www.ceneo.pl/106771651",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450273",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB SA40007NL",
+      "url": "https://www.ceneo.pl/200450273",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185175397",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52674UNIW)",
+      "url": "https://www.ceneo.pl/185175397",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040248",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52671UNIW)",
+      "url": "https://www.ceneo.pl/197040248",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040346",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52693UNIW)",
+      "url": "https://www.ceneo.pl/197040346",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040420",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53552UNIW)",
+      "url": "https://www.ceneo.pl/197040420",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040336",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52692UNIW)",
+      "url": "https://www.ceneo.pl/197040336",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040366",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52695UNIW)",
+      "url": "https://www.ceneo.pl/197040366",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200498054",
+      "title": "Dysk twardy ESUS IT 3,5 cala 4TB 52710UNIW",
+      "url": "https://www.ceneo.pl/200498054",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040287",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52677UNIW)",
+      "url": "https://www.ceneo.pl/197040287",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200445594",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB DELL4000NLSA7S11",
+      "url": "https://www.ceneo.pl/200445594",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200445991",
+      "title": "Dysk twardy Origin Storage M.2 2TB OTLC2TB3DNVMEM280",
+      "url": "https://www.ceneo.pl/200445991",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450313",
+      "title": "Dysk twardy Origin Storage 3,5 cala 2TB DELL2000NLS7S20",
+      "url": "https://www.ceneo.pl/200450313",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450713",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB CPQ4000NLSA7S8",
+      "url": "https://www.ceneo.pl/200450713",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450739",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB CPQ4000NLSA7S5",
+      "url": "https://www.ceneo.pl/200450739",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982099",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53581UNIW)",
+      "url": "https://www.ceneo.pl/194982099",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982031",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53563UNIW)",
+      "url": "https://www.ceneo.pl/194982031",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982117",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53584UNIW)",
+      "url": "https://www.ceneo.pl/194982117",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762731",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53554UNIW)",
+      "url": "https://www.ceneo.pl/189762731",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040258",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52672UNIW)",
+      "url": "https://www.ceneo.pl/197040258",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040386",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53524UNIW)",
+      "url": "https://www.ceneo.pl/197040386",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980525",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52717UNIW)",
+      "url": "https://www.ceneo.pl/194980525",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040263",
+      "title": "Dysk twardy Western digital 3.5 2 TB (51591UNIW)",
+      "url": "https://www.ceneo.pl/197040263",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982309",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52705UNIW)",
+      "url": "https://www.ceneo.pl/194982309",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185175400",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52718UNIW)",
+      "url": "https://www.ceneo.pl/185175400",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982301",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52704UNIW)",
+      "url": "https://www.ceneo.pl/194982301",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040380",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53546UNIW)",
+      "url": "https://www.ceneo.pl/197040380",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980577",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52725UNIW)",
+      "url": "https://www.ceneo.pl/194980577",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982285",
+      "title": "Dysk twardy Western digital 3.5 4 TB (52702UNIW)",
+      "url": "https://www.ceneo.pl/194982285",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982014",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53555UNIW)",
+      "url": "https://www.ceneo.pl/194982014",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982107",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53583UNIW)",
+      "url": "https://www.ceneo.pl/194982107",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762736",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53564UNIW)",
+      "url": "https://www.ceneo.pl/189762736",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040340",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53537UNIW)",
+      "url": "https://www.ceneo.pl/197040340",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "105300363",
+      "title": "Hp Inc. Dysk 2Tb 7200Rpm Sata 3.5In Enterprise (2Z274AA)",
+      "url": "https://www.ceneo.pl/105300363",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200282308",
+      "title": "Dysk twardy HIK 3,5 cala 2TB HDDWD20PURZR",
+      "url": "https://www.ceneo.pl/200282308",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "106771653",
+      "title": "Hp Hewlett Packard Enterprise 4Tb 6G Sas 7.2K Lff Hdd Rpm (3.5-Inch) Midline 1Yr Warranty Hard Drive (693689B21)",
+      "url": "https://www.ceneo.pl/106771653",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200445558",
+      "title": "Dysk twardy Origin Storage 3,5 cala 2TB DELL2000NLS7S17",
+      "url": "https://www.ceneo.pl/200445558",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982294",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52703UNIW)",
+      "url": "https://www.ceneo.pl/194982294",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040370",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53545UNIW)",
+      "url": "https://www.ceneo.pl/197040370",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "185175395",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52716UNIW)",
+      "url": "https://www.ceneo.pl/185175395",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597062",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52666UNIW)",
+      "url": "https://www.ceneo.pl/192597062",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040376",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52697UNIW)",
+      "url": "https://www.ceneo.pl/197040376",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040316",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52686UNIW)",
+      "url": "https://www.ceneo.pl/197040316",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040331",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53536UNIW)",
+      "url": "https://www.ceneo.pl/197040331",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597037",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52687UNIW)",
+      "url": "https://www.ceneo.pl/192597037",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982061",
+      "title": "Dysk twardy Western digital 3.5 4 TB (53572UNIW)",
+      "url": "https://www.ceneo.pl/194982061",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982079",
+      "title": "Dysk twardy Western digital 3.5 4 TB (53576UNIW)",
+      "url": "https://www.ceneo.pl/194982079",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982372",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52713UNIW)",
+      "url": "https://www.ceneo.pl/194982372",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040278",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52676UNIW)",
+      "url": "https://www.ceneo.pl/197040278",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762737",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53559UNIW)",
+      "url": "https://www.ceneo.pl/189762737",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982218",
+      "title": "Dysk twardy Esus it 3.5 4 TB (51592UNIW)",
+      "url": "https://www.ceneo.pl/194982218",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197387483",
+      "title": "Dysk twardy Dell 3.5 4 TB (51421UNIW)",
+      "url": "https://www.ceneo.pl/197387483",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "193839849",
+      "title": "Dysk twardy Dell 2.5 2 TB (51417UNIW)",
+      "url": "https://www.ceneo.pl/193839849",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762732",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53558UNIW)",
+      "url": "https://www.ceneo.pl/189762732",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189784054",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53579UNIW)",
+      "url": "https://www.ceneo.pl/189784054",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762711",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53577UNIW)",
+      "url": "https://www.ceneo.pl/189762711",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040360",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53540UNIW)",
+      "url": "https://www.ceneo.pl/197040360",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597040",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53544UNIW)",
+      "url": "https://www.ceneo.pl/192597040",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762733",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53562UNIW)",
+      "url": "https://www.ceneo.pl/189762733",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597028",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52684UNIW)",
+      "url": "https://www.ceneo.pl/192597028",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982051",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53566UNIW)",
+      "url": "https://www.ceneo.pl/194982051",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040400",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53549UNIW)",
+      "url": "https://www.ceneo.pl/197040400",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "101317176",
+      "title": "Lenovo FAN Option Kit (4F17A12354)",
+      "url": "https://www.ceneo.pl/101317176",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "16712178",
+      "title": "Origin Storage 2TB 3.5\" NLSATA 7200 rpm (CPQ-2000NLS/7-S5)",
+      "url": "https://www.ceneo.pl/16712178",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200445645",
+      "title": "Dysk twardy Origin Storage 3,5 cala 2TB NLS2000",
+      "url": "https://www.ceneo.pl/200445645",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450250",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB DELL4000NLSA7S17",
+      "url": "https://www.ceneo.pl/200450250",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450717",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB DELL4000NLSA7F21",
+      "url": "https://www.ceneo.pl/200450717",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "183453611",
+      "title": "Dysk twardy Mars 980 Blade Adata M.2 4 TB (0081610084)",
+      "url": "https://www.ceneo.pl/183453611",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "163345157",
+      "title": "Hpe Hewlett Packard Enterprise 4Tb 6G Sata 7.2K 3.5In Mdl Sc (MB4000GCVBU)",
+      "url": "https://www.ceneo.pl/163345157",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762710",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53557UNIW)",
+      "url": "https://www.ceneo.pl/189762710",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982391",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52715UNIW)",
+      "url": "https://www.ceneo.pl/194982391",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197415096",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53533UNIW)",
+      "url": "https://www.ceneo.pl/197415096",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597025",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53529UNIW)",
+      "url": "https://www.ceneo.pl/192597025",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040291",
+      "title": "Dysk twardy Western digital 3.5 2 TB (53527UNIW)",
+      "url": "https://www.ceneo.pl/197040291",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982354",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52711UNIW)",
+      "url": "https://www.ceneo.pl/194982354",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040268",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52673UNIW)",
+      "url": "https://www.ceneo.pl/197040268",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762714",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53571UNIW)",
+      "url": "https://www.ceneo.pl/189762714",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982266",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52700UNIW)",
+      "url": "https://www.ceneo.pl/194982266",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597046",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52688UNIW)",
+      "url": "https://www.ceneo.pl/192597046",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597071",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53528UNIW)",
+      "url": "https://www.ceneo.pl/192597071",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597043",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52679UNIW)",
+      "url": "https://www.ceneo.pl/192597043",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597074",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53532UNIW)",
+      "url": "https://www.ceneo.pl/192597074",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982382",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52714UNIW)",
+      "url": "https://www.ceneo.pl/194982382",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982253",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52699UNIW)",
+      "url": "https://www.ceneo.pl/194982253",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982319",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52706UNIW)",
+      "url": "https://www.ceneo.pl/194982319",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982089",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53578UNIW)",
+      "url": "https://www.ceneo.pl/194982089",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596983",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52680UNIW)",
+      "url": "https://www.ceneo.pl/192596983",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596996",
+      "title": "Dysk twardy Dell 3.5 2 TB (52683UNIW)",
+      "url": "https://www.ceneo.pl/192596996",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "188789505",
+      "title": "Dysk twardy Dell 2.5 2 TB",
+      "url": "https://www.ceneo.pl/188789505",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596993",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53522UNIW)",
+      "url": "https://www.ceneo.pl/192596993",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982364",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52712UNIW)",
+      "url": "https://www.ceneo.pl/194982364",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "101317180",
+      "title": "HP E Dual Port Midline 2 TB (653948001)",
+      "url": "https://www.ceneo.pl/101317180",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "186260860",
+      "title": "Dell 4Tb 7.2K 128Mb Sata III 3.5'' St4000Nm0033 (0THGNN)",
+      "url": "https://www.ceneo.pl/186260860",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200445813",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB DELL4000NLSA7S20",
+      "url": "https://www.ceneo.pl/200445813",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "200450646",
+      "title": "Dysk twardy Origin Storage 3,5 cala 4TB DELL4000NLSA7BWC",
+      "url": "https://www.ceneo.pl/200450646",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980616",
+      "title": "Dysk twardy Dell 3.5 4 TB (52729UNIW)",
+      "url": "https://www.ceneo.pl/194980616",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597064",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53525UNIW)",
+      "url": "https://www.ceneo.pl/192597064",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762735",
+      "title": "Dysk twardy Esus it 3.5 4 TB (51627UNIW)",
+      "url": "https://www.ceneo.pl/189762735",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597021",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53534UNIW)",
+      "url": "https://www.ceneo.pl/192597021",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040396",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53526UNIW)",
+      "url": "https://www.ceneo.pl/197040396",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194982344",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52709UNIW)",
+      "url": "https://www.ceneo.pl/194982344",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "194980568",
+      "title": "Dysk twardy Esus it 3.5 4 TB (52724UNIW)",
+      "url": "https://www.ceneo.pl/194980568",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040296",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52678UNIW)",
+      "url": "https://www.ceneo.pl/197040296",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040326",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52691UNIW)",
+      "url": "https://www.ceneo.pl/197040326",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "197040273",
+      "title": "Dysk twardy Western digital 3.5 2 TB (52668UNIW)",
+      "url": "https://www.ceneo.pl/197040273",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597077",
+      "title": "Dysk twardy Esus it 3.5 2 TB (51626UNIW)",
+      "url": "https://www.ceneo.pl/192597077",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192596974",
+      "title": "Dysk twardy Esus it 3.5 2 TB (52667UNIW)",
+      "url": "https://www.ceneo.pl/192596974",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "192597024",
+      "title": "Dysk twardy Esus it 3.5 2 TB (53548UNIW)",
+      "url": "https://www.ceneo.pl/192597024",
+      "error": false
+    },
+    {
+      "provider": "ceneo",
+      "itemId": "189762734",
+      "title": "Dysk twardy Esus it 3.5 4 TB (53567UNIW)",
+      "url": "https://www.ceneo.pl/189762734",
+      "error": false
+    }
+  ]
+}
