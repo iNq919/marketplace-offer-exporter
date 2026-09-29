@@ -2,6 +2,14 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.3.0
+
+- Allegro przestało traktować widoczne numery paginacji jako twardą granicę skanu.
+- Skan Allegro kończy się dopiero po kolejnych stronach bez nowych ID.
+- Ceneo preferuje główne karty produktów i ogranicza zbieranie rekomendacji.
+- Fallback Ceneo sprawdza filtry z URL, m.in. pojemność i interfejs.
+- Rozszerzono diagnostykę liczby faktycznie przeskanowanych stron.
+
 ## v1.2.0
 
 - Rozdzielono stan, wyniki i historię dla Allegro oraz Ceneo.

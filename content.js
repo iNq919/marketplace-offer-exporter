@@ -359,6 +359,30 @@
     return url.href;
   }
 
+  function parseAllegroDeclaredCount(doc) {
+    const candidates = [];
+
+    // Najpierw patrzymy w okolice głównego nagłówka. Allegro ma w dalszej części
+    // strony wiele innych napisów typu "X ofert", które nie oznaczają całego wyniku.
+    for (const heading of doc.querySelectorAll('h1, [role="heading"][aria-level="1"]')) {
+      const own = singleLine(heading.textContent || '');
+      const parent = singleLine(heading.parentElement?.textContent || '').slice(0, 1200);
+      candidates.push(own, parent);
+    }
+
+    // Fallback tylko do początku dokumentu, zamiast skanowania całego body.
+    candidates.push(singleLine(doc.body?.textContent || '').slice(0, 3500));
+
+    for (const value of candidates) {
+      const matches = [...String(value).matchAll(/([\d\s]+)\s+ofert(?:a|y)?\b/gi)]
+        .map((match) => Number.parseInt(match[1].replace(/\s/g, ''), 10))
+        .filter((count) => Number.isFinite(count) && count > 0 && count < 1000000);
+      if (matches.length) return Math.max(...matches);
+    }
+
+    return null;
+  }
+
   function parseAllegroListing(html, baseUrl) {
     const doc = parseDocument(html);
     const map = new Map();
@@ -379,19 +403,10 @@
       }
     }
 
-    const bodyText = cleanText(doc.body?.textContent || '');
+    const declaredCount = parseAllegroDeclaredCount(doc);
 
-    // Allegro potrafi umieszczać na stronie kilka napisów typu „60 ofert”.
-    // Pierwsza wersja brała pierwszy znaleziony numer, co mogło błędnie kończyć
-    // skanowanie po jednej stronie. Bierzemy największą sensowną wartość.
-    const declaredCounts = [...bodyText.matchAll(/([\d\s]+)\s+ofert(?:a|y)?\b/gi)]
-      .map((match) => Number.parseInt(match[1].replace(/\s/g, ''), 10))
-      .filter((value) => Number.isFinite(value) && value > 0 && value < 1000000);
-    const declaredCount = declaredCounts.length ? Math.max(...declaredCounts) : null;
-
-    // Najpewniejszy sygnał liczby stron to linki paginacji z parametrem p.
-    // Nie ograniczamy się do tekstu strony, bo Allegro często renderuje tam
-    // liczbę ofert na pojedynczą sekcję, a nie cały wynik filtrowania.
+    // To jest wyłącznie podpowiedź widocznej paginacji, nie liczba wszystkich stron.
+    // Allegro pokazuje tylko fragment numerów stron wokół bieżącej strony.
     const pageNumbers = [];
     for (const anchor of doc.querySelectorAll('a[href]')) {
       const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
@@ -403,16 +418,11 @@
         // no-op
       }
     }
-    let totalPages = pageNumbers.length ? Math.max(...pageNumbers) : null;
-    if (declaredCount && map.size >= 10) {
-      const estimatedPages = Math.min(MAX_LISTING_PAGES, Math.ceil(declaredCount / map.size));
-      totalPages = Math.max(totalPages || 0, estimatedPages);
-    }
 
     return {
       offers: [...map.values()],
       declaredCount,
-      totalPages,
+      totalPages: pageNumbers.length ? Math.max(...pageNumbers) : null,
     };
   }
 
@@ -561,10 +571,14 @@
 
   function findCeneoCard(anchor) {
     let node = anchor;
-    for (let depth = 0; node && depth < 8; depth += 1, node = node.parentElement) {
+    for (let depth = 0; node && depth < 9; depth += 1, node = node.parentElement) {
       const text = singleLine(node.textContent);
-      if (text.length >= 40 && text.length <= 5000 && /\d[\d\s]*[,.]\d{2}\s*zł/i.test(text)) {
-        if (/Porównaj ceny|Idź do sklepu|opini|Pojemność|Cache|Prędkość/i.test(text)) return node;
+      if (text.length >= 30 && text.length <= 7000) {
+        const className = String(node.className || '');
+        const hasProductShape = /cat-prod-row|category-list-item|product-list-item/i.test(className)
+          || node.hasAttribute?.('data-productid');
+        const hasCommerceText = /\d[\d\s]*[,.]\d{2}\s*zł|Porównaj ceny|Idź do sklepu|opini|Pojemność|Cache|Prędkość/i.test(text);
+        if (hasProductShape || hasCommerceText) return node;
       }
     }
     return anchor.parentElement;
@@ -596,59 +610,220 @@
     };
   }
 
+  function getCeneoPrimaryCards(doc, baseUrl) {
+    const selectors = [
+      'div.cat-prod-row.js_category-list-item',
+      '[class*="cat-prod-row"][class*="js_category-list-item"]',
+      '[data-productid][class*="cat-prod-row"]',
+      '[data-productid][class*="category-list-item"]',
+      '[data-productid][class*="product-list-item"]',
+    ];
+
+    const candidates = [];
+    const seen = new Set();
+
+    for (const selector of selectors) {
+      for (const node of doc.querySelectorAll(selector)) {
+        if (seen.has(node)) continue;
+        const productId = node.getAttribute?.('data-productid');
+        const hasProductLink = [...node.querySelectorAll('a[href]')].some((anchor) => {
+          const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+          return Boolean(href && getCeneoProductId(href));
+        });
+        if (!productId && !hasProductLink) continue;
+        seen.add(node);
+        candidates.push(node);
+      }
+      if (candidates.length >= 5) break;
+    }
+
+    // Usuń zagnieżdżone duplikaty, zostawiając najbardziej zewnętrzną kartę.
+    return candidates.filter((node, index) => !candidates.some((other, otherIndex) => (
+      otherIndex !== index && other.contains(node)
+    )));
+  }
+
+  function getCeneoProductAnchor(card, baseUrl) {
+    const preferred = [
+      'strong.cat-prod-row__name a[href]',
+      '.cat-prod-row__name a[href]',
+      'a.go-to-product[href]',
+      'a.js_seoUrl[href]',
+    ];
+
+    for (const selector of preferred) {
+      const anchor = card.querySelector?.(selector);
+      const href = anchor ? absoluteUrl(anchor.getAttribute('href'), baseUrl) : null;
+      if (href && getCeneoProductId(href)) return anchor;
+    }
+
+    let fallback = null;
+    for (const anchor of card.querySelectorAll?.('a[href]') || []) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || !getCeneoProductId(href)) continue;
+      const anchorText = singleLine(anchor.textContent);
+      const fallbackText = singleLine(fallback?.textContent || '');
+      if (!fallback || anchorText.length > fallbackText.length) fallback = anchor;
+    }
+    return fallback;
+  }
+
+  function parseCeneoPathFilter(sourceUrl, name) {
+    try {
+      const pathname = decodeURIComponent(new URL(sourceUrl).pathname);
+      const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const match = pathname.match(new RegExp(`(?:^|/)${escaped}:([^/;]+?)(?:\\.htm|/|$)`, 'i'));
+      if (!match) return [];
+      return match[1].split(',').map((value) => value.trim().toUpperCase()).filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  function extractCapacityTokens(value) {
+    return [...String(value || '').matchAll(/\b(\d+(?:[.,]\d+)?)\s*(TB|GB)\b/gi)]
+      .map((match) => `${match[1].replace(',', '.')}${match[2].toUpperCase()}`.toUpperCase());
+  }
+
+  function normalizeInterfaceToken(value) {
+    const compact = String(value || '').toUpperCase().replace(/\s+/g, '');
+    if (/SAS/.test(compact)) return 'SAS';
+    if (/SATA/.test(compact)) {
+      return /SATA(?:III|3)|6GB\/?S/.test(compact) ? 'SATA3' : 'SATA';
+    }
+    if (/(?:^|[^S])ATA/.test(compact)) return 'ATA';
+    return '';
+  }
+
+  function ceneoFallbackMatchesActiveFilters(baseUrl, title, cardData, cardText) {
+    const allowedCapacities = parseCeneoPathFilter(baseUrl, 'Pojemnosc')
+      .map((value) => value.replace(',', '.').toUpperCase());
+
+    if (allowedCapacities.length) {
+      const strongCapacitySource = [
+        cardData?.listingParams?.Pojemność,
+        cardData?.listingParams?.Pojemnosc,
+        title,
+      ].filter(Boolean).join(' ');
+      const capacities = extractCapacityTokens(strongCapacitySource);
+      if (capacities.length && !capacities.some((value) => allowedCapacities.includes(value))) return false;
+
+      // Jeśli tytuł/parametr nie mówi o pojemności, użyj całej karty jako słabszego fallbacku.
+      if (!capacities.length) {
+        const cardCapacities = extractCapacityTokens(cardText);
+        if (cardCapacities.length && !cardCapacities.some((value) => allowedCapacities.includes(value))) return false;
+      }
+    }
+
+    const allowedInterfaces = parseCeneoPathFilter(baseUrl, 'Interfejs')
+      .map(normalizeInterfaceToken)
+      .filter(Boolean);
+
+    if (allowedInterfaces.length) {
+      const interfaceSource = [
+        cardData?.listingParams?.Interfejs,
+        title,
+      ].filter(Boolean).join(' ');
+      const detected = normalizeInterfaceToken(interfaceSource);
+      if (detected && !allowedInterfaces.includes(detected)) return false;
+    }
+
+    return true;
+  }
+
+  function addCeneoListingCandidate(map, anchor, card, baseUrl, strictCard = false) {
+    const href = absoluteUrl(anchor?.getAttribute?.('href'), baseUrl);
+    if (!href || detectProvider(href) !== 'ceneo') return;
+
+    const productId = getCeneoProductId(href);
+    if (!productId) return;
+
+    const anchorText = singleLine(anchor.textContent);
+    const cardText = singleLine(card?.textContent || '');
+    const generic = /^(warianty|porównaj ceny|idź do sklepu|napisz opinię|\d+[,.]\d{2}\s*zł|od\s*\d)/i.test(anchorText);
+    const cardData = parseCeneoCard(card);
+
+    // W głównej liście nie wymagamy ceny. Ceneo może policzyć produkt, którego
+    // karta nie ma aktualnie ceny "od". W fallbacku wymagamy ceny i zgodności z filtrami.
+    if (!strictCard && !cardData.listingPrice) return;
+    if (!strictCard && !ceneoFallbackMatchesActiveFilters(baseUrl, anchorText, cardData, cardText)) return;
+
+    const existing = map.get(productId);
+    if (!existing) {
+      map.set(productId, {
+        provider: 'ceneo',
+        url: normalizeCeneoProductUrl(href),
+        itemId: productId,
+        listingTitle: generic ? '' : anchorText,
+        ...cardData,
+      });
+      return;
+    }
+
+    if (!generic && anchorText.length > (existing.listingTitle || '').length) existing.listingTitle = anchorText;
+    if (!existing.listingPrice && cardData.listingPrice) existing.listingPrice = cardData.listingPrice;
+    if (!existing.shopsCount && cardData.shopsCount) existing.shopsCount = cardData.shopsCount;
+    if (!existing.offersCount && cardData.offersCount) existing.offersCount = cardData.offersCount;
+    if (!existing.rating && cardData.rating) existing.rating = cardData.rating;
+    if (!existing.reviewCount && cardData.reviewCount) existing.reviewCount = cardData.reviewCount;
+    existing.listingParams = { ...(existing.listingParams || {}), ...(cardData.listingParams || {}) };
+  }
+
   function parseCeneoListing(html, baseUrl) {
     const doc = parseDocument(html);
     const map = new Map();
+    const primaryCards = getCeneoPrimaryCards(doc, baseUrl);
 
-    for (const anchor of doc.querySelectorAll('a[href]')) {
-      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
-      if (!href || detectProvider(href) !== 'ceneo') continue;
-      const productId = getCeneoProductId(href);
-      if (!productId) continue;
-
-      const anchorText = singleLine(anchor.textContent);
-      const generic = /^(warianty|porównaj ceny|idź do sklepu|napisz opinię|\d+[,.]\d{2}\s*zł|od\s*\d)/i.test(anchorText);
-      const cardData = parseCeneoCard(findCeneoCard(anchor));
-      if (!cardData.listingPrice) continue;
-      const existing = map.get(productId);
-
-      if (!existing) {
-        map.set(productId, {
-          provider: 'ceneo',
-          url: normalizeCeneoProductUrl(href),
-          itemId: productId,
-          listingTitle: generic ? '' : anchorText,
-          ...cardData,
-        });
-      } else {
-        if (!generic && anchorText.length > (existing.listingTitle || '').length) existing.listingTitle = anchorText;
-        if (!existing.listingPrice && cardData.listingPrice) existing.listingPrice = cardData.listingPrice;
-        if (!existing.shopsCount && cardData.shopsCount) existing.shopsCount = cardData.shopsCount;
-        if (!existing.offersCount && cardData.offersCount) existing.offersCount = cardData.offersCount;
-        if (!existing.rating && cardData.rating) existing.rating = cardData.rating;
-        if (!existing.reviewCount && cardData.reviewCount) existing.reviewCount = cardData.reviewCount;
-        existing.listingParams = { ...(existing.listingParams || {}), ...(cardData.listingParams || {}) };
+    if (primaryCards.length >= 3) {
+      for (const card of primaryCards) {
+        const anchor = getCeneoProductAnchor(card, baseUrl);
+        if (anchor) addCeneoListingCandidate(map, anchor, card, baseUrl, true);
+      }
+    } else {
+      // Fallback dla przyszłej zmiany HTML. Aktywne filtry z URL odrzucają
+      // rekomendacje, które nie pasują np. do 2TB/4TB albo SATA.
+      for (const anchor of doc.querySelectorAll('a[href]')) {
+        const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+        if (!href || detectProvider(href) !== 'ceneo' || !getCeneoProductId(href)) continue;
+        addCeneoListingCandidate(map, anchor, findCeneoCard(anchor), baseUrl, false);
       }
     }
 
     const bodyText = singleLine(doc.body?.textContent || '');
     const h1 = singleLine(doc.querySelector('h1')?.textContent || '');
     const h1Index = h1 ? bodyText.indexOf(h1) : -1;
-    const headSlice = h1Index >= 0 ? bodyText.slice(h1Index, h1Index + 600) : bodyText.slice(0, 1500);
+    const headSlice = h1Index >= 0 ? bodyText.slice(h1Index, h1Index + 700) : bodyText.slice(0, 1800);
     const countMatch = headSlice.match(/\(([\d\s]+)\)/);
     const declaredCount = countMatch ? Number.parseInt(countMatch[1].replace(/\s/g, ''), 10) : null;
 
     let totalPages = null;
-    const explicitPageTotalMatches = [...bodyText.matchAll(/\bz\s+(\d{1,3})\b/g)];
-    for (const match of explicitPageTotalMatches) {
-      const total = Number.parseInt(match[1], 10);
-      if (total >= 2 && total <= MAX_LISTING_PAGES) {
-        totalPages = Math.max(totalPages || 0, total);
+
+    // Ceneo koduje numer strony w URL jako ...;0020-30-0-0-N.htm.
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || detectProvider(href) !== 'ceneo') continue;
+      try {
+        const pathname = new URL(href).pathname;
+        const match = pathname.match(/;0020-30-0-0-(\d+)\.htm$/i);
+        if (match) {
+          const page = Number.parseInt(match[1], 10) + 1;
+          if (page >= 2 && page <= MAX_LISTING_PAGES) totalPages = Math.max(totalPages || 0, page);
+        }
+      } catch {
+        // no-op
+      }
+    }
+
+    if (!totalPages) {
+      const explicitPageTotalMatches = [...bodyText.matchAll(/\bz\s+(\d{1,3})\b/g)];
+      for (const match of explicitPageTotalMatches) {
+        const total = Number.parseInt(match[1], 10);
+        if (total >= 2 && total <= MAX_LISTING_PAGES) totalPages = Math.max(totalPages || 0, total);
       }
     }
 
     return {
-      offers: [...map.values()].filter((item) => item.listingTitle || item.listingPrice),
+      offers: [...map.values()].filter((item) => item.listingTitle || item.listingPrice || item.itemId),
       declaredCount: Number.isFinite(declaredCount) ? declaredCount : null,
       totalPages,
     };
@@ -845,7 +1020,8 @@
       `Liczba pozycji w eksporcie: ${offers.length}`,
       diagnostics.discoveredCount !== undefined ? `Znalezione na listingu: ${diagnostics.discoveredCount}` : null,
       diagnostics.declaredCount ? `Liczba deklarowana przez serwis: ${diagnostics.declaredCount}` : null,
-      diagnostics.totalPages ? `Liczba stron: ${diagnostics.totalPages}` : null,
+      diagnostics.pagesScanned ? `Przeskanowane strony: ${diagnostics.pagesScanned}` : null,
+      diagnostics.totalPages ? `Wskazówka paginacji: ${diagnostics.totalPages}` : null,
       diagnostics.skippedSeen ? `Pominięto z historii: ${diagnostics.skippedSeen}` : null,
       diagnostics.successCount !== undefined ? `Pobrane poprawnie: ${diagnostics.successCount}` : null,
       diagnostics.errorCount ? `Błędy pobierania: ${diagnostics.errorCount}` : null,
@@ -1017,12 +1193,20 @@
       });
 
       if (options.maxOffers > 0 && queuedOffers.size >= options.maxOffers) break;
-      if (totalPages && page >= totalPages) break;
-      if (declaredCount && allOffers.size >= declaredCount) break;
 
-      // Jeśli znamy liczbę stron, skanujemy do końca nawet gdy jedna strona nie da nowych linków.
-      // Bez znanej liczby stron kończymy dopiero po dwóch kolejnych pustych stronach.
-      if (!totalPages && page > firstPage && consecutiveEmptyPages >= 2) break;
+      if (provider === 'ceneo') {
+        // Ceneo ma stabilną numerację stron. Gdy znamy ostatnią stronę, dochodzimy do niej.
+        if (totalPages && page >= totalPages) break;
+        if (!totalPages && page > firstPage && consecutiveEmptyPages >= 2) break;
+      } else {
+        // Na Allegro numery widoczne w paginacji są tylko oknem wokół bieżącej strony,
+        // a teksty typu "X ofert" występują także w innych modułach. Nie używamy ich
+        // jako warunku zakończenia. Idziemy dalej, dopóki kolejne strony przynoszą
+        // nowe ID ofert. Strony poza końcem wyników zwykle zwracają powtórkę/redirect,
+        // więc dwie kolejne strony bez nowych ID bezpiecznie kończą skan.
+        if (page > firstPage && consecutiveEmptyPages >= 2) break;
+      }
+
       await sleep(provider === 'ceneo' ? 500 : 700);
     }
 
@@ -1218,6 +1402,7 @@
           discoveredCount: scanResult.allOffers.length,
           declaredCount: scanResult.declaredCount,
           totalPages: scanResult.totalPages,
+          pagesScanned: scanResult.pagesScanned,
           skippedSeen: scanResult.skippedSeen,
           successCount: 0,
           errorCount: 0,
@@ -1227,6 +1412,7 @@
         emptyResult.discoveredCount = scanResult.allOffers.length;
         emptyResult.declaredCount = scanResult.declaredCount;
         emptyResult.totalPages = scanResult.totalPages;
+        emptyResult.pagesScanned = scanResult.pagesScanned;
         await chrome.storage.local.set({ [resultStorageKey]: emptyResult });
         await setState(provider, {
           running: false,
@@ -1270,6 +1456,7 @@
         discoveredCount: scanResult.allOffers.length,
         declaredCount: scanResult.declaredCount,
         totalPages: scanResult.totalPages,
+        pagesScanned: scanResult.pagesScanned,
         skippedSeen: scanResult.skippedSeen,
         successCount: detailResult.offers.filter((offer) => !offer.error).length,
         errorCount: detailResult.errors,
@@ -1279,6 +1466,7 @@
       result.discoveredCount = scanResult.allOffers.length;
       result.declaredCount = scanResult.declaredCount;
       result.totalPages = scanResult.totalPages;
+      result.pagesScanned = scanResult.pagesScanned;
       result.successCount = detailResult.offers.filter((offer) => !offer.error).length;
       result.errorCount = detailResult.errors;
       await chrome.storage.local.set({ [resultStorageKey]: result });

@@ -1,7 +1,7 @@
 {
   "provider": "allegro",
-  "source": "previous-export-reviewed-in-chat",
-  "count": 25,
+  "source": "previous-and-current-exports-reviewed-in-chat",
+  "count": 149,
   "offers": [
     {
       "provider": "allegro",
@@ -176,6 +176,874 @@
       "itemId": "17947938865",
       "title": "Dysk twardy Western Digital Red WD20EFRX 2TB SATA III 3,5\"",
       "url": "https://allegro.pl/produkt/serwerowy-dysk-hdd-3-5-wd-red-wd20efrx-2tb-5400rpm-sata-iii-u-99d4dc31-aa50-42df-8b91-a342ddafd3ac?offerId=17947938865",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18842090094",
+      "title": "Dysk do CCTV twardy Seagate SkyHawk 2 TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-do-cctv-twardy-seagate-skyhawk-2-tb-sata-iii-3-5-734cedc4-07e8-4952-b940-a8662afe8af8?offerId=18842090094",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18689070453",
+      "title": "Dysk twardy Seagate Mobile HDD ST2000LM007 2 TB SATA 2,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-mobile-hdd-st2000lm007-2-tb-sata-2-5-56f5d481-0db2-413b-b9fe-73169572faf7?offerId=18689070453",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18949265608",
+      "title": "Dysk twardy HGST UltraStar 7K6000 4TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hgst-ultrastar-7k6000-4tb-sata-iii-3-5-a4e1ea01-7d35-49b6-8e3d-be52a0734d28?offerId=18949265608",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18684725122",
+      "title": "NOWY Dysk NAS HDD WD Red Plus 2TB SATA WD20EFPX ORYGINALNY",
+      "url": "https://allegro.pl/produkt/dysk-hdd-wd-red-plus-2tb-3-5-wd20efpx-5400rpm-64mb-nas-2d172b3f-a18d-4dd4-8603-65622f81d4c7?offerId=18684725122",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18893470718",
+      "title": "NOWY Dysk twardy Seagate Barracuda ST4000DM004 4TB SATA III 3,5\" ORYGINALNY",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-st4000dm004-4tb-sata-iii-3-5-3cdc08f5-298f-4ef5-af43-72d4715bf201?offerId=18893470718",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18673395374",
+      "title": "Dysk twardy Seagate BarraCuda 2TB Compute ST2000DMZ08/DM008 SATA 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-2tb-compute-st2000dmz08-dm008-sata-3-5-bd1d2fb3-804e-462d-b94b-6c6382dc43f8?offerId=18673395374",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18331237027",
+      "title": "WD GREEN 2TB 7.2K 64MB SATA III 3.5\" WD20EARX",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-caviar-green-wd20earx-2tb-sata-iii-3-5-2a2c00a0-af1e-42e8-ac11-f30eb2f927a7?offerId=18331237027",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17851613649",
+      "title": "SAMSUNG SpinPoint F4EG 2TB 5.4K 32MB SATA II 3.5'' HD204UI",
+      "url": "https://allegro.pl/produkt/dysk-twardy-samsung-hd204ui-2tb-sata-ii-3-5-c3d707ab-08e8-4d70-9e11-44538517aa70?offerId=17851613649",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18672543772",
+      "title": "Dysk WD Blue 2TB 3.5\" SATA III (WD20EARZ)",
+      "url": "https://allegro.pl/produkt/dysk-hdd-wd-blue-2tb-3-5-sata-wd20earz-c67cbedd-7d6b-4261-b3ea-b224dba9380b?offerId=18672543772",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18900719014",
+      "title": "Dysk do rejestratora Western Digital WD Purple 2TB do ciągłej pracy",
+      "url": "https://allegro.pl/produkt/dysk-do-rejestratora-western-digital-wd-purple-2tb-do-pracy-ciaglej-24-7-f3b4ea02-2b6e-4235-9d63-89b53200d5b6?offerId=18900719014",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18368118841",
+      "title": "Dysk twardy Western Digital WD Purple 2TB WD23PURZ 2 TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-purple-digital-purple-2tb-sata-iii-3-5-703320c3-dea2-4408-b415-1b3228321344?offerId=18368118841",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18602794064",
+      "title": "Dysk serwerowy SAS 3,5\" HDD Seagate Exos 7E8 4TB ST4000NM005A (W)",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-exos-7e8-4tb-sas-3-5-65e5cee1-f9a9-4394-9985-063947d82d2c?offerId=18602794064",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18916479696",
+      "title": "Toshiba P300 2TB HDWD320UZSVA",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-hdwd320uzsva-2tb-sata-iii-3-5-f7d768bf-1997-401f-bba0-7cab9f2e660b?offerId=18916479696",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18913486615",
+      "title": "Dysk twardy Seagate BarraCuda 4TB SATA III 2,5\" ST4000LM024",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-st4000lm024-4tb-sata-iii-2-5-1a1c9ea2-7cb7-4d57-be59-3623ccc83d70?offerId=18913486615",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18801483303",
+      "title": "Dysk HDD 4TB Western Digital Purple 3.5\" SATA III do CCTV",
+      "url": "https://allegro.pl/produkt/western-digital-purple-dysk-twardy-4-tb-5400-rpm-64-mb-3-5-sata-iii-ef343cf8-f346-4ac0-b3c6-9ef8f1abed53?offerId=18801483303",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17894147799",
+      "title": "TOSHIBA 2TB 7.2K 16MB SAS-2 3.5'' MK2001TRKB",
+      "url": "https://allegro.pl/produkt/toshiba-2tb-7-2k-16mb-sas-2-3-5-mk2001trkb-e9794901-2532-4537-92b3-fc239307b704?offerId=17894147799",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18938332530",
+      "title": "Dysk twardy HDD Hikvision DS-20HKVS-VX1 2 TB do MONITORINGU REJESTRATORA",
+      "url": "https://allegro.pl/produkt/dysk-monitoringu-hikvision-ds-20hkvs-vx1-2tb-do-rejestratora-nagrywarki-dd9dbd40-aac4-42db-8eaa-823da7bdcc79?offerId=18938332530",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17618778393",
+      "title": "Dysk Toshiba S300 (SMR) HDWT720UZSVA 2TB sATA III",
+      "url": "https://allegro.pl/produkt/dysk-hdd-toshiba-s300-2tb-surveillance-do-cctv-hdwt720uzsva-fb9cb8d1-01e7-400c-b01f-035c0d0993fd?offerId=17618778393",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17649752509",
+      "title": "Dysk twardy iDiskk PD01 2TB 2,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-idiskk-pd01-2tb-2-5-3cad8a5c-5690-4c8d-8291-6f0c3daa9065?offerId=17649752509",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18874353677",
+      "title": "DYSK DO REJESTRATORA HDD-ST2000VX017 2TB 24/7 SkyHawk SEAGATE aw",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-skyhawk-2tb-sata-iii-3-5-5e7b88f7-9982-47fb-bb72-52158726eb29?offerId=18874353677",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18794956963",
+      "title": "DYSK DO REJESTRATORA MONITORING HDD-ST2000VX017 2TB 24/7 SkyHawk SEAGATE aw",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-skyhawk-2tb-sata-iii-3-5-0f87a2bc-68cd-4bbb-b82c-45ee0d948c9d?offerId=18794956963",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18658298939",
+      "title": "Serwerowy dysk HDD 3.5\" Western Digital RED WD40EFAX 4TB 5400RPM SATA III",
+      "url": "https://allegro.pl/produkt/dysk-twardy-western-digital-red-wd40efax-4tb-sata-iii-3-5-dee438a2-b44f-488a-8d26-15d68e575fcc?offerId=18658298939",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "13982855736",
+      "title": "Dysk twardy HDD 2TB Seagate SKYHAWK 2000Gb SATA III",
+      "url": "https://allegro.pl/produkt/dysk-hdd-2-5-seagate-skyhawk-st2000lv000-2tb-5400rpm-sata-iii-4e8a4fa7-2233-4fa4-8423-5a70274c7c53?offerId=13982855736",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18813823682",
+      "title": "Dysk zewnętrzny Seagate Expansion STKN4000400 4TB",
+      "url": "https://allegro.pl/produkt/dysk-zewnetrzny-seagate-expansion-stkn4000400-4tb-04b27679-d4de-484c-85f9-77165d587401?offerId=18813823682",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "15304673901",
+      "title": "CoreParts SA2T5I247 dysk twardy 2 TB 7200 RPM 3.5\" SAS",
+      "url": "https://allegro.pl/produkt/dysk-twardy-coreparts-sa2t5i247-2tb-sas-3-5-847c4241-1331-4ddb-afba-80855df3befc?offerId=15304673901",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18867598142",
+      "title": "HGST UltraStar 7K4000 2TB 7.2K 64MB SATA III 3.5'' HUS724020ALA640",
+      "url": "https://allegro.pl/produkt/dysk-nas-3-5-hgst-2tb-sata-iii-hus724020ala640-18a4e61a-6a7a-4eaa-9135-33fd5d037547?offerId=18867598142",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18805952272",
+      "title": "Dysk serwerowy WD Ultrastar DC HC310 4TB 3.5'' SAS-3 (12Gb/s) OUTLET",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-hus726t4tala600-4tb-sata-iii-3-5-87bd1e79-3849-4eaf-9cc7-a44339ebbf9b?offerId=18805952272",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18422124105",
+      "title": "SAMSUNG SpinPoint F3EG 2TB 5.4K 32MB SATA II 3.5'' HD203WI",
+      "url": "https://allegro.pl/produkt/dysk-twardy-samsung-spinpoint-f3eg-hd203wi-2tb-sata-ii-3-5-dacdf7bf-ba35-4a5a-854d-4c66787a7678?offerId=18422124105",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18794961178",
+      "title": "DYSK DO REJESTRATORA MONITORING HDD-ST2000VX017 2TB 24/7 SkyHawk SEAGATE aw",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-2tb-sata-iii-do-monitoringu-773a74e4-263d-48e1-a9a3-097aa62841d7?offerId=18794961178",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18572790204",
+      "title": "IBM 46W0979 46W0978 4TB 7.2K 32MB SAS-2 3.5'' ST4000NM0023",
+      "url": "https://allegro.pl/produkt/dysk-twardy-ibm-st4000nm0023-4tb-sas-3-5-dc9f8965-367b-47cc-8ae0-fffa16b2778b?offerId=18572790204",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18584261077",
+      "title": "Dysk twardy Seagate Barracuda ST4000DMZ04 4TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-st4000dmz04-4tb-sata-iii-3-5-5400rpm-256mb-723d8f60-bfc3-47e5-84df-7e0144c1c42a?offerId=18584261077",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17135245482",
+      "title": "SEAGATE BARRACUDA XT 2TB 5.9K 32MB SATA II 3.5'' ST32000541AS 655-1625C",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-xt-st32000541as-2tb-sata-ii-3-5-a77d439d-a578-4301-b364-0eb1be98b8c7?offerId=17135245482",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18842017226",
+      "title": "WD CAVIAR GREEN 2TB 5.4K 32MB SATA II 3.5'' WD20EADS",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-caviar-green-wd20eads-2tb-sata-ii-3-5-bac8cfa2-8d27-407e-9291-e09fae0313a3?offerId=18842017226",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18077967346",
+      "title": "WD GREEN 4TB 5.4K 64MB SATA III 3.5'' WD40EZRX",
+      "url": "https://allegro.pl/produkt/dysk-wd-4tb-wd40ezrx-7-2k-64mb-cache-sata-3-3-5-d646cc53-d341-4d2c-93aa-9835cb8204e4?offerId=18077967346",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18034278609",
+      "title": "HGST UltraStar 7K4000 4TB 7.2K 64MB SATA III 3.5'' HUS724040ALA640",
+      "url": "https://allegro.pl/produkt/hgst-ultrastar-7k4000-4tb-7-2k-64mb-sata-iii-3-5-hus724040ala640-714fb298-7901-43a7-8c25-613daf08b3d6?offerId=18034278609",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18281068588",
+      "title": "DELL 0NYR3N 2TB 7.2K 64MB SATA III 3.5\" ST2000DM001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-2tb-sata-iii-3-5-st2000dm001-e775694f-da1a-467f-b062-59e7346769e3?offerId=18281068588",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18090446796",
+      "title": "WD 2TB BLUE 5.4K 256MB SATA III 3.5'' WD20EZAZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-western-digital-wd20ezaz-wd-blue-2tb-sata-iii-3-5-27c2a9a6-2ef9-4d7c-bd57-ff5e13f23fab?offerId=18090446796",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18637556982",
+      "title": "HGST UltraStar 7K3000 2TB 7.2K 64MB SATA III 3.5'' HUA723020ALA640",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hgst-ultrastar-7k3000-hua723020ala640-2tb-sata-iii-3-5-94c4f6e0-30e0-4bfa-99df-32b257f86c18?offerId=18637556982",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17796955634",
+      "title": "WD BLUE 2TB 5.4K 64MB SATA III 3.5'' WD20EZRZ",
+      "url": "https://allegro.pl/produkt/dysk-hdd-3-5-western-digital-blue-wd20ezrz-2tb-5400rpm-sata-iii-d733acff-1457-4077-af45-eb6fa59fadba?offerId=17796955634",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18570446754",
+      "title": "DYSK HDD 3.5 SEAGATE IRONWOLF NAS 5900RPM 2TB",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-st2000vn004-ironwolf-2tb-sata-iii-3-5-c776de83-f092-4881-ad35-6eb73e21e8b8?offerId=18570446754",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18198806018",
+      "title": "HITACHI DeskStar 7K2000 2TB 7.2K 32MB SATA II 3.5'' HDS722020ALA330",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hitachi-deskstar-7k2000-hds722020ala330-2tb-sata-3-5-619cafde-bffd-484b-8351-8136f9190376?offerId=18198806018",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18539227133",
+      "title": "Dysk twardy Seagate Barracuda 2TB SATA III 2,5\" 7MM",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-st2000lm007-fw-sdm2-2tb-sata-2-5-6c9846e6-7521-432a-bf6e-895d9d0f4044?offerId=18539227133",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18868185360",
+      "title": "TOSHIBA PC P300 HDWD120 2TB 7.2K 64MB SATA III 3.5'' HDWD120UZSVA",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-hdwd120uzsva-p300-2tb-sata-iii-3-5-8a4a57e2-3a2a-4751-a7ea-0f63c88ac704?offerId=18868185360",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17803275417",
+      "title": "Dysk Twardy HDD 2TB SATA Do Monitoringu Rejestratora 3.5 2T Wewnętrzny WD",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-purple-wd2tbpurz-2tb-sata-3-5-b95a708a-798e-424b-8828-b1e7130d3ad5?offerId=17803275417",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18890882295",
+      "title": "Dysk twardy Toshiba MQ04ABD200 2TB SATA III 2,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-mq04abd200-2tb-sata-iii-2-5-2df3dd9b-3c81-45e0-b04e-f95c155000a4?offerId=18890882295",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18883185853",
+      "title": "TOSHIBA 4TB 7.2K 128MB SAS-3 3.5'' MG04SCA40EE",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-mg04sca40ee-4tb-sas-3-5-6422fe0f-d717-4b02-9ded-249a2d588a58?offerId=18883185853",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17980970723",
+      "title": "TOSHIBA P300 HDWD220 2TB 5.4K 128MB SATA III 3.5'' HDWD220UZSVA",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-hdd-2tb-sata-iii-3-5-0d36b6f5-5358-4012-9540-e66765ee1258?offerId=17980970723",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17889533510",
+      "title": "Dysk zewnętrzny Seagate FireCuda Star Wars Grogu STKL2000404 2TB HDD",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-firecuda-stkl2000404-2tb-sata-2-5-32aa5b08-5340-4883-ba7d-437e85417689?offerId=17889533510",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "15808845445",
+      "title": "SEAGATE CONSTELLATION ES 2TB 7.2K 64MB SATA II 3.5'' ST32000644NS",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-constellation-es-st32000644ns-2tb-sata-ii-3-5-00a1a971-6cfb-4cfb-b2e0-75c21383f1e8?offerId=15808845445",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18949227690",
+      "title": "Dysk twardy Seagate Constellation ES.3 ST2000NM0033 2TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-constellation-es-3-st2000nm0033-2tb-sata-iii-3-5-77f0af25-df1e-4cef-950c-2194fea3b336?offerId=18949227690",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18155159248",
+      "title": "SEAGATE BARRACUDA LP 2TB 5.9K 32MB SATA II 3.5'' ST32000542AS",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-lp-st32000542as-2tb-sata-ii-3-5-d3d6e863-8cf0-453c-ba0b-85c2ab5e9ddd?offerId=18155159248",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17003395495",
+      "title": "WD GREEN 2TB 5.4K 8MB SATA III 2.5'' WD20NPVX",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-green-mobile-2tb-sata-2-5-0e012c07-3b47-407e-9aa6-165b34af4b25?offerId=17003395495",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16968183379",
+      "title": "SEAGATE FireCuda 2TB 5.4K 128MB SATA III 2.5'' ST2000LX001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-st2000lx001-firecuda-2tb-sata-iii-2-5-d65e4b88-b985-46d2-adfa-1b2e031e2ab3?offerId=16968183379",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17656399158",
+      "title": "WD BLACK 2TB 7.2K 64MB SATA III 3.5'' WD2002FAEX",
+      "url": "https://allegro.pl/produkt/dysk-wd-2tb-wd2002faex-7-2k-64mb-sata3-3-5-9cec7808-cbef-44a3-9d6c-f35a1690ee28?offerId=17656399158",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18937612748",
+      "title": "Dysk twardy WD Red WD20EFAX 2TB SATA III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-red-wd20efax-2tb-sata-iii-3-5-d562b824-5b39-43a6-b5b9-57ccc9aa5e6a?offerId=18937612748",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18888097448",
+      "title": "SEAGATE DESKTOP HDD 4TB 5.9K 64MB SATA III 3.5'' ST4000DM000",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-desktop-st4000dm000-4tb-sata-iii-3-5-77a3670c-c932-4050-b7c7-1254f21a261d?offerId=18888097448",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17051786893",
+      "title": "WD RE 2TB 7.2K 64MB SATA III 3.5'' WD2000FYYZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-2tb-sata-iii-7200-obr-min-3-5-0a2c7ba7-0f56-4e6f-a3ae-77223fe790b6?offerId=17051786893",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18629620548",
+      "title": "TOSHIBA 4TB 7.2K 64MB SATA III 3.5'' MD04ACA400",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-hdd-4tb-sata-iii-3-5-5d482378-18c1-431f-a3f1-6f50d4c4a940?offerId=18629620548",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18816573487",
+      "title": "SEAGATE NAS HDD 2TB 5.9K 64MB SATA III 3.5'' ST2000VN000",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-nas-hdd-st2000vn000-2tb-sata-iii-3-5-0fa9d20c-4d87-4506-a13d-adbc2fa730ec?offerId=18816573487",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16842148553",
+      "title": "WD CAVIAR BLACK 2TB 7.2K 64MB SATA II 3.5'' WD2001FASS",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-caviar-black-wd2001fass-2tb-sata-ii-3-5-a074c0b4-a2b9-46ec-9eca-114172db8e90?offerId=16842148553",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18860687381",
+      "title": "DELL 0YD6FM 2TB 7.2K 64MB SATA III 3.5\" ST2000DM001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-st2000dm001-2tb-sata-ii-3-5-5d1bc77d-88a8-4305-80be-d75c6de14134?offerId=18860687381",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18439369002",
+      "title": "SEAGATE VIDEO 3.5 HDD 4TB 5.9K 64MB SATA III 3.5'' ST4000VM000",
+      "url": "https://allegro.pl/produkt/dysk-hdd-3-5-seagate-video-st4000vm000-4tb-5900rpm-sata-iii-b-5047225c-527f-4e44-8c7b-83a84a2a6fc3?offerId=18439369002",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16855179353",
+      "title": "SEAGATE VIDEO 3.5 HDD 2TB 5.9K 64MB SATA III 3.5'' ST2000VM003",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-video-3-5-hdd-st2000vm003-2tb-sata-iii-3-5-4372a97c-a494-46b8-87c3-c21b5243e5b1?offerId=16855179353",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18958623235",
+      "title": "SEAGATE BARRACUDA 2TB 7.2K 64MB SATA III 3.5'' ST2000DM006",
+      "url": "https://allegro.pl/produkt/dysk-hdd-3-5-seagate-barracuda-st2000dm006-2tb-7200rpm-sata-iii-05becd50-c62f-4092-9f16-5705d6f2a1e2?offerId=18958623235",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18295033901",
+      "title": "WD GREEN 2TB 5.4K 64MB SATA III 3.5\" WD20EZRX",
+      "url": "https://allegro.pl/produkt/dysk-twardy-western-digital-wd-green-wd20ezrx-2tb-sata-iii-3-5-b8f67127-de13-45de-81a7-1ce6df58fa87?offerId=18295033901",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18637537853",
+      "title": "WD AV-GP 2TB 5.4K 64MB SATA II 3.5'' WD20EURX",
+      "url": "https://allegro.pl/produkt/dysk-wd20eurx-2tb-sata-ii-3-5-5b7d3639-0eb0-47c1-9179-6a289a234cda?offerId=18637537853",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16767511116",
+      "title": "HITACHI DeskStar 7K3000 2TB SATA III 7.2K 64MB 3.5'' HDS723020BLA642",
+      "url": "https://allegro.pl/produkt/hitachi-deskstar-7k3000-2tb-sata-iii-7-2k-64mb-3-5-hds723020bla642-81612194-11ea-4575-875f-58bfdc8da138?offerId=16767511116",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17554086078",
+      "title": "HP 507613-002 2TB SAS-2 7.2K 16MB 3.5'' MB2000FAMYV",
+      "url": "https://allegro.pl/produkt/hp-507613-002-2tb-sas-2-7-2k-16mb-3-5-mb2000famyv-fca25b14-7ea5-4f4f-ac3d-48744ad70bc8?offerId=17554086078",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18868506117",
+      "title": "SAMSUNG SpinPoint M9T 2TB 5.4K 32MB SATA III 2.5'' ST2000LM003",
+      "url": "https://allegro.pl/produkt/dysk-twardy-samsung-spinpoint-st2000lm003-2tb-sata-iii-2-5-6d4b02a3-d11c-4abc-811e-55937399f9b4?offerId=18868506117",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17288006451",
+      "title": "Dysk twardy HDD WD Purple 2TB SATA III 2000Gb do CCTV WD23PURZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-hdd-wd20purx-5902887012709-2tb-sata-3-5-e0c38e3c-71db-4ece-b7a0-7c1b98328e1f?offerId=17288006451",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17131585538",
+      "title": "TOSHIBA 2TB 5.7K 32MB SATA III 3.5'' DT01ABA200",
+      "url": "https://allegro.pl/produkt/dysk-twardy-toshiba-dt01aba200-2tb-sata-iii-3-5-ebe91c45-2eaf-4b05-b5e2-3f5ff057ff2b?offerId=17131585538",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18181593029",
+      "title": "SEAGATE FireCuda 2TB 7.2K 64MB SATA III 3.5'' ST2000DX002",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-firecuda-2tb-sata-iii-3-5-89f083cf-90ca-4c5c-b3c0-097080560c2d?offerId=18181593029",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18798809928",
+      "title": "WD GREEN 2TB 5.4K 64MB SATA II 3.5\" WD20EARS",
+      "url": "https://allegro.pl/produkt/dysk-hdd-western-digital-caviar-green-wd20ears-2tb-sata-ii-3-5-6c2aef15-c7c7-45b2-998f-d503d07f9371?offerId=18798809928",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17942568236",
+      "title": "HITACHI DeskStar 5K3000 2TB SATA III 5.9K 32MB 3.5'' HDS5C3020ALA632",
+      "url": "https://allegro.pl/produkt/hitachi-2tb-5-9k-32mb-sata-iii-3-5-hds5c3020ala632-a0115a0c-2ac5-4f81-830b-33d4c35db2c4?offerId=17942568236",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14282257329",
+      "title": "NOWY HPE 2TB 3,5 12G SAS 7.2K LFF PN: N9X10A",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-n9x10a-2tb-sas-3-5-c37b02bc-5245-44ae-aaac-4f855f6cd715?offerId=14282257329",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18618472838",
+      "title": "DYSK DO REJESTRATORA MONITORING HDD-ST2000VX017 2TB 24/7 SkyHawk SEAGATE aw",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-skyhawk-st2000vxz17-2tb-sata-iii-3-5-15d64399-dc50-47ac-9e8c-ef0627f6eb38?offerId=18618472838",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18672550127",
+      "title": "SEAGATE BarraCuda 2TB 5.4K 256MB SATA III 3.5'' ST2000DM005",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-st2000dm005-2tb-sata-iii-3-5-d4ae34ff-7d97-451a-8ecc-753f6ece28d0?offerId=18672550127",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16877030592",
+      "title": "SEAGATE BARRACUDA LP 2TB 5.9K 32MB SATA II 3.5'' ST2000DL001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-green-st2000dl001-2tb-sata-ii-3-5-dfeeae62-7848-4554-b21c-82a4690e3f7b?offerId=16877030592",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18902297117",
+      "title": "SEAGATE 2TB 7.2K 128MB SATA III 3.5'' ST2000NM0008",
+      "url": "https://allegro.pl/produkt/seagate-2tb-7-2k-128mb-sata-iii-3-5-st2000nm0008-43775f37-a22d-481a-8450-2a55b01d13d1?offerId=18902297117",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18629733613",
+      "title": "WD RE 2TB 7.2K 128MB SATA III 3.5'' WD2004FBYZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-re-wd2004fbyz-2tb-sata-iii-3-5-1ec7d7d2-32ed-46b5-b7dc-98cdc0625cd1?offerId=18629733613",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18378926737",
+      "title": "TOSHIBA X300 HDWE140 4TB 7.2K 128MB SATA III 3.5'' HDETR11GCA51",
+      "url": "https://allegro.pl/produkt/toshiba-x300-4tb-7-2k-128mb-sata-iii-3-5-hdetr11gca51-574fdb72-5770-4c56-b849-ca72a2aef5b5?offerId=18378926737",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18897030734",
+      "title": "SEAGATE SV35 2TB 7.2K 64MB SATA III 3.5'' ST2000VX000",
+      "url": "https://allegro.pl/produkt/seagate-sv35-2tb-7-2k-64mb-sata-iii-3-5-st2000vx000-c680876b-2e9d-4b0c-8dd6-60be75fcc27c?offerId=18897030734",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18544035152",
+      "title": "DELL 06C10R 2TB 7.2K 32MB SATA II 3.5'' HUAA722020ALA330",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-huaa722020ala330-2tb-sata-ii-3-5-313a6659-ad4e-4bb5-b8c9-561f8b114a6d?offerId=18544035152",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17329516549",
+      "title": "LENOVO 03T7847 SL10A28335 2TB 7.2K 128MB SATA III 3.5'' ST2000NM0033",
+      "url": "https://allegro.pl/produkt/lenovo-03t7847-sl10a28335-2tb-7-2k-128mb-sata-iii-3-5-st2000nm0033-d1031e44-e6f6-42d6-964a-3ff11059e6d9?offerId=17329516549",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18521485299",
+      "title": "WD 4TB 5.4K 64MB SATA III 3.5'' WD40EMAZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-wd40emaz-4tb-sata-iii-3-5-388d168a-f241-4e3e-8719-1a66002a5cd1?offerId=18521485299",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18788396927",
+      "title": "Dysk twardy do rejestratora WD Purple WD23PURZ 2TB SATA 3,5\" (aw)",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-western-digital-purple-wd20purx-64akyy0-2tb-sata-iii-3-5-3080c3a5-edd0-4f33-9b15-fccc5b3d848f?offerId=18788396927",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17834535974",
+      "title": "SEAGATE BARRACUDA GREEN 2TB SATA III 5.9K 64MB 3.5'' ST2000DL003",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-green-st2000dl003-2tb-sata-iii-3-5-69f97e59-8d85-4c42-8d7d-101422d39d01?offerId=17834535974",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17901778408",
+      "title": "SEAGATE CONSTELLATION CS SED 2TB 7.2K 64MB SATA III 3.5'' ST2000NC000",
+      "url": "https://allegro.pl/produkt/seagate-2tb-7-2k-64mb-sata-iii-3-5-st2000nc000-3cb8f96b-f451-41a0-b408-1e6a1907193f?offerId=17901778408",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18897486991",
+      "title": "DELL 07RCGV 2TB 7.2K 128MB SAS-3 3.5'' ST2000NM0155",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-st2000nm0155-2tb-sata-ii-3-5-2d3de189-bdff-46a4-8286-2e50e56e3d02?offerId=18897486991",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17130316589",
+      "title": "HP 695503-002 2TB 7.2K 128MB SATA III 3.5\" MB2000GCWDA",
+      "url": "https://allegro.pl/produkt/hp-695503-002-2tb-7-2k-128mb-sata-iii-3-5-mb2000gcwda-162e66a3-e0f3-4a0e-8e08-3ff7a99c66da?offerId=17130316589",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18721333345",
+      "title": "Western Digital Dysk twardy WD Purple 2TB 3,5 256 MB 5400 do monitoringu",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-wd22purz-purple-2tb-sata-iii-3-5-52fa7d93-a524-464f-9801-041f78fadc12?offerId=18721333345",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "15304822682",
+      "title": "HPE 507632-S21 dysk twardy 2 TB 7200 RPM 3.5\" SATA II",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hpe-507632-s21-2tb-sata-3-5-d96f4590-b947-47c8-b899-54cd01fcf6ac?offerId=15304822682",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18617563400",
+      "title": "HGST DeskStar 7K4000 4TB 7.2K 64MB SATA III 3.5'' HDS724040ALE640",
+      "url": "https://allegro.pl/produkt/hgst-4tb-7-2k-64mb-sata-iii-3-5-hds724040ale640-adc8c4cd-ca7c-4e6b-a2b3-410a799e2c5c?offerId=18617563400",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18607350123",
+      "title": "DELL 055FX5 2TB 7.2K 128MB SATA III 3.5'' ST2000NM0033",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-st2000nm0033-2tb-sata-ii-3-5-978db7e5-a984-4f77-9268-9c95732b47c8?offerId=18607350123",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18521596241",
+      "title": "APPLE 655-1697A 2TB 5.4K 64MB SATA 3.5'' HUA5C3020ALA640",
+      "url": "https://allegro.pl/produkt/hitachi-hua5c3020ala640-2tb-5-4k-64mb-sata-3-5-f8d20863-8816-46b1-a653-4a1203295008?offerId=18521596241",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18874674605",
+      "title": "DELL 0NPVM6 2TB 7.2K 128MB SATA III 3.5'' MG04ACA200NY",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-mg04aca200ny-2tb-sata-iii-3-5-7f933155-4d80-4780-b4a6-851bc4e5e9e3?offerId=18874674605",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18770107704",
+      "title": "HGST 2TB UltraStar 7K4000 7.2K 64MB SATA III 3.5'' HUS724020ALE640",
+      "url": "https://allegro.pl/produkt/hgst-2tb-7-2k-64mb-sata-iii-3-5-hus724020ale640-9043ea5d-f0f7-4208-9de4-999ff3d2964c?offerId=18770107704",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18876865336",
+      "title": "DELL 0V9H6C 2TB 7.2K 128MB SATA III 3.5'' HUS722T2TALA600",
+      "url": "https://allegro.pl/produkt/dysk-twardy-dell-hus722t2tala600-2tb-sata-iii-3-5-b5b4a3ac-ecf1-4750-b506-566f4d1b48ba?offerId=18876865336",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18876962727",
+      "title": "LENOVO 00MX126 2TB 7.2K 256MB SATA III 3.5'' ST2000NM000A",
+      "url": "https://allegro.pl/produkt/dysk-twardy-lenovo-st2000nm000a_00mx126-2tb-sata-iii-3-5-655252e5-7457-426d-ac5d-3578218bb66f?offerId=18876962727",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18893830459",
+      "title": "SEAGATE BarraCuda Pro 2TB 7.2K 128MB SATA III 3.5'' ST2000DM009",
+      "url": "https://allegro.pl/produkt/seagate-2tb-st2000dm009-7-2k-128mb-sata-iii-3-5-61eaa147-1c29-4301-8a60-55b17a247236?offerId=18893830459",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17858213310",
+      "title": "WD SE 2TB 7.2K 64MB SATA III 3.5'' WD2000F9YZ",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-se-wd2000f9yz-09n20l0-2tb-sata-iii-3-5-a4b61c94-870e-45b3-9d81-4f16880a726b?offerId=17858213310",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17131213207",
+      "title": "WD CAVIAR GREEN POWER 2TB 7.2K 32MB SATA II 3.5'' WD20EVDS",
+      "url": "https://allegro.pl/produkt/wd-caviar-green-power-2tb-7-2k-32mb-sata-ii-3-5-wd20evds-3d2e4057-1b8a-4592-a82e-54515266d069?offerId=17131213207",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "18876896323",
+      "title": "HGST UltraStar 7K6000 2TB 7.2K 128MB SATA III 3.5'' HUS726020ALE610",
+      "url": "https://allegro.pl/produkt/hgst-hus726020ale610-2tb-7200rpm-sata-iii-128mb-3-5-423c1b8b-8ff5-43a7-97a0-35860764fbce?offerId=18876896323",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14280981998",
+      "title": "Seagate 2TB ST32000641AS 7,2K 64Mb Sata III 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-barracuda-xt-st32000641as-2tb-sata-iii-3-5-437c4ee2-21f9-42ec-bcb8-ee159ea9512f?offerId=14280981998",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14280906977",
+      "title": "Seagate 2TB ST2000DX001 7,2K 64Mb Sata III 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-desktop-st2000dx001-2tb-sata-iii-3-5-baa00860-8257-49c0-80a6-21e48efb746c?offerId=14280906977",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16162511530",
+      "title": "Dysk NetApp 2Tb ST2000NM0011 64Mb 7,2K Sata3 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-netapp-st2000nm0011-108-00242-a1-2tb-sata-3-5-db4e8783-1c70-4695-aec9-946507be9cab?offerId=16162511530",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14249283613",
+      "title": "Western Digital 2TB WD20NPVT 5,4K 8Mb Sata2 2,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-green-wd20npvt-2tb-sata-ii-2-5-e054adec-09a4-4c0c-b58f-aa6de75d953b?offerId=14249283613",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14276002382",
+      "title": "Seagate 2Tb ST2000NM0011 7,2K 64Mb Sata 3 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-constellation-st2000nm0011-2tb-sata-iii-3-5-381f2aff-1562-4538-b6a5-ef76999e9395?offerId=14276002382",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16326549071",
+      "title": "HP MB2000FBUCL 2TB 7200Rpm Sas II 3.5'' 638521-001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-mb2000fbucl-2tb-sas-3-5-a0511473-221a-459b-8123-01680a7579d0?offerId=16326549071",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14298799425",
+      "title": "HGST 4TB HDS5C4040ALE630 7200Rpm 64MB Sata3 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hgst-hds5c4040ale630-4tb-sata-iii-3-5-b7e57e1f-d564-49ea-afd8-ec66e041acbf?offerId=14298799425",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14254867146",
+      "title": "Dysk WD 2TB WD20EADS 5,4K 32Mb Cache Sata II 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-wd-green-wd20eads-00w4b0-2tb-sata-ii-3-5-4db546e0-b188-4f05-a889-bec6adbdae5b?offerId=14254867146",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16164376755",
+      "title": "HP ST2000NM0023 2TB 128MB Cache 7,2k Sas3 3.5\" 719770-002",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-st2000nm0023-2tb-sas-3-5-0f45a958-9c2e-4c26-b1df-754bb1856fda?offerId=16164376755",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14298123161",
+      "title": "Hitachi HUA722020ALA331 2TB 7,2K 32MB Sata2 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hitachi-7k2000-hua722020ala331-2tb-sata-3-5-60df4e9f-cbee-4589-a254-4631fecbd751?offerId=14298123161",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16154481390",
+      "title": "HP ST2000NM0001 2TB SAS III 7200RPM 3.5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-st2000nm0001-hp-2tb-sas-3-5-699b280b-5125-473f-a49e-2e0df1137b18?offerId=16154481390",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16162824146",
+      "title": "Dysk NetApp 2Tb WD2003FYYS 64Mb 7,2K Sata2 3,5''",
+      "url": "https://allegro.pl/produkt/dysk-twardy-netapp-wd2003fyys-108-00242-a1-2tb-sata-3-5-9cececed-619f-4eb2-8ef8-108313ec8b47?offerId=16162824146",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "15664786574",
+      "title": "Seagate Enterprise ST2000VN0001 2TB 5900RPM 64MB Sata III 3,5\"",
+      "url": "https://allegro.pl/produkt/dysk-twardy-seagate-enterprise-nas-hdd-st2000vn0001-2tb-sata-iii-3-5-2ca7758c-f255-42e7-a104-f121ec7edd6f?offerId=15664786574",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14930100257",
+      "title": "WD BLUE WD20NPVZ 2TB 8MB 5400U/min 2,5\" SATA III",
+      "url": "https://allegro.pl/produkt/wd-blue-wd20npvz-2tb-8mb-5400u-min-2-5-sata-iii-fd371f20-778e-4d1a-a49d-5a2dcb322502?offerId=14930100257",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "14293354445",
+      "title": "Dell 2Tb ST2000NM0011 7,2K 64Mb Sata3 3,5'' 0835R9",
+      "url": "https://allegro.pl/produkt/dell-2tb-st2000nm0011-7-2k-64mb-sata3-3-5-0835r9-b5e17872-1c1b-42f9-a225-1253075ebb7d?offerId=14293354445",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16335352784",
+      "title": "Dysk IBM ST2000NM0043 2TB Sas2 7,2K 3.5'' 98Y3195",
+      "url": "https://allegro.pl/produkt/dysk-twardy-ibm-gepard-st2000nm0043-2tb-sas-3-5-599fafbd-7d23-4f00-be94-3a552baad44f?offerId=16335352784",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16170075931",
+      "title": "HP SMEG4000S5XNN7.2 4Tb 128Mb Cache 7200Rpm 710490-003 Sas 3,5\"",
+      "url": "https://allegro.pl/produkt/hp-smeg4000s5xnn7-2-4tb-128mb-cache-7200rpm-710490-003-sas-3-5-ff75396a-5e99-4beb-818d-b0ab74b040b5?offerId=16170075931",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16254479674",
+      "title": "Seagate 2TB ST2000NM0024 7,2K 128Mb Sata III 3,5''",
+      "url": "https://allegro.pl/produkt/seagate-2tb-st2000nm0024-7-2k-128mb-sata-iii-3-5-a48ac1a3-6cdf-467a-be47-d95d63db455a?offerId=16254479674",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "17209996886",
+      "title": "Samsung HD204UI/CE 2TB 5400Rpm 32Mb Cache Sata II 3,5",
+      "url": "https://allegro.pl/produkt/samsung-hd204ui-ce-2tb-5400rpm-32mb-cache-sata-ii-3-5-9f82ec31-60f7-4a40-8aff-7f05af42f281?offerId=17209996886",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16254558828",
+      "title": "Seagate 2TB ST2000NM0044 7,2K 128Mb Sata III 3,5''",
+      "url": "https://allegro.pl/produkt/seagate-2tb-st2000nm0044-7-2k-128mb-sata-iii-3-5-9a8f7889-937a-4dcd-960b-36b6a933e1ff?offerId=16254558828",
+      "error": false
+    },
+    {
+      "provider": "allegro",
+      "itemId": "16326253864",
+      "title": "HP 2TB MB2000EAZNL 7,2K Sata2 3,5'' 584786-001",
+      "url": "https://allegro.pl/produkt/dysk-twardy-hp-mb2000eaznl-2tb-sata-ii-3-5-8145a63b-307d-4482-bd2f-a014069f3e21?offerId=16326253864",
       "error": false
     }
   ]

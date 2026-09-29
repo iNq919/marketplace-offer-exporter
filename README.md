@@ -1,76 +1,85 @@
-# Allegro + Ceneo Offer Exporter for ChatGPT 1.2.0
+# Allegro + Ceneo Offer Exporter for ChatGPT 1.3.0
 
 Rozszerzenie Chrome Manifest V3 do zbierania ofert z Allegro i produktów z Ceneo.
 
-## Co nowego w 1.2.0
+## Co poprawiono w 1.3.0
 
-- Allegro i Ceneo mają osobne stany, wyniki i historię.
-- Można uruchomić eksport Allegro i Ceneo jednocześnie na dwóch otwartych kartach.
-- Opcja pomijania wcześniej poprawnie wyeksportowanych pozycji.
-- Historia jest przechowywana osobno dla Allegro i Ceneo.
-- Można importować stare eksporty TXT i JSON do historii.
-- Pozycje, które wcześniej zakończyły się błędem, nie są dodawane do historii i zostaną ponowione przy następnym eksporcie.
-- Poprawione skanowanie paginacji Allegro. Rozszerzenie nie kończy już skanowania tylko dlatego, że na stronie wystąpił pierwszy napis typu "60 ofert".
-- Dodane wykrywanie numerów stron z linków paginacji Allegro.
-- Jedna pusta strona nie kończy skanowania, jeśli znamy całkowitą liczbę stron.
-- Bezpieczniejsze pobieranie Allegro: dłuższy backoff dla HTTP 403/429/5xx, automatyczny cooldown oraz druga wolniejsza próba pobrania błędnych ofert.
-- Domyślne ustawienia są spokojniejsze dla Allegro: 1 worker i 1200 ms przerwy.
-- W UI widać osobno: strony, znalezione, kolejkę, pominięte z historii, pobrane i błędy.
-- Eksport TXT zawiera diagnostykę liczby znalezionych pozycji, stron, pominiętych pozycji i błędów.
+- Allegro nie kończy już skanowania na podstawie widocznych numerów paginacji.
+- Allegro nie traktuje liczby znalezionej w dowolnym napisie `X ofert` jako pewnej granicy skanowania.
+- Dla Allegro rozszerzenie przechodzi kolejne strony tak długo, jak pojawiają się nowe ID ofert. Dwie kolejne strony bez nowych ID kończą skan.
+- W eksporcie podawana jest rzeczywista liczba przeskanowanych stron. Widoczna paginacja jest tylko wskazówką diagnostyczną.
+- Ceneo najpierw odczytuje wyłącznie główne karty produktów z listingu (`cat-prod-row` / `category-list-item`), dzięki czemu rekomendacje i podobne produkty nie powinny wpadać do wyniku.
+- Jeśli Ceneo zmieni HTML i trzeba użyć fallbacku, rozszerzenie dodatkowo sprawdza aktywne filtry z URL, np. `Pojemnosc:2TB,4TB` i `Interfejs:SATA,SATA3`.
+- Karta Ceneo może zostać zebrana również wtedy, gdy nie ma widocznej ceny `od`, jeśli należy do głównej listy. Dzięki temu liczba pozycji powinna lepiej odpowiadać liczbie deklarowanej przez Ceneo.
+- Nadal działają osobne stany, wyniki i historia dla Allegro oraz Ceneo.
+- Nadal można uruchamiać oba serwisy jednocześnie.
 
-## Instalacja
+## Dlaczego powstała ta poprawka
+
+W poprzednim przebiegu:
+
+- Allegro pokazywało 589 ofert, ale rozszerzenie zatrzymało się po 4 stronach i znalazło tylko 148.
+- Ceneo deklarowało 279 produktów, a rozszerzenie zebrało 287, ponieważ do wyniku wpadały także produkty z modułów rekomendacji, np. pojemności spoza aktywnego filtra.
+
+## Instalacja / aktualizacja
 
 1. Rozpakuj ZIP.
-2. Otwórz `chrome://extensions`.
-3. Włącz tryb dewelopera.
-4. Kliknij `Załaduj rozpakowane`.
-5. Wskaż folder rozszerzenia.
+2. Jeśli masz już rozszerzenie załadowane z folderu, podmień jego pliki nową wersją.
+3. Wejdź w `chrome://extensions`.
+4. Kliknij `Odśwież` przy rozszerzeniu.
+5. Odśwież otwarte karty Allegro i Ceneo.
 
-Przy aktualizacji istniejącej instalacji podmień pliki w folderze rozszerzenia i kliknij `Odśwież` na stronie rozszerzeń Chrome.
+Nie usuwaj rozszerzenia z Chrome, jeśli chcesz zachować jego aktualną historię w `chrome.storage.local`.
 
-## Równoległe Allegro + Ceneo
+## Historia i pomijanie
 
-1. Otwórz kartę Allegro z ustawionymi filtrami.
-2. Otwórz kartę Ceneo z ustawionymi filtrami.
-3. Otwórz popup rozszerzenia.
-4. Kliknij `Uruchom Allegro + Ceneo`.
+Opcja `Pomiń wcześniej poprawnie wyeksportowane pozycje` działa osobno dla serwisów:
 
-Każde zadanie działa w swojej karcie. Wyniki i postęp nie nadpisują się wzajemnie.
-
-Możesz też uruchamiać serwisy osobno przyciskiem `Uruchom bieżącą kartę`.
-
-## Historia i pomijanie pozycji
-
-Domyślnie zaznaczona jest opcja `Pomiń wcześniej poprawnie wyeksportowane pozycje`.
-
-- Allegro jest rozpoznawane po ID oferty.
-- Ceneo jest rozpoznawane po ID produktu.
-- Do historii trafiają tylko pozycje pobrane bez błędu.
+- Allegro po ID oferty.
+- Ceneo po ID produktu.
+- Błędy pobierania nie są oznaczane jako sprawdzone.
 - Historię można wyczyścić osobno dla każdego serwisu.
-- Stary eksport TXT lub JSON można dodać przez `Importuj TXT / JSON`.
-- Przy imporcie TXT bloki z `Błąd pobierania` są ignorowane.
+- Można importować wcześniejsze eksporty TXT i JSON.
 
-To oznacza, że po nieudanym pobraniu oferta nie przepada i będzie mogła zostać pobrana w kolejnym uruchomieniu.
+W folderze `history-import` są pliki pomocnicze zawierające pozycje z wcześniejszych eksportów:
+
+- `allegro-reviewed.json` - 149 unikalnych ofert Allegro z dotychczasowych poprawnych eksportów.
+- `ceneo-reviewed.json` - 396 unikalnych produktów Ceneo z dotychczasowych eksportów.
+
+Jeśli aktualizujesz istniejącą instalację przez podmianę plików i `Odśwież`, zwykle nie musisz importować ich ponownie, bo historia rozszerzenia pozostaje w Chrome.
 
 ## Zalecane ustawienia
 
-Dla Allegro przy dużej liczbie ofert:
+Dla dużego eksportu Allegro:
 
 - równoległe pobieranie: 1
 - przerwa: 1200-2000 ms
-- tryb AI compact
+- tryb: AI compact
+- `Maks. nowych pozycji: 0`, jeśli chcesz zebrać wszystkie jeszcze niesprawdzone pozycje
 
-Dla Ceneo zwykle można użyć 2 workerów i 600-1000 ms, ale wspólne bezpieczne ustawienie dla obu serwisów to 1 worker i 1200 ms.
+Dla Ceneo:
 
-## Uwaga
+- 1-2 workery
+- 600-1200 ms
 
-Serwisy mogą zmieniać HTML, limity zapytań i zabezpieczenia. Przy dużych eksportach przetwarzanie może trwać długo. Nie zamykaj ani nie odświeżaj karty, na której działa dane zadanie.
+Przy 500+ ofertach Allegro pełne pobieranie szczegółów może trwać kilkanaście minut lub dłużej.
 
-## Historia przygotowana z dotychczasowych eksportów
+## Równoległe Allegro + Ceneo
 
-W katalogu `history-import` są dwa pliki gotowe do jednorazowego importu:
+1. Otwórz kartę Allegro z filtrami.
+2. Otwórz kartę Ceneo z filtrami.
+3. Kliknij `Uruchom Allegro + Ceneo`.
 
-- `allegro-reviewed.json` - 25 ofert Allegro, które w poprzednim eksporcie pobrały się poprawnie. 35 pozycji z błędem nie zostało dodanych, więc rozszerzenie spróbuje pobrać je ponownie.
-- `ceneo-reviewed.json` - 370 produktów Ceneo z poprzedniego eksportu.
+Oba zadania mają osobny postęp, historię i eksport.
 
-W popupie kliknij `Importuj TXT / JSON` i zaznacz oba pliki. Dzięki temu przy włączonym `Pomiń wcześniej poprawnie wyeksportowane pozycje` kolejne uruchomienie nie będzie pobierać tych samych pozycji ponownie.
+## Diagnostyka
+
+Po zakończeniu zwróć uwagę na:
+
+- `Strony` - ile stron faktycznie przeskanowano.
+- `Znalezione` - liczba unikalnych ID znalezionych na listingach.
+- `Pominięte` - pozycje już obecne w historii.
+- `Kolejka` - nowe pozycje do pobrania.
+- `Pobrane` i `Błędy` - wynik pobierania szczegółów.
+
+Dla Allegro napis `widoczna paginacja do: X` jest tylko informacją o aktualnie widocznym fragmencie paginacji, a nie granicą skanowania.

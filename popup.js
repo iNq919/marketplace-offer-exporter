@@ -231,7 +231,11 @@ function renderState(provider, rawState) {
 
   const diagnostics = [];
   if (state.declaredCount) diagnostics.push(`Serwis deklaruje: ${state.declaredCount}`);
-  if (state.totalPages) diagnostics.push(`stron: ${state.totalPages}`);
+  if (state.totalPages) {
+    diagnostics.push(provider === 'allegro'
+      ? `widoczna paginacja do: ${state.totalPages}`
+      : `stron wg paginacji: ${state.totalPages}`);
+  }
   ui.declared.textContent = diagnostics.join(', ');
   renderGlobalBadge();
 }
@@ -278,7 +282,8 @@ function renderResult() {
   const modeLabel = result.mode === 'full' ? 'pełne opisy' : 'AI compact';
 
   els.resultTitle.textContent = `Eksport ${providerLabel(provider)}`;
-  els.resultMeta.textContent = `Znalezione: ${discovered}, eksport: ${total}, poprawnie: ${success}, błędy: ${errors}, pominięte z historii: ${skipped}, fragmenty: ${result.chunks.length}, tryb: ${modeLabel}`;
+  const pages = Number(result.pagesScanned || 0);
+  els.resultMeta.textContent = `Znalezione: ${discovered}, eksport: ${total}, poprawnie: ${success}, błędy: ${errors}, pominięte z historii: ${skipped}, przeskanowane strony: ${pages || '?'}, fragmenty: ${result.chunks.length}, tryb: ${modeLabel}`;
 
   const index = Math.min(chunkIndexes[provider] || 0, result.chunks.length - 1);
   chunkIndexes[provider] = index;
