@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Allegro + Ceneo Offer Exporter for ChatGPT",
+  "version": "1.1.1",
+  "description": "Zbiera oferty i produkty ze wszystkich stron bieżącego filtrowania Allegro lub Ceneo i przygotowuje eksport do ChatGPT.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "unlimitedStorage",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://allegro.pl/*",
+    "https://*.allegro.pl/*",
+    "https://ceneo.pl/*",
+    "https://*.ceneo.pl/*"
+  ],
+  "action": {
+    "default_title": "Eksportuj Allegro / Ceneo",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://allegro.pl/*",
+        "https://*.allegro.pl/*",
+        "https://ceneo.pl/*",
+        "https://*.ceneo.pl/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

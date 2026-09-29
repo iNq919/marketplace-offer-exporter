@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Allegro + Ceneo Offer Exporter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Allegro + Ceneo</h1>
+        <p>Zbierz wszystkie pozycje z aktywnych filtrów.</p>
+      </div>
+      <span id="statusBadge" class="badge idle">gotowy</span>
+    </header>
+
+    <section class="card settings">
+      <label class="checkbox-row">
+        <input id="startFromFirst" type="checkbox" checked>
+        <span>Zacznij od strony 1, niezależnie od aktualnej strony wyników</span>
+      </label>
+
+      <label>
+        Tryb eksportu
+        <select id="mode">
+          <option value="compact" selected>AI compact, opis do 1200 znaków</option>
+          <option value="full">Pełne opisy</option>
+        </select>
+      </label>
+
+      <div class="grid2">
+        <label>
+          Maks. pozycji
+          <input id="maxOffers" type="number" min="0" step="1" value="0">
+          <small>0 = wszystkie</small>
+        </label>
+        <label>
+          Równoległe pobieranie
+          <input id="concurrency" type="number" min="1" max="5" step="1" value="2">
+          <small>2 jest bezpiecznym ustawieniem</small>
+        </label>
+      </div>
+
+      <label>
+        Przerwa między pobraniami na worker
+        <div class="range-row">
+          <input id="delayMs" type="range" min="200" max="2000" step="50" value="500">
+          <output id="delayOutput">500 ms</output>
+        </div>
+      </label>
+
+      <div class="actions">
+        <button id="startBtn" class="primary">Zbierz pozycje</button>
+        <button id="stopBtn" class="danger" disabled>Przerwij</button>
+      </div>
+    </section>
+
+    <section class="card progress-card">
+      <div class="progress-head">
+        <strong id="phase">Gotowy</strong>
+        <span id="percent">0%</span>
+      </div>
+      <progress id="progress" max="100" value="0"></progress>
+      <div class="stats">
+        <span>Strony: <strong id="pagesScanned">0</strong></span>
+        <span>Znalezione: <strong id="offersFound">0</strong></span>
+        <span>Pobrane: <strong id="processed">0</strong></span>
+        <span>Błędy: <strong id="errors">0</strong></span>
+      </div>
+      <p id="currentItem" class="current-item"></p>
+    </section>
+
+    <section id="resultCard" class="card result-card hidden">
+      <div class="result-head">
+        <div>
+          <strong>Eksport gotowy</strong>
+          <p id="resultMeta"></p>
+        </div>
+      </div>
+
+      <div class="chunk-nav">
+        <button id="prevChunkBtn" title="Poprzedni fragment">←</button>
+        <span id="chunkLabel">Fragment 1/1</span>
+        <button id="nextChunkBtn" title="Następny fragment">→</button>
+      </div>
+
+      <div class="actions vertical-mobile">
+        <button id="copyChunkBtn" class="primary">Kopiuj bieżący fragment</button>
+        <button id="copyAllBtn">Kopiuj wszystko</button>
+        <button id="downloadTxtBtn">Pobierz TXT</button>
+        <button id="downloadJsonBtn">Pobierz JSON</button>
+      </div>
+      <p class="hint">Do ChatGPT najlepiej wklejaj fragmenty po kolei. Każdy fragment zawiera kompletne pozycje, bez przecinania ich w połowie.</p>
+    </section>
+
+    <section id="messageBox" class="message hidden"></section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
