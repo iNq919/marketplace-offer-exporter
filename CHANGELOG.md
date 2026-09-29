@@ -2,6 +2,14 @@
 
 Historia zmian rozszerzenia Marketplace Offer Exporter.
 
+## v1.4.0
+
+- Dodano obsługę OLX.
+- Dodano niezależny stan, wynik i historię OLX.
+- Możliwe jest jednoczesne uruchomienie Allegro, Ceneo i OLX.
+- OLX zbiera tytuł, cenę, stan, parametry, lokalizację, datę, sprzedawcę i opis.
+- Ogłoszenia OLX są deduplikowane po stabilnym ID z adresu.
+
 ## v1.3.0
 
 - Allegro przestało traktować widoczne numery paginacji jako twardą granicę skanu.

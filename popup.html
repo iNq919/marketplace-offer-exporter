@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Allegro + Ceneo Exporter</title>
+  <title>Allegro + Ceneo + OLX Exporter</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <main>
     <header>
       <div>
-        <h1>Allegro + Ceneo</h1>
-        <p id="activeSiteLabel">Eksport ofert i produktów do ChatGPT.</p>
+        <h1>Allegro + Ceneo + OLX</h1>
+        <p id="activeSiteLabel">Eksport ofert, produktów i ogłoszeń do ChatGPT.</p>
       </div>
       <span id="globalBadge" class="badge idle">gotowy</span>
     </header>
@@ -44,7 +44,7 @@
         <label>
           Równoległe pobieranie
           <input id="concurrency" type="number" min="1" max="5" step="1" value="1">
-          <small>Dla Allegro zalecane 1</small>
+          <small>Dla Allegro i OLX zalecane 1</small>
         </label>
       </div>
 
@@ -58,9 +58,9 @@
 
       <div class="actions">
         <button id="startCurrentBtn" class="primary">Uruchom bieżącą kartę</button>
-        <button id="startBothBtn">Uruchom Allegro + Ceneo</button>
+        <button id="startBothBtn">Uruchom Allegro + Ceneo + OLX</button>
       </div>
-      <p class="hint">Aby uruchomić oba jednocześnie, otwórz po jednej karcie z ustawionymi filtrami Allegro i Ceneo. Oba zadania mają osobny postęp, wynik i historię.</p>
+      <p class="hint">Aby uruchomić wszystkie 3 jednocześnie, otwórz po jednej karcie z ustawionymi filtrami Allegro, Ceneo i OLX. Każde zadanie ma osobny postęp, wynik i historię.</p>
     </section>
 
     <section class="providers-grid">
@@ -123,6 +123,36 @@
           <button id="ceneoClearHistoryBtn">Wyczyść historię</button>
         </div>
       </article>
+
+      <article class="card provider-card" data-provider="olx">
+        <div class="provider-head">
+          <div>
+            <strong>OLX</strong>
+            <small id="olxHistoryCount">Historia: 0</small>
+          </div>
+          <span id="olxBadge" class="badge idle">gotowy</span>
+        </div>
+        <div class="progress-head">
+          <span id="olxPhase">Gotowy</span>
+          <span id="olxPercent">0%</span>
+        </div>
+        <progress id="olxProgress" max="100" value="0"></progress>
+        <div class="stats stats6">
+          <span>Strony <strong id="olxPages">0</strong></span>
+          <span>Znalezione <strong id="olxFound">0</strong></span>
+          <span>Kolejka <strong id="olxQueued">0</strong></span>
+          <span>Pominięte <strong id="olxSkipped">0</strong></span>
+          <span>Pobrane <strong id="olxProcessed">0</strong></span>
+          <span>Błędy <strong id="olxErrors">0</strong></span>
+        </div>
+        <p id="olxDeclared" class="diagnostic"></p>
+        <p id="olxCurrent" class="current-item"></p>
+        <div class="actions compact-actions">
+          <button id="olxStopBtn" class="danger" disabled>Przerwij</button>
+          <button id="olxResultBtn" disabled>Pokaż wynik</button>
+          <button id="olxClearHistoryBtn">Wyczyść historię</button>
+        </div>
+      </article>
     </section>
 
     <section class="card history-tools">
@@ -145,6 +175,7 @@
         <select id="resultProvider" aria-label="Wybierz wynik">
           <option value="allegro">Allegro</option>
           <option value="ceneo">Ceneo</option>
+          <option value="olx">OLX</option>
         </select>
       </div>
 
@@ -160,7 +191,7 @@
         <button id="downloadTxtBtn">Pobierz TXT</button>
         <button id="downloadJsonBtn">Pobierz JSON</button>
       </div>
-      <p class="hint">Eksporty Allegro i Ceneo są przechowywane osobno. Ponowne uruchomienie jednego serwisu nie kasuje wyniku drugiego.</p>
+      <p class="hint">Eksporty Allegro, Ceneo i OLX są przechowywane osobno. Ponowne uruchomienie jednego serwisu nie kasuje wyników pozostałych.</p>
     </section>
 
     <section id="messageBox" class="message hidden"></section>

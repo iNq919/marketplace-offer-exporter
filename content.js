@@ -46,6 +46,7 @@
       const hostname = new URL(rawUrl).hostname.toLowerCase();
       if (hostname === 'allegro.pl' || hostname.endsWith('.allegro.pl')) return 'allegro';
       if (hostname === 'ceneo.pl' || hostname.endsWith('.ceneo.pl')) return 'ceneo';
+      if (hostname === 'olx.pl' || hostname.endsWith('.olx.pl')) return 'olx';
     } catch {
       // no-op
     }
@@ -53,7 +54,9 @@
   }
 
   function providerLabel(provider) {
-    return provider === 'ceneo' ? 'Ceneo' : 'Allegro';
+    if (provider === 'ceneo') return 'Ceneo';
+    if (provider === 'olx') return 'OLX';
+    return 'Allegro';
   }
 
   function parseDocument(html) {
@@ -83,7 +86,9 @@
           const provider = detectProvider(url);
           const fallbackWait = provider === 'allegro'
             ? Math.min(30000, 3000 * (2 ** attempt))
-            : Math.min(12000, 1500 * (attempt + 1));
+            : provider === 'olx'
+              ? Math.min(18000, 2200 * (attempt + 1))
+              : Math.min(12000, 1500 * (attempt + 1));
           const wait = retryAfter > 0 ? retryAfter * 1000 : fallbackWait;
           lastError = new Error(`HTTP ${response.status} dla ${url}`);
           if (attempt < retries) {
@@ -98,7 +103,7 @@
         }
 
         const html = await response.text();
-        if (/nietypow(?:y|a) ruch|access denied|potwierdź.{0,80}robotem|verify.{0,80}human/i.test(html) && html.length < 250000) {
+        if (/nietypow(?:y|a) ruch|access denied|potwierdź.{0,80}robotem|verify.{0,80}human|sprawdź.{0,80}człowiekiem|captcha/i.test(html) && html.length < 250000) {
           throw new Error(`Serwis ${providerLabel(detectProvider(url))} zwrócił stronę ochronną zamiast danych`);
         }
         return html;
@@ -933,12 +938,257 @@
     };
   }
 
+
+  // OLX
+  function getOlxAdId(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      const match = url.pathname.match(/-ID([A-Za-z0-9]+)\.html(?:$|\/)/i);
+      if (match) return `ID${match[1]}`;
+      const alt = url.pathname.match(/\/d\/oferta\/[^/?#]+-([A-Za-z0-9]{6,})\.html/i);
+      return alt?.[1] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function isOlxAdUrl(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      if (!(url.hostname === 'olx.pl' || url.hostname.endsWith('.olx.pl'))) return false;
+      return /\/d\/oferta\//i.test(url.pathname) && /\.html$/i.test(url.pathname);
+    } catch {
+      return false;
+    }
+  }
+
+  function normalizeOlxAdUrl(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      url.hash = '';
+      url.search = '';
+      return url.href;
+    } catch {
+      return rawUrl;
+    }
+  }
+
+  function olxPageUrl(sourceUrl, page) {
+    const url = new URL(sourceUrl);
+    if (page <= 1) url.searchParams.delete('page');
+    else url.searchParams.set('page', String(page));
+    return url.href;
+  }
+
+  function getOlxCurrentPage(sourceUrl) {
+    try {
+      return Math.max(1, Number.parseInt(new URL(sourceUrl).searchParams.get('page') || '1', 10) || 1);
+    } catch {
+      return 1;
+    }
+  }
+
+  function getOlxPrimaryCards(doc) {
+    const selectors = [
+      '[data-cy="l-card"]',
+      '[data-testid="l-card"]',
+      'div[data-cy*="l-card"]',
+      'article[data-cy*="l-card"]',
+    ];
+    const out = [];
+    const seen = new Set();
+    for (const selector of selectors) {
+      for (const card of doc.querySelectorAll(selector)) {
+        if (seen.has(card)) continue;
+        const hasAd = [...card.querySelectorAll('a[href]')].some((a) => {
+          const href = absoluteUrl(a.getAttribute('href'), location.origin);
+          return Boolean(href && isOlxAdUrl(href));
+        });
+        if (!hasAd) continue;
+        seen.add(card);
+        out.push(card);
+      }
+      if (out.length >= 3) break;
+    }
+    return out.filter((node, index) => !out.some((other, i) => i !== index && other.contains(node)));
+  }
+
+  function findOlxCard(anchor) {
+    let node = anchor;
+    for (let depth = 0; node && depth < 10; depth += 1, node = node.parentElement) {
+      const cy = String(node.getAttribute?.('data-cy') || '');
+      const testid = String(node.getAttribute?.('data-testid') || '');
+      if (/l-card/i.test(cy) || /l-card/i.test(testid)) return node;
+      const text = singleLine(node.textContent || '');
+      if (text.length >= 20 && text.length <= 2200 && /\d[\d\s]*\s*zł/i.test(text)) return node;
+    }
+    return anchor.parentElement;
+  }
+
+  function getOlxAdAnchor(card, baseUrl) {
+    let best = null;
+    for (const anchor of card?.querySelectorAll?.('a[href]') || []) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || !isOlxAdUrl(href)) continue;
+      const text = singleLine(anchor.textContent || '');
+      if (!best || text.length > singleLine(best.textContent || '').length) best = anchor;
+    }
+    return best;
+  }
+
+  function parseOlxListingCard(card, anchor) {
+    const text = singleLine(card?.textContent || '');
+    const title = singleLine(anchor?.textContent || '');
+    const priceMatch = text.match(/(\d[\d\s]*(?:[,.]\d{1,2})?\s*zł(?:\s+do negocjacji)?)/i);
+    const conditionMatch = text.match(/\b(Nowe|Używane|Uszkodzone)\b/i);
+    const dateMatch = text.match(/(?:Odświeżono\s+)?(?:dzisiaj|wczoraj|dnia\s+\d{1,2}\s+[a-ząćęłńóśźż]+\s+\d{4}|\d{1,2}\s+[a-ząćęłńóśźż]+\s+\d{4}|Dzisiaj\s+o\s+\d{1,2}:\d{2})/i);
+    return {
+      listingTitle: title,
+      listingPrice: priceMatch?.[1] || '',
+      listingCondition: conditionMatch?.[1] || '',
+      listingDate: dateMatch?.[0] || '',
+    };
+  }
+
+  function parseOlxDeclaredCount(doc) {
+    const text = singleLine(doc.body?.textContent || '').slice(0, 7000);
+    const match = text.match(/Znaleźliśmy\s+(?:ponad\s+)?([\d\s]+)\s+ogłosze(?:ń|nia)/i)
+      || text.match(/([\d\s]+)\s+ogłosze(?:ń|nia)/i);
+    if (!match) return null;
+    const value = Number.parseInt(match[1].replace(/\s/g, ''), 10);
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }
+
+  function parseOlxListing(html, baseUrl) {
+    const doc = parseDocument(html);
+    const map = new Map();
+    const cards = getOlxPrimaryCards(doc);
+
+    const add = (anchor, card) => {
+      const href = absoluteUrl(anchor?.getAttribute?.('href'), baseUrl);
+      if (!href || !isOlxAdUrl(href)) return;
+      const itemId = getOlxAdId(href) || normalizeOlxAdUrl(href);
+      if (map.has(itemId)) return;
+      const cardData = parseOlxListingCard(card, anchor);
+      map.set(itemId, {
+        provider: 'olx',
+        itemId,
+        url: normalizeOlxAdUrl(href),
+        ...cardData,
+      });
+    };
+
+    if (cards.length >= 3) {
+      for (const card of cards) {
+        const anchor = getOlxAdAnchor(card, baseUrl);
+        if (anchor) add(anchor, card);
+      }
+    } else {
+      // Fallback: link do ogłoszenia musi mieć w bliskim kontenerze cenę.
+      for (const anchor of doc.querySelectorAll('a[href]')) {
+        const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+        if (!href || !isOlxAdUrl(href)) continue;
+        const card = findOlxCard(anchor);
+        const cardText = singleLine(card?.textContent || '');
+        if (!/\d[\d\s]*(?:[,.]\d{1,2})?\s*zł/i.test(cardText)) continue;
+        add(anchor, card);
+      }
+    }
+
+    let totalPages = null;
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      const href = absoluteUrl(anchor.getAttribute('href'), baseUrl);
+      if (!href || detectProvider(href) !== 'olx') continue;
+      try {
+        const page = Number.parseInt(new URL(href).searchParams.get('page') || '', 10);
+        if (Number.isFinite(page) && page >= 2 && page <= MAX_LISTING_PAGES) totalPages = Math.max(totalPages || 0, page);
+      } catch {
+        // no-op
+      }
+    }
+
+    return {
+      offers: [...map.values()],
+      declaredCount: parseOlxDeclaredCount(doc),
+      totalPages,
+    };
+  }
+
+  function extractOlxPrice(doc, productLd, listing, pageText) {
+    if (listing.listingPrice) return listing.listingPrice;
+    const offer = Array.isArray(productLd?.offers) ? productLd.offers[0] : productLd?.offers;
+    if (offer?.price !== undefined && offer?.price !== null) {
+      return `${offer.price}${offer.priceCurrency === 'PLN' ? ' zł' : offer.priceCurrency ? ` ${offer.priceCurrency}` : ''}`;
+    }
+    const metaPrice = getMeta(doc, 'meta[property="product:price:amount"]');
+    if (metaPrice) return `${metaPrice} zł`;
+    const top = pageText.slice(0, 3500);
+    const match = top.match(/(?:^|\n)(\d[\d\s]*(?:[,.]\d{1,2})?\s*zł(?:\s+do negocjacji)?)(?:\n|$)/i);
+    return match ? singleLine(match[1]) : '';
+  }
+
+  function extractOlxLocation(productLd, pageText) {
+    const address = productLd?.offers?.availableAtOrFrom?.address || productLd?.availableAtOrFrom?.address;
+    if (address && typeof address === 'object') {
+      const value = [address.addressLocality, address.addressRegion].filter(Boolean).join(', ');
+      if (value) return singleLine(value);
+    }
+    const match = pageText.match(/(?:^|\n)Lokalizacja\n([^\n]{2,120})/i);
+    return match ? singleLine(match[1]) : '';
+  }
+
+  function parseOlxOffer(html, listing, mode) {
+    const doc = parseDocument(html);
+    const productLd = findProductJsonLd(doc);
+    const pageText = fragmentToText(doc.body);
+    const params = { ...(listing.listingParams || {}), ...extractKnownParameters(doc), ...extractAllTableParameters(doc) };
+    const descriptionRaw = extractSectionByMatcher(
+      doc,
+      (text) => /^opis$/i.test(text),
+      [
+        (text) => /o sprzedającym|użytkownik|lokalizacja|zwroty|pakiet ochronny|podobne ogłoszenia|inne ogłoszenia/i.test(text),
+      ],
+    );
+    const title = singleLine(
+      productLd?.name
+      || getMeta(doc, 'meta[property="og:title"]')
+      || doc.querySelector('h1')?.textContent
+      || listing.listingTitle
+      || doc.title,
+    ).replace(/\s*[|•]\s*OLX\.pl.*$/i, '');
+    const numericId = pageText.match(/(?:^|\n)ID:\s*(\d{5,})\b/i)?.[1] || '';
+    const sellerType = pageText.match(/(?:^|\n)(Prywatne|Firmowe)(?:\n|$)/i)?.[1] || '';
+    const dateAdded = pageText.match(/(?:^|\n)(Dodane\s+[^\n]{2,80}|Odświeżono(?: dnia)?\s+[^\n]{2,80})(?:\n|$)/i)?.[1] || listing.listingDate || '';
+    const offer = Array.isArray(productLd?.offers) ? productLd.offers[0] : productLd?.offers;
+    const sellerName = singleLine(offer?.seller?.name || productLd?.seller?.name || '');
+
+    return {
+      provider: 'olx',
+      itemId: listing.itemId || getOlxAdId(listing.url),
+      numericId,
+      title,
+      price: extractOlxPrice(doc, productLd, listing, pageText),
+      condition: params.Stan || listing.listingCondition || '',
+      sellerType,
+      seller: sellerName,
+      location: extractOlxLocation(productLd, pageText),
+      dateAdded: singleLine(dateAdded),
+      params,
+      parametersText: '',
+      description: mode === 'full' ? descriptionRaw : truncate(descriptionRaw, 1600),
+      url: listing.url,
+    };
+  }
+
   function listingPageUrl(provider, sourceUrl, page) {
-    return provider === 'ceneo' ? ceneoPageUrl(sourceUrl, page) : allegroPageUrl(sourceUrl, page);
+    if (provider === 'ceneo') return ceneoPageUrl(sourceUrl, page);
+    if (provider === 'olx') return olxPageUrl(sourceUrl, page);
+    return allegroPageUrl(sourceUrl, page);
   }
 
   function currentPageNumber(provider, sourceUrl) {
     if (provider === 'ceneo') return getCeneoCurrentPage(sourceUrl);
+    if (provider === 'olx') return getOlxCurrentPage(sourceUrl);
     try {
       return Math.max(1, Number.parseInt(new URL(sourceUrl).searchParams.get('p') || '1', 10) || 1);
     } catch {
@@ -947,15 +1197,15 @@
   }
 
   function parseListing(provider, html, baseUrl) {
-    return provider === 'ceneo'
-      ? parseCeneoListing(html, baseUrl)
-      : parseAllegroListing(html, baseUrl);
+    if (provider === 'ceneo') return parseCeneoListing(html, baseUrl);
+    if (provider === 'olx') return parseOlxListing(html, baseUrl);
+    return parseAllegroListing(html, baseUrl);
   }
 
   function parseOffer(provider, html, listing, mode) {
-    return provider === 'ceneo'
-      ? parseCeneoOffer(html, listing, mode)
-      : parseAllegroOffer(html, listing, mode);
+    if (provider === 'ceneo') return parseCeneoOffer(html, listing, mode);
+    if (provider === 'olx') return parseOlxOffer(html, listing, mode);
+    return parseAllegroOffer(html, listing, mode);
   }
 
   function formatOffer(offer, index) {
@@ -971,6 +1221,22 @@
         ['Liczba ofert', offer.offersCount],
         ['Kupionych ostatnio', offer.purchasesRecently],
         ['ID produktu', offer.itemId],
+        ['URL', offer.url],
+      ];
+      for (const [key, value] of main) {
+        if (value !== '' && value !== null && value !== undefined) lines.push(`- ${key}: ${value}`);
+      }
+    } else if (offer.provider === 'olx') {
+      const main = [
+        ['Źródło', 'OLX'],
+        ['Cena', offer.price],
+        ['Stan', offer.condition],
+        ['Typ sprzedawcy', offer.sellerType],
+        ['Sprzedawca', offer.seller],
+        ['Lokalizacja', offer.location],
+        ['Dodane / odświeżone', offer.dateAdded],
+        ['ID ogłoszenia', offer.itemId],
+        ['Numer OLX', offer.numericId],
         ['URL', offer.url],
       ];
       for (const [key, value] of main) {
@@ -1011,7 +1277,9 @@
     const site = providerLabel(provider);
     const sourceNote = provider === 'ceneo'
       ? 'Na Ceneo cena "od" pochodzi z porównywarki danego produktu i może obejmować wiele sklepów.'
-      : 'Na Allegro każda pozycja odpowiada konkretnej ofercie.';
+      : provider === 'olx'
+        ? 'Na OLX każda pozycja odpowiada konkretnemu ogłoszeniu. Dane o SMART, przebiegu i stanie mogą znajdować się wyłącznie w opisie sprzedającego.'
+        : 'Na Allegro każda pozycja odpowiada konkretnej ofercie.';
     const header = [
       `# Eksport z ${site}`,
       '',
@@ -1135,14 +1403,14 @@
       try {
         html = page === currentPage && page === firstPage
           ? document.documentElement.outerHTML
-          : await fetchHtml(url, signal, provider === 'allegro' ? 5 : 3);
+          : await fetchHtml(url, signal, provider === 'allegro' ? 5 : provider === 'olx' ? 4 : 3);
       } catch (error) {
         // Nie traktujemy pojedynczego błędu strony listingu jako końca paginacji.
         // Przy Allegro chwilowe blokady są częste, więc robimy dłuższą przerwę i próbujemy dalej.
         await setState(provider, {
           currentItem: `Błąd strony ${page}: ${error?.message || String(error)}. Przerwa i dalsza próba.`,
         });
-        await sleep(provider === 'allegro' ? 8000 : 3000);
+        await sleep(provider === 'allegro' ? 8000 : provider === 'olx' ? 5000 : 3000);
         if (totalPages && page < totalPages) continue;
         throw error;
       }
@@ -1198,6 +1466,11 @@
         // Ceneo ma stabilną numerację stron. Gdy znamy ostatnią stronę, dochodzimy do niej.
         if (totalPages && page >= totalPages) break;
         if (!totalPages && page > firstPage && consecutiveEmptyPages >= 2) break;
+      } else if (provider === 'olx') {
+        // OLX korzysta z parametru page=N. Paginacja jest wskazówką, ale zatrzymujemy
+        // się również po dwóch stronach bez nowych ID, aby nie polegać wyłącznie na DOM.
+        if (totalPages && page >= totalPages) break;
+        if (page > firstPage && consecutiveEmptyPages >= 2) break;
       } else {
         // Na Allegro numery widoczne w paginacji są tylko oknem wokół bieżącej strony,
         // a teksty typu "X ofert" występują także w innych modułach. Nie używamy ich
@@ -1207,7 +1480,7 @@
         if (page > firstPage && consecutiveEmptyPages >= 2) break;
       }
 
-      await sleep(provider === 'ceneo' ? 500 : 700);
+      await sleep(provider === 'ceneo' ? 500 : provider === 'olx' ? 800 : 700);
     }
 
     return {
@@ -1237,7 +1510,7 @@
     async function fetchOne(listing, index, retryPass = false) {
       await maybeCooldown();
       try {
-        const html = await fetchHtml(listing.url, signal, provider === 'allegro' ? 5 : 3);
+        const html = await fetchHtml(listing.url, signal, provider === 'allegro' ? 5 : provider === 'olx' ? 4 : 3);
         const parsed = parseOffer(provider, html, listing, options.mode);
         if (!parsed.title && listing.listingTitle) parsed.title = listing.listingTitle;
         consecutiveErrors = 0;
@@ -1246,6 +1519,8 @@
         consecutiveErrors += 1;
         if (provider === 'allegro' && consecutiveErrors >= 3) {
           cooldownUntil = Math.max(cooldownUntil, Date.now() + 20000);
+        } else if (provider === 'olx' && consecutiveErrors >= 3) {
+          cooldownUntil = Math.max(cooldownUntil, Date.now() + 12000);
         }
         return {
           provider,
@@ -1279,7 +1554,7 @@
 
         const listing = listingOffers[index];
         await setState(provider, {
-          phase: provider === 'ceneo' ? 'Pobieranie danych produktów' : 'Pobieranie szczegółów ofert',
+          phase: provider === 'ceneo' ? 'Pobieranie danych produktów' : provider === 'olx' ? 'Pobieranie szczegółów ogłoszeń' : 'Pobieranie szczegółów ofert',
           currentItem: `${index + 1}/${total}: ${listing.listingTitle || listing.url}`,
           queued: total,
           processed,
@@ -1299,14 +1574,20 @@
           currentItem: `Worker ${workerNo}: ukończono ${processed}/${total}`,
         });
 
-        const baseDelay = provider === 'allegro' ? Math.max(options.delayMs, 1000) : options.delayMs;
+        const baseDelay = provider === 'allegro'
+          ? Math.max(options.delayMs, 1000)
+          : provider === 'olx'
+            ? Math.max(options.delayMs, 900)
+            : options.delayMs;
         await sleep(baseDelay);
       }
     }
 
     const safeConcurrency = provider === 'allegro'
       ? Math.max(1, Math.min(options.concurrency, 2))
-      : Math.max(1, Math.min(options.concurrency, 5));
+      : provider === 'olx'
+        ? Math.max(1, Math.min(options.concurrency, 2))
+        : Math.max(1, Math.min(options.concurrency, 5));
     const workerCount = Math.max(1, Math.min(safeConcurrency, total || 1));
     await Promise.all(Array.from({ length: workerCount }, (_, i) => worker(i + 1)));
 
@@ -1319,10 +1600,14 @@
     if (failedIndexes.length && !signal.aborted) {
       await setState(provider, {
         phase: `Ponawianie ${failedIndexes.length} błędów`,
-        currentItem: provider === 'allegro' ? 'Dłuższa przerwa przed ponowną próbą' : 'Ponowna próba pobierania',
+        currentItem: provider === 'allegro'
+          ? 'Dłuższa przerwa przed ponowną próbą'
+          : provider === 'olx'
+            ? 'Krótka przerwa przed ponowną próbą OLX'
+            : 'Ponowna próba pobierania',
         percent: 91,
       });
-      await sleep(provider === 'allegro' ? 15000 : 3000);
+      await sleep(provider === 'allegro' ? 15000 : provider === 'olx' ? 8000 : 3000);
 
       let retried = 0;
       for (const index of failedIndexes) {
@@ -1342,7 +1627,11 @@
           results[index] = parsed;
         }
         retried += 1;
-        await sleep(provider === 'allegro' ? Math.max(2500, options.delayMs * 2) : Math.max(1200, options.delayMs));
+        await sleep(provider === 'allegro'
+          ? Math.max(2500, options.delayMs * 2)
+          : provider === 'olx'
+            ? Math.max(1800, options.delayMs * 1.5)
+            : Math.max(1200, options.delayMs));
       }
     }
 
@@ -1359,7 +1648,7 @@
 
     if (!provider) {
       job = null;
-      throw new Error('Obsługiwane są tylko Allegro i Ceneo.');
+      throw new Error('Obsługiwane są tylko Allegro, Ceneo i OLX.');
     }
 
     const stateStorageKey = stateKey(provider);
@@ -1503,7 +1792,7 @@
   async function migrateLegacyStorage() {
     const legacy = await chrome.storage.local.get([LEGACY_STORAGE_STATE, LEGACY_STORAGE_RESULT]);
     const oldResult = legacy[LEGACY_STORAGE_RESULT];
-    if (oldResult?.provider && (oldResult.provider === 'allegro' || oldResult.provider === 'ceneo')) {
+    if (oldResult?.provider && (oldResult.provider === 'allegro' || oldResult.provider === 'ceneo' || oldResult.provider === 'olx')) {
       const provider = oldResult.provider;
       const newResultKey = resultKey(provider);
       const existing = (await chrome.storage.local.get(newResultKey))[newResultKey];
@@ -1512,7 +1801,7 @@
     }
 
     const oldState = legacy[LEGACY_STORAGE_STATE];
-    if (oldState?.provider && (oldState.provider === 'allegro' || oldState.provider === 'ceneo')) {
+    if (oldState?.provider && (oldState.provider === 'allegro' || oldState.provider === 'ceneo' || oldState.provider === 'olx')) {
       const provider = oldState.provider;
       const newStateKey = stateKey(provider);
       const existing = (await chrome.storage.local.get(newStateKey))[newStateKey];
@@ -1532,8 +1821,8 @@
         startFromFirst: message.options?.startFromFirst !== false,
         mode: message.options?.mode === 'full' ? 'full' : 'compact',
         maxOffers: Math.max(0, Number(message.options?.maxOffers || 0)),
-        concurrency: Math.max(1, Math.min(5, Number(message.options?.concurrency || (provider === 'allegro' ? 1 : 2)))),
-        delayMs: Math.max(200, Number(message.options?.delayMs || (provider === 'allegro' ? 1200 : 600))),
+        concurrency: Math.max(1, Math.min(5, Number(message.options?.concurrency || (provider === 'ceneo' ? 2 : 1)))),
+        delayMs: Math.max(200, Number(message.options?.delayMs || (provider === 'ceneo' ? 600 : 1200))),
         skipSeen: message.options?.skipSeen !== false,
       };
 

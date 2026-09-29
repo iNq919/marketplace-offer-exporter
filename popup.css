@@ -10,7 +10,7 @@
 
 body {
   margin: 0;
-  width: 650px;
+  width: 780px;
   min-height: 650px;
   background: #f6f7f9;
 }
@@ -141,7 +141,7 @@ button.danger { color: #b42318; border-color: #fda29b; }
 
 .providers-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 

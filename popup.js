@@ -1,4 +1,4 @@
-const PROVIDERS = ['allegro', 'ceneo'];
+const PROVIDERS = ['allegro', 'ceneo', 'olx'];
 const STORAGE_PREFIX = 'marketplaceExporter';
 const LEGACY_STORAGE_STATE = 'marketplaceExporterState';
 const LEGACY_STORAGE_RESULT = 'marketplaceExporterResult';
@@ -55,9 +55,9 @@ const providerEls = Object.fromEntries(PROVIDERS.map((provider) => [provider, {
   clearHistoryBtn: document.querySelector(`#${provider}ClearHistoryBtn`),
 }]));
 
-const states = { allegro: {}, ceneo: {} };
-const results = { allegro: null, ceneo: null };
-const chunkIndexes = { allegro: 0, ceneo: 0 };
+const states = { allegro: {}, ceneo: {}, olx: {} };
+const results = { allegro: null, ceneo: null, olx: null };
+const chunkIndexes = { allegro: 0, ceneo: 0, olx: 0 };
 let activeResultProvider = 'allegro';
 let refreshTimer = null;
 
@@ -66,6 +66,7 @@ function providerFromUrl(rawUrl) {
     const host = new URL(rawUrl).hostname.toLowerCase();
     if (host === 'allegro.pl' || host.endsWith('.allegro.pl')) return 'allegro';
     if (host === 'ceneo.pl' || host.endsWith('.ceneo.pl')) return 'ceneo';
+    if (host === 'olx.pl' || host.endsWith('.olx.pl')) return 'olx';
   } catch {
     // no-op
   }
@@ -73,7 +74,9 @@ function providerFromUrl(rawUrl) {
 }
 
 function providerLabel(provider) {
-  return provider === 'ceneo' ? 'Ceneo' : 'Allegro';
+  if (provider === 'ceneo') return 'Ceneo';
+  if (provider === 'olx') return 'OLX';
+  return 'Allegro';
 }
 
 function showMessage(message, error = true) {
@@ -110,7 +113,7 @@ async function sendToMarketplaceTab(tabId, message, injectIfMissing = true) {
 
 async function getTabsByProvider() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
-  const grouped = { allegro: [], ceneo: [] };
+  const grouped = { allegro: [], ceneo: [], olx: [] };
   for (const tab of tabs) {
     const provider = providerFromUrl(tab.url || '');
     if (provider && tab.id) grouped[provider].push(tab);
@@ -125,7 +128,7 @@ async function getActiveMarketplaceTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const provider = providerFromUrl(tab?.url || '');
   if (!tab?.id || !provider) {
-    throw new Error('Otwórz kartę Allegro lub Ceneo z ustawionymi filtrami.');
+    throw new Error('Otwórz kartę Allegro, Ceneo lub OLX z ustawionymi filtrami.');
   }
   return { tab, provider };
 }
@@ -201,7 +204,7 @@ function renderGlobalBadge() {
   els.globalBadge.className = 'badge';
   if (running) {
     els.globalBadge.classList.add('running');
-    els.globalBadge.textContent = running === 2 ? '2 zadania' : 'pracuje';
+    els.globalBadge.textContent = running > 1 ? `${running} zadania` : 'pracuje';
   } else if (errors) {
     els.globalBadge.classList.add('error');
     els.globalBadge.textContent = 'błąd';
@@ -305,9 +308,9 @@ function downloadText(filename, text, type = 'text/plain;charset=utf-8') {
 async function refreshActiveSiteLabel() {
   try {
     const { provider } = await getActiveMarketplaceTab();
-    els.activeSiteLabel.textContent = `Bieżąca karta: ${providerLabel(provider)}. Możesz równolegle uruchomić drugi serwis.`;
+    els.activeSiteLabel.textContent = `Bieżąca karta: ${providerLabel(provider)}. Możesz równolegle uruchomić pozostałe serwisy.`;
   } catch {
-    els.activeSiteLabel.textContent = 'Otwórz kartę Allegro lub Ceneo, albo użyj obu otwartych kart.';
+    els.activeSiteLabel.textContent = 'Otwórz kartę Allegro, Ceneo lub OLX. Możesz uruchomić wszystkie 3 jednocześnie.';
   }
 }
 
@@ -364,14 +367,19 @@ async function mergeHistory(provider, entries) {
 function parseTxtHistory(text) {
   const provider = /#\s*Eksport z Ceneo/i.test(text) ? 'ceneo'
     : /#\s*Eksport z Allegro/i.test(text) ? 'allegro'
-      : null;
+      : /#\s*Eksport z OLX/i.test(text) ? 'olx'
+        : null;
   if (!provider) throw new Error('Nie rozpoznano, czy plik pochodzi z Allegro czy Ceneo.');
 
   const blocks = text.split(/\n\s*---\s*\n/g);
   const entries = [];
   for (const block of blocks) {
     if (/Błąd pobierania/i.test(block)) continue;
-    const idRegex = provider === 'allegro' ? /-\s*ID oferty:\s*(\d+)/i : /-\s*ID produktu:\s*(\d+)/i;
+    const idRegex = provider === 'allegro'
+      ? /-\s*ID oferty:\s*(\d+)/i
+      : provider === 'ceneo'
+        ? /-\s*ID produktu:\s*(\d+)/i
+        : /-\s*ID ogłoszenia:\s*([^\s]+)/i;
     const id = block.match(idRegex)?.[1];
     if (!id) continue;
     const title = block.match(/^##\s*\d+\.\s*(.+)$/m)?.[1] || '';
@@ -394,7 +402,7 @@ function parseJsonHistory(text) {
 
 async function importHistoryFiles(fileList) {
   let total = 0;
-  const counts = { allegro: 0, ceneo: 0 };
+  const counts = { allegro: 0, ceneo: 0, olx: 0 };
   const errors = [];
 
   for (const file of [...fileList]) {
@@ -412,7 +420,7 @@ async function importHistoryFiles(fileList) {
   }
 
   if (total) {
-    showMessage(`Zaimportowano do historii: Allegro ${counts.allegro}, Ceneo ${counts.ceneo}.`, false);
+    showMessage(`Zaimportowano do historii: Allegro ${counts.allegro}, Ceneo ${counts.ceneo}, OLX ${counts.olx}.`, false);
   }
   if (errors.length) showMessage(`Nie udało się zaimportować części plików:\n${errors.join('\n')}`, true);
 }
@@ -469,7 +477,7 @@ els.startCurrentBtn.addEventListener('click', async () => {
     await saveSettings();
     const { tab, provider } = await getActiveMarketplaceTab();
     await startOnTab(tab, provider);
-    showMessage(`Eksport ${providerLabel(provider)} uruchomiony. Drugi serwis możesz uruchomić równolegle na jego karcie.`, false);
+    showMessage(`Eksport ${providerLabel(provider)} uruchomiony. Pozostałe serwisy możesz uruchomić równolegle na ich kartach.`, false);
     await refresh();
   } catch (error) {
     showMessage(error?.message || String(error));
@@ -496,7 +504,7 @@ els.startBothBtn.addEventListener('click', async () => {
       }
     }
 
-    if (!started.length) throw new Error('Otwórz po jednej karcie Allegro i Ceneo z ustawionymi filtrami.');
+    if (!started.length) throw new Error('Otwórz po jednej karcie Allegro, Ceneo lub OLX z ustawionymi filtrami.');
     let message = `Uruchomiono: ${started.join(' + ')}.`;
     if (missing.length) message += ` Brak otwartej karty: ${missing.map(providerLabel).join(', ')}.`;
     if (failures.length) message += ` Błędy: ${failures.join(' | ')}`;
